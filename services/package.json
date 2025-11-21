@@ -1,0 +1,31 @@
+{
+  "name": "ucdlib-ref-stats",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "spelkey@ucdavis.edu",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "client-watch": "cd ./client/build && webpack --config webpack-watch.config.js --watch",
+    "client-build-dev": "cd ./client/build && webpack --config webpack-watch.config.js",
+    "client-build-dist": "cd ./client/build && webpack --config webpack-dist.config.js"
+  },
+  "dependencies": {
+    "@ucd-lib/cork-app-build": "^0.5.0",
+    "@ucd-lib/cork-app-state": "^3.2.0",
+    "@ucd-lib/cork-app-utils": "^6.4.1",
+    "@ucd-lib/cork-icon": "^1.4.2",
+    "@ucd-lib/logger": "^0.0.7",
+    "@ucd-lib/spa-router-middleware": "^0.2.4",
+    "@ucd-lib/theme-elements": "^3.3.2",
+    "@ucd-lib/theme-sass": "^6.0.1",
+    "express": "^5.1.0",
+    "jwt-decode": "^4.0.0",
+    "keycloak-js": "^26.2.1",
+    "lit": "^3.3.1",
+    "pg": "^8.16.3",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

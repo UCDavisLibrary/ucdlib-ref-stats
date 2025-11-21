@@ -1,0 +1,34 @@
+x-variables:
+  main-image: &main-image localhost/local-dev/ucdlib-ref-stats:local-dev
+services:
+  app:
+    image: *main-image
+    env_file:
+      - .env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+      PGUSER: 'postgres'
+      PGHOST: 'db'
+      PGDATABASE: 'postgres'
+      PGPASSWORD: 'localhost'
+      PGPORT: 5432
+    volumes:
+      - ../../../services:/services
+      - /services/node_modules
+    depends_on:
+      - db
+    ports:
+      - ${APP_HOST_PORT:-3000}:${APP_CONTAINER_PORT:-3000}
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: localhost
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ../../../services/pg/schema:/docker-entrypoint-initdb.d
+  adminer:
+    image: adminer:5
+    ports:
+      - ${ADMINER_HOST_PORT:-8080}:8080
+volumes:
+  db-data:
