@@ -45,11 +45,11 @@ COPY services/package-lock.json .
 RUN npm install
 
 # Copy app source code
-# COPY services/lib ./lib
+COPY services/lib ./lib
 COPY services/pg ./pg
 COPY services/client ./client
 
 # Build the client
-# RUN npm run client-build-dist && npm run client-build-dev
+RUN npm run client-build-dist
 
 CMD ["bash", "-c", "tail -f /dev/null"]

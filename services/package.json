@@ -9,7 +9,8 @@
   "scripts": {
     "client-watch": "cd ./client/build && webpack --config webpack-watch.config.js --watch",
     "client-build-dev": "cd ./client/build && webpack --config webpack-watch.config.js",
-    "client-build-dist": "cd ./client/build && webpack --config webpack-dist.config.js"
+    "client-build-dist": "cd ./client/build && webpack --config webpack-dist.config.js",
+    "start-client": "node ./client/index.js"
   },
   "dependencies": {
     "@ucd-lib/cork-app-build": "^0.5.0",

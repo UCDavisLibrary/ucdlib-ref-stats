@@ -10,7 +10,7 @@ class WebpackUtils {
   constructor(){
     this.publicDir = path.join(__dirname, '../public');
     this.root = __dirname;
-    this.entry = path.join(__dirname, '../dev/index.js');
+    this.entry = path.join(__dirname, '../dev/elements/ref-stats-app.js');
     this.bundleName = config.app.bundleName;
     this.clientModules = [];
   }

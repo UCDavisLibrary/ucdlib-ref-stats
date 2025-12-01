@@ -4,8 +4,13 @@ class Config {
     this.app = {
       hostPort: this.getEnv('APP_HOST_PORT', 3000),
       containerPort: this.getEnv('APP_CONTAINER_PORT', 3000),
-      bundleName: this.getEnv('APP_BUNDLE_NAME', 'ucdlib-ref-stats.js')
+      bundleName: this.getEnv('APP_BUNDLE_NAME', 'ucdlib-ref-stats.js'),
+      loggerName: this.getEnv('APP_LOGGER_NAME', 'ucdlib-ref-stats'),
+      isDevEnv: this.getEnv('APP_ENV') === 'dev',
+      bundleVersion: (new Date()).toISOString()
     }
+
+    // todo: if not dev env, read version from cork-build version file
   }
 
   /**
