@@ -13,6 +13,7 @@
     "start-client": "node ./client/index.js"
   },
   "dependencies": {
+    "@formio/js": "^5.2.3",
     "@ucd-lib/cork-app-build": "^0.5.0",
     "@ucd-lib/cork-app-state": "^3.2.0",
     "@ucd-lib/cork-app-utils": "^6.4.1",
@@ -21,6 +22,8 @@
     "@ucd-lib/spa-router-middleware": "^0.2.4",
     "@ucd-lib/theme-elements": "^3.3.2",
     "@ucd-lib/theme-sass": "^6.0.1",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "express": "^5.1.0",
     "jwt-decode": "^4.0.0",
     "keycloak-js": "^26.2.1",
