@@ -15,13 +15,19 @@ import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 // app pages
+import './pages/ref-stats-page-home.js';
 
 // app global components
+import './components/cork-app-dialog-modal.js';
+import './components/cork-app-error.js';
+import './components/cork-app-loader.js';
+import './components/cork-app-toast.js';
 
 // icon elements and model
 import '@ucd-lib/cork-icon';
 
 // cork models
+import '../../../lib/cork/models/AppStateModel.js';
 Registry.ready();
 
 
@@ -46,12 +52,11 @@ export default class RefStatsApp extends Mixin(LitElement)
     this.page = '';
     this._firstAppStateUpdate = false;
 
-    //this._injectModel('AppStateModel');
+    this._injectModel('AppStateModel');
   }
 
   firstUpdated(){
-    //this.AppStateModel.refresh();
-    this._onAppStateUpdate({page: 'home'});
+    this.AppStateModel.refresh();
   }
 
   async _onAppStateUpdate(e) {

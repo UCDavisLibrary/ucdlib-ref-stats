@@ -13,7 +13,15 @@ export function styles() {
 export function render() { 
 return html`
   ${renderHeader.call(this)}
-  <p>hello world</p>
+  <cork-app-loader></cork-app-loader>
+  <cork-app-error></cork-app-error>
+  <cork-app-toast></cork-app-toast>
+  <cork-app-dialog-modal></cork-app-dialog-modal>
+  <ucdlib-pages
+    selected=${this.page}
+    attr-for-selected='page-id'>
+    <ref-stats-page-home page-id='home'></ref-stats-page-home>
+  </ucdlib-pages>
 `;}
 
 function renderHeader(){
