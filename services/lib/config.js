@@ -9,8 +9,13 @@ class Config {
       isDevEnv: this.getEnv('APP_ENV') === 'dev',
       bundleVersion: (new Date()).toISOString()
     }
-
     // todo: if not dev env, read version from cork-build version file
+
+    this.db = {
+      tables: {
+        picklist: 'picklist'
+      }
+    }
   }
 
   /**

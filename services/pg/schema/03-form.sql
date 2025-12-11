@@ -72,7 +72,9 @@ BEGIN
      OR form_id = try_cast_uuid(name_or_id)
   LIMIT 1;
   IF uid IS NULL THEN
-    RAISE EXCEPTION 'Form not found: %', name_or_id;
+    RAISE EXCEPTION USING
+      MESSAGE = format('Form not found: %s', name_or_id),
+      ERRCODE = 'P4040';
   END IF;
   RETURN uid;
 END;

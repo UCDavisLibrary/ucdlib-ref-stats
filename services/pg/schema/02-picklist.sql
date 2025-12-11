@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE TABLE IF NOT EXISTS picklist (
   picklist_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL UNIQUE,
-  label TEXT,
+  label TEXT NOT NULL,
   description TEXT,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now(),
@@ -19,6 +19,10 @@ CREATE INDEX IF NOT EXISTS idx_picklist_active
   ON picklist (name)
   WHERE NOT is_archived;
 
+CREATE INDEX IF NOT EXISTS idx_picklist_label_trgm
+  ON picklist
+  USING GIN (label gin_trgm_ops);
+
 CREATE OR REPLACE FUNCTION get_picklist_id(name_or_id TEXT)
   RETURNS UUID AS $$
 DECLARE
@@ -30,7 +34,9 @@ BEGIN
      OR picklist_id = try_cast_uuid(name_or_id);
 
   IF uid IS NULL THEN
-    RAISE EXCEPTION 'Pick list not found: %', name_or_id;
+    RAISE EXCEPTION USING
+      MESSAGE = format('Picklist not found: %s', name_or_id),
+      ERRCODE = 'P4040';
   END IF;
 
   RETURN uid;

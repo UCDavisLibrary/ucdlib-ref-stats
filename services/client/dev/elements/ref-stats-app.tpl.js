@@ -21,6 +21,8 @@ return html`
     selected=${this.page}
     attr-for-selected='page-id'>
     <ref-stats-page-home page-id='home'></ref-stats-page-home>
+    <ref-stats-page-picklist page-id='picklist'></ref-stats-page-picklist>
+    <ref-stats-page-picklist-single page-id='picklist-single'></ref-stats-page-picklist-single>
   </ucdlib-pages>
 `;}
 
@@ -34,6 +36,13 @@ function renderHeader(){
 
       <ucd-theme-primary-nav>
       </ucd-theme-primary-nav>
+
+      <ucd-theme-quick-links
+        title="Admin"
+        style-modifiers="highlight"
+      >
+        <a href="/picklist">Picklist Management</a>
+      </ucd-theme-quick-links>
     </ucd-theme-header>
   `;
 }

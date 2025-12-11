@@ -28,6 +28,10 @@ class AppStateModelImpl extends AppStateModel {
       update.lastLocation = JSON.parse(JSON.stringify(this.store.data.location));
       let page = update.location.path?.[0] ? update.location.path[0] : 'home';
 
+      if ( page === 'picklist' && update.location.path?.length > 1 ) {
+        page = 'picklist-single';
+      }
+
       update.page = page;
     }
 
@@ -94,6 +98,7 @@ class AppStateModelImpl extends AppStateModel {
    */
   addErrorRequest(req) {
     if ( req.errorSettings?.suppressError ) return;
+    if ( req?.payload?.error?.response?.status == 422 ) return; // validation errors handled by form
     this.errorRequests.push(req);
     if ( this._errorVisible || this._showErrorTimer ) return;
 
@@ -205,7 +210,11 @@ class AppStateModelImpl extends AppStateModel {
    * @param {Boolean} opts.showOnPageLoad - Optional. Wait to show the toast on the next page load event
    */
   showToast(text, opts={}){
-    opts = { text, ...opts };
+    if ( typeof text === 'object' ) {
+      opts = text;
+    } else {
+      opts.text = text;
+    }
     if ( opts.showOnPageLoad ) {
       delete opts.showOnPageLoad;
       this.toastOnPageLoad = opts;

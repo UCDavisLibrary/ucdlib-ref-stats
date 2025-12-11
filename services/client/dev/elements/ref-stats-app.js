@@ -8,6 +8,7 @@ import '../css/index.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-primary-nav/ucd-theme-primary-nav.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-branding-bar/ucdlib-branding-bar.js';
+import '@ucd-lib/theme-elements/brand/ucd-theme-quick-links/ucd-theme-quick-links.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js';
 
@@ -22,12 +23,17 @@ import './components/cork-app-dialog-modal.js';
 import './components/cork-app-error.js';
 import './components/cork-app-loader.js';
 import './components/cork-app-toast.js';
+import './components/cork-field-container.js';
+
+import bundleLoader from '../utils/bundleLoader.js';
 
 // icon elements and model
 import '@ucd-lib/cork-icon';
 
 // cork models
 import '../../../lib/cork/models/AppStateModel.js';
+import '../../../lib/cork/models/PicklistModel.js';
+import '../../../lib/cork/models/ValidationModel.js';
 Registry.ready();
 
 
@@ -67,6 +73,13 @@ export default class RefStatsApp extends Mixin(LitElement)
     }
     this.closeNav();
     const { page, location } = e;
+
+    const bundleLoadedForFirstTime = await bundleLoader.loadForPage(page);
+    if ( bundleLoadedForFirstTime ) {
+      this.AppStateModel.refresh();
+      return;
+    }
+
     this.page = page;
   }
 

@@ -2,7 +2,7 @@ import { html, css } from 'lit';
 
 export function styles() {
   const elementStyles = css`
-    :host {
+    ref-stats-page-home {
       display: block;
     }
   `;

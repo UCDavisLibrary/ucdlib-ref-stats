@@ -6,7 +6,8 @@ export default preload([
     aliases: ['fas'], 
     preload: [
       'plug-circle-exclamation', 'xmark', 'trash',
-      'spinner', 'circle-exclamation', 'upload', 'circle-info', 'plus'
+      'spinner', 'circle-exclamation', 'upload', 'circle-info', 'plus',
+      'check'
     ]
   }, 
   { 
