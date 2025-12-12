@@ -1,6 +1,6 @@
 import {PayloadUtils} from '@ucd-lib/cork-app-utils'
 
-const ID_ORDER = ['action'];
+const ID_ORDER = ['action', 'page', 'per_page'];
 
 let inst = new PayloadUtils({
   idParts: ID_ORDER

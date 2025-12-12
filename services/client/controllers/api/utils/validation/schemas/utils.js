@@ -40,4 +40,35 @@ const urlFriendlyString = z.string().regex(/^[a-z0-9_-]+$/, {
   message: "Must be URL-friendly: lowercase letters, numbers, hyphens, and underscores only."
 });
 
-export { requiredString, requiredNumber, urlFriendlyString };
+const pageParam = z.preprocess(
+  v => {
+    if (v == null || v === '') return 1;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : v;
+  },
+  z.number().int().positive("Page must be a positive integer")
+);
+
+const perPageParam = (defaultValue = 15, maxValue = 50) =>
+  z.preprocess(
+    v => {
+      if (v == null || v === '') return defaultValue;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : v;
+    },
+    z.number()
+      .int()
+      .positive("per_page must be a positive integer")
+      .max(maxValue, `per_page must be ≤ ${maxValue}`)
+  );
+
+const booleanParam = z.preprocess(
+  v => {
+    if (v === 'true') return true;
+    if (v === 'false') return false;
+    return v;
+  },
+  z.boolean().optional()
+);
+
+export { requiredString, requiredNumber, urlFriendlyString, pageParam, perPageParam, booleanParam };

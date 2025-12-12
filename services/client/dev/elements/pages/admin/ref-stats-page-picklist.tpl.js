@@ -1,5 +1,6 @@
 import { html, css } from 'lit';
 import focalLink from '../../templates/focal-link.js';
+import '../../components/ref-stats-picklists.js';
 
 export function styles() {
   const elementStyles = css`
@@ -21,6 +22,7 @@ export function render() {
     <div class="l-container">
       <div class="l-basic--flipped">
         <div class="l-content">
+          <ref-stats-picklists></ref-stats-picklists>
         </div>
         <div class="l-sidebar-second">
           ${focalLink({

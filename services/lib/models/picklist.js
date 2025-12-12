@@ -3,6 +3,48 @@ import config from '../config.js';
 
 class Picklist {
 
+  async query(params={}){
+    const page = params.page || 1;
+    const perPage = params.per_page || 15;
+    const offset = (page - 1) * perPage;
+    
+    const where = [];
+    const values = [];
+
+    if ( params.active_only ) {
+      values.push(false);
+      where.push(`is_archived = $${values.length}`);
+    } else if ( params.archived_only ) {
+      values.push(true);
+      where.push(`is_archived = $${values.length}`);
+    }
+
+    const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
+    const sql = `
+      SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.tables.picklist}
+      ${whereSQL}
+      ORDER BY label ASC
+      LIMIT $${values.length + 1} OFFSET $${values.length + 2}
+    `;
+    const r = await pgClient.query(sql, [...values, perPage, offset]);
+    if ( r.error ) {
+      return r;
+    }
+    const total_count = r.res.rows.length > 0 ? parseInt(r.res.rows[0].total_count) : 0;
+    const results = r.res.rows.map(row => {
+      delete row.total_count;
+      return row;
+    });
+    return { res: {
+      results,
+      offset,
+      per_page: perPage,
+      page,
+      max_page: Math.ceil(total_count / perPage),
+      total_count
+    }};
+  }
+
   /**
    * @description Get a picklist by ID or name
    * @param {String} idOrName - The picklist ID or name
@@ -30,12 +72,11 @@ class Picklist {
     const client = await pgClient.pool.connect();
     try {
       const d = pgClient.prepareObjectForInsert(data);
-      const sql = `INSERT INTO ${config.db.tables.picklist} (${d.keysString}) VALUES (${d.placeholdersString}) RETURNING picklist_id`;
+      const sql = `INSERT INTO ${config.db.tables.picklist} (${d.keysString}) VALUES (${d.placeholdersString}) RETURNING picklist_id, name;`;
       let result = await client.query(sql, d.values);
-      let picklist_id = result.rows[0].picklist_id;
 
       await client.query('COMMIT');
-      return { res: { picklist_id } };
+      return { res: result.rows[0] };
     } catch (error) {
         await client.query('ROLLBACK');
         return { error };

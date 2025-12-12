@@ -1,5 +1,5 @@
 import handleError from "../handleError.js";
-import { picklistCreateSchema } from './schemas/picklist.js';
+import { picklistCreateSchema, picklistQuerySchema } from './schemas/picklist.js';
 
 /**
  * @description Middleware to validate request data against a Zod schema.
@@ -45,6 +45,7 @@ function formatErrorResponse(zodError) {
 
 const schema = {
   picklistCreate: picklistCreateSchema,
+  picklistQuery: picklistQuerySchema
 };
 
 export { validate, schema };

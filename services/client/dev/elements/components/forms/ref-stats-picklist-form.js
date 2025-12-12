@@ -35,6 +35,10 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     this._injectModel('PicklistModel', 'AppStateModel');
   }
 
+  _onAppStateUpdate() {
+    this.payload = {};
+  }
+
   willUpdate(props){
     if ( props.has('picklistId') ) {
       this.ctl.modal.setModalTitle(this.picklistId ? 'Edit Picklist' : 'New Picklist');
@@ -60,9 +64,11 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
 
     if ( r.state === 'loaded' ){
       this.AppStateModel.showToast({text: 'Picklist created successfully', type: 'success'});
-      // 1. refresh app state. 2. go to picklist page
-      // emit event
-      ///this.AppStateModel.refresh();
+      this.dispatchEvent(new CustomEvent('ref-stats-picklist-updated', {
+        detail: { picklist: r.payload, newPicklist: !this.picklistId },
+        bubbles: true,
+        composed: true
+      }));
     }
 
     return r;

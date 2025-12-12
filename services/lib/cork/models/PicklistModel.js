@@ -17,6 +17,10 @@ class PicklistModel extends BaseModel {
     this.inject('ValidationModel');
   }
 
+  async query(query) {
+    return this.service.query(query);
+  }
+
   async create(data) {
     const res = await this.service.create(data);
     this.ValidationModel.notify('picklist', res);

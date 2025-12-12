@@ -32,6 +32,14 @@ export default class RefStatsPagePicklistSingle extends Mixin(LitElement)
     this.picklistId = e.location.path[1] === 'new' ? null : e.location.path[1];
   }
 
+  _onPicklistUpdated(e){
+    if ( e.detail.newPicklist ) {
+      this.AppStateModel.setLocation('/picklist')
+    } else {
+      this.AppStateModel.refresh();
+    }
+  }
+
 }
 
 customElements.define('ref-stats-page-picklist-single', RefStatsPagePicklistSingle);

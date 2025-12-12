@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { requiredString, urlFriendlyString } from "./utils.js";
+import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam } from "./utils.js";
 import models from '../../../../../../lib/models/index.js';
 
 const picklistBaseSchema = z.object({
@@ -19,7 +19,7 @@ const picklistCreateSchema = picklistBaseSchema.extend({
       if (existing.res) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Picklist with this name already exists',
+          message: 'A picklist with this name already exists',
           path: [] 
         });
       }
@@ -27,4 +27,19 @@ const picklistCreateSchema = picklistBaseSchema.extend({
   label: requiredString().pipe(z.string().max(250))
 });
 
-export { picklistBaseSchema, picklistCreateSchema };
+const picklistQuerySchema = z.object({
+  page: pageParam,
+  per_page: perPageParam(15),
+  active: z.preprocess(
+    v => {
+      if (v === 'true') return true;
+      if (v === 'false') return false;
+      return v;
+    },
+    z.union([z.literal(true), z.literal(false)]).optional()
+  ),
+  archived_only: booleanParam,
+  active_only: booleanParam
+});
+
+export { picklistBaseSchema, picklistCreateSchema, picklistQuerySchema };

@@ -20,7 +20,10 @@ export function render() {
       <li>${pageTitle}</li>
     </ol>
     <div class="l-container l-container--narrow l-container--narrow-desktop">
-      <ref-stats-picklist-form .picklistId=${this.picklistId}></ref-stats-picklist-form>
+      <ref-stats-picklist-form 
+        .picklistId=${this.picklistId}
+        @ref-stats-picklist-updated=${this._onPicklistUpdated}
+        ></ref-stats-picklist-form>
     </div>
   `;
 }

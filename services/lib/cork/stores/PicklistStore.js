@@ -7,7 +7,8 @@ class PicklistStore extends BaseStore {
     super();
 
     this.data = {
-      create: new LruStore({name: 'picklist.create'})
+      create: new LruStore({name: 'picklist.create'}),
+      query: new LruStore({name: 'picklist.query'})
     };
     this.events = {};
   }
