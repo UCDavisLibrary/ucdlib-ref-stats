@@ -41,6 +41,30 @@ class PicklistService extends BaseService {
     return store.get(id);
   }
 
+  async get(id){
+    const store = this.store.data.get;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to get picklist'}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}/${id}`,
+        checkCached : () => store.get(id),
+        onUpdate : resp => this.store.set(
+          {...resp, id},
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+
+    return store.get(id);
+  }
+
   async create(data){
     let id = digest(data);
     const store = this.store.data.create;
@@ -66,6 +90,60 @@ class PicklistService extends BaseService {
         )
       })
     );
+    return store.get(id);
+  }
+
+  async patch(id, data){
+    let storeId = digest({id, data});
+    const store = this.store.data.patch;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to update picklist'}
+    };
+
+    await this.checkRequesting(
+      storeId, store,
+      () => this.request({
+        url : `${this.baseUrl}/${id}`,
+        json: true,
+        fetchOptions: { 
+          method: 'PATCH',
+          body: data
+        },
+        onUpdate : resp => this.store.set(
+          {...resp, id: storeId},
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+    return store.get(storeId);
+  }
+
+  async delete(id){
+    const store = this.store.data.delete;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to delete picklist'}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}/${id}`,
+        fetchOptions: { 
+          method: 'DELETE'
+        },
+        onUpdate : resp => this.store.set(
+          {...resp, id},
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+
     return store.get(id);
   }
 }

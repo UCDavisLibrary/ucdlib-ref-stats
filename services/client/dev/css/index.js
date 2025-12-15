@@ -39,6 +39,40 @@ const styles = `
     color: var(--ucd-black-60);
     margin-top: 0.25rem;
   }
+  input[disabled],
+  textarea[disabled] {
+    background-color: #f0f0f0;
+  }
+  .ucd-link-list-item {
+    display: flex;
+    gap: .25rem;
+  }
+  .ucd-link-list-item + .ucd-link-list-item {
+    margin-top: 1rem;
+  }
+  .ucd-link-list-item .ucd-link-list-item--title {
+    display: inline-block;
+    color: var(--ucd-blue-80, #13639E);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.6rem;
+  }
+  .ucd-link-list-item .ucd-link-list-item--title:hover {
+    text-decoration: underline;
+  }
+  .ucd-link-list-item .ucd-link-list-item--icon {
+    color: var(--category-brand, #73abdd);
+    --cork-icon-size: 1rem;
+    margin-top: 0.3rem;
+  }
+  .ucd-link-list-item .ucd-link-list-item--excerpt {
+    display: block;
+    color: var(--ucd-black-70, #4C4C4C);
+    font-size: .875rem;
+    line-height: 1.3rem;
+    font-weight: 400;
+  }
 
   ${sharedStyles}
   ${brandCssProps}

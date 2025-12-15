@@ -7,7 +7,7 @@ export default preload([
     preload: [
       'plug-circle-exclamation', 'xmark', 'trash',
       'spinner', 'circle-exclamation', 'upload', 'circle-info', 'plus',
-      'check'
+      'check', 'circle-chevron-right'
     ]
   }, 
   { 

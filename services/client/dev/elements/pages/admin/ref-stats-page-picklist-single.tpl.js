@@ -11,7 +11,7 @@ export function styles() {
 }
 
 export function render() {
-  const pageTitle = this.picklistId ? this.picklistId : 'New Picklist'; 
+  const pageTitle = this.data?.label || 'New Picklist'; 
   return html`
     <div><h1 class="page-title">${pageTitle}</h1></div>
     <ol class="breadcrumbs">
@@ -21,7 +21,7 @@ export function render() {
     </ol>
     <div class="l-container l-container--narrow l-container--narrow-desktop">
       <ref-stats-picklist-form 
-        .picklistId=${this.picklistId}
+        .picklistIdOrName=${this.picklistId}
         @ref-stats-picklist-updated=${this._onPicklistUpdated}
         ></ref-stats-picklist-form>
     </div>

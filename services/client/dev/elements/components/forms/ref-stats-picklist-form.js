@@ -5,6 +5,7 @@ import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 import ModalFormController from '../../../controllers/ModalFormController.js';
+import AppComponentController from '../../../controllers/AppComponentController.js';
 import IdGenerator from '../../../utils/IdGenerator.js';
 import textUtils from '../../../../../lib/textUtils.js';
 
@@ -13,7 +14,7 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
 
   static get properties() {
     return {
-      picklistId: {type: String},
+      picklistIdOrName: {type: String},
       payload: {type: Object }
     }
   }
@@ -25,26 +26,51 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
   constructor() {
     super();
     this.render = render.bind(this);
-    this.picklistId = null;
+    this.picklistIdOrName = null;
 
     this.ctl = {
       modal : new ModalFormController(this, {submitCallback: '_onSubmitClick'}),
-      idGen : new IdGenerator()
+      appComponent : new AppComponentController(this),
+      idGen : new IdGenerator(),
+
     }
 
     this._injectModel('PicklistModel', 'AppStateModel');
   }
 
-  _onAppStateUpdate() {
-    this.payload = {};
+  _onAppStateUpdate(e) {
+    if ( !this.ctl.appComponent.isOnActivePage ) return;
+
+    // reset form to initial state if returning to same picklist
+    // (willUpdate does not get called if property value does not change)
+    const nameOrId = e.location.path[1] === 'new' ? null : e.location.path[1];
+    if ( nameOrId === this.picklistIdOrName )  {
+      this.getData();
+    }
+  }
+
+  _onAppDialogOpen() {
+    if ( this.ctl.modal.modal ) {
+      this.getData();
+    }
   }
 
   willUpdate(props){
-    if ( props.has('picklistId') ) {
-      this.ctl.modal.setModalTitle(this.picklistId ? 'Edit Picklist' : 'New Picklist');
-      this.ctl.modal.setModalSubmitButton(this.picklistId ? 'Save Changes' : 'Create Picklist');
+    if ( props.has('picklistIdOrName') ) {
+      this.ctl.modal.setModalTitle(this.picklistIdOrName ? 'Edit Picklist' : 'New Picklist');
+      this.ctl.modal.setModalSubmitButton(this.picklistIdOrName ? 'Save Changes' : 'Create Picklist');
 
-      this.payload = {};
+      this.getData();
+    }
+  }
+
+  async getData(){
+    this.payload = {};
+    if ( !this.picklistIdOrName ) return;
+
+    const res = await this.PicklistModel.get(this.picklistIdOrName);
+    if ( res?.state === 'loaded' ) {
+      this.payload = {...res.payload};
     }
   }
 
@@ -57,15 +83,44 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     }
   }
 
+  _onDeleteRequest(){
+    this.AppStateModel.showDialogModal({
+      title: 'Delete Picklist',
+      content: () => `Are you sure you want to delete this picklist? All data associated with this picklist will be lost. This action cannot be undone.`,
+      actions: [
+        {text: 'Close', value: 'dismiss', invert: true, color: 'secondary'},
+        { text: 'Delete', color: 'double-decker', value: 'picklist-delete' }
+      ]
+    })
+  }
+
+  async _onAppDialogAction(e){
+    if ( e.action.value !== 'picklist-delete' ) return;
+    const res = await this.PicklistModel.delete(this.picklistIdOrName);
+    if ( res?.state === 'loaded' ) {
+      this.AppStateModel.showToast({text: 'Picklist deleted successfully', type: 'success'});
+      this.dispatchEvent(new CustomEvent('ref-stats-picklist-updated', {
+        detail: { picklist: res.payload, deleted: true },
+        bubbles: true,
+        composed: true
+      }));
+    }
+  }
+
   async _onSubmitClick(){
-    console.log('submit picklist form', this.picklistId, this.payload);
-    const r = await this.PicklistModel.create(this.payload);
+    let r;
+    if ( this.picklistIdOrName ) {
+      r = await this.PicklistModel.patch(this.picklistIdOrName, this.payload);
+    } else {
+      r = await this.PicklistModel.create(this.payload);
+    }
     if ( r?.payload?.error?.response?.status == 422 ) return r;
 
     if ( r.state === 'loaded' ){
-      this.AppStateModel.showToast({text: 'Picklist created successfully', type: 'success'});
+      const toastText = this.picklistIdOrName ? 'Picklist updated successfully' : 'Picklist created successfully';
+      this.AppStateModel.showToast({text: toastText, type: 'success'});
       this.dispatchEvent(new CustomEvent('ref-stats-picklist-updated', {
-        detail: { picklist: r.payload, newPicklist: !this.picklistId },
+        detail: { picklist: r.payload, newPicklist: !this.picklistIdOrName },
         bubbles: true,
         composed: true
       }));

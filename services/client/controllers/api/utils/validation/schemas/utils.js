@@ -5,11 +5,18 @@ import * as z from "zod";
  * @param {String} msg - The validation message to return. Default: 'Required'
  * @returns
  */
-const requiredString = (msg = 'Required') =>
+export const requiredString = (msg = 'Required') =>
   z.preprocess(
     v => (v == null ? '' : v),
     z.string().trim().min(1, msg)
   );
+
+export const toString = z.preprocess(
+  v => {
+    if (v == null ) return '';
+    return String(v);
+  }, z.string()
+);
 
 /**
  * @description Validates a value as a required number, allowing string inputs with commas and decimal points
@@ -19,7 +26,7 @@ const requiredString = (msg = 'Required') =>
  * @param {String} messages.nan - The "not a number" validation message. Default: "Must be a number"
  * @returns
  */
-const requiredNumber = (
+export const requiredNumber = (
   messages = { required: "Required", nan: "Must be a number" }
   ) =>
   z.preprocess(
@@ -36,11 +43,11 @@ const requiredNumber = (
       .transform(v => Number(v.replace(/,/g, '')))
   );
 
-const urlFriendlyString = z.string().regex(/^[a-z0-9_-]+$/, {
+export const urlFriendlyString = z.string().regex(/^[a-z0-9_-]+$/, {
   message: "Must be URL-friendly: lowercase letters, numbers, hyphens, and underscores only."
 });
 
-const pageParam = z.preprocess(
+export const pageParam = z.preprocess(
   v => {
     if (v == null || v === '') return 1;
     const n = Number(v);
@@ -49,7 +56,7 @@ const pageParam = z.preprocess(
   z.number().int().positive("Page must be a positive integer")
 );
 
-const perPageParam = (defaultValue = 15, maxValue = 50) =>
+export const perPageParam = (defaultValue = 15, maxValue = 50) =>
   z.preprocess(
     v => {
       if (v == null || v === '') return defaultValue;
@@ -62,7 +69,7 @@ const perPageParam = (defaultValue = 15, maxValue = 50) =>
       .max(maxValue, `per_page must be ≤ ${maxValue}`)
   );
 
-const booleanParam = z.preprocess(
+export const booleanParam = z.preprocess(
   v => {
     if (v === 'true') return true;
     if (v === 'false') return false;
@@ -70,5 +77,3 @@ const booleanParam = z.preprocess(
   },
   z.boolean().optional()
 );
-
-export { requiredString, requiredNumber, urlFriendlyString, pageParam, perPageParam, booleanParam };

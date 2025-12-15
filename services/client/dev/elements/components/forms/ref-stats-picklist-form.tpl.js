@@ -13,6 +13,8 @@ export function styles() {
 }
 
 export function render() { 
+  const isNew = !this.picklistIdOrName;
+  const isEdit = !!this.picklistIdOrName;
   return html`
     <form @submit="${this._onSubmit}" novalidate>
       <cork-field-container schema='picklist' path='label' class='field-container'>
@@ -20,7 +22,6 @@ export function render() {
         <input 
           type="text" 
           id=${this.ctl.idGen.get('label')} 
-          name="label" 
           .value=${this.payload?.label || ''}
           required 
           @input=${e => this._onPayloadInput('label', e.target.value)}>
@@ -30,25 +31,34 @@ export function render() {
         <input 
           type="text" 
           id=${this.ctl.idGen.get('name')} 
-          name="name" 
+          ?disabled=${isEdit}
           .value=${this.payload?.name || ''}
           required @input=${e => this._onPayloadInput('name', e.target.value)}>
         <div class='field-description'>
-          The name should be URL-friendly: all lowercase and contains only letters, numbers, and hyphens.
-          <b>Once saved, the name cannot be changed.</b>
+          <span ?hidden=${isEdit}>The name should be URL-friendly: all lowercase and contains only letters, numbers, and hyphens.
+          <b>Once saved, the name cannot be changed.</b></span>
+          <span ?hidden=${isNew}>The name cannot be changed.</span>
         </div>
       </cork-field-container>
       <cork-field-container schema='picklist' path='description' class='field-container'>
         <label for=${this.ctl.idGen.get('description')}>Description</label>
         <textarea 
           id=${this.ctl.idGen.get('description')} 
-          name="description" 
           .value=${this.payload?.description || ''}
           rows="4"
           @input=${e => this._onPayloadInput('description', e.target.value)}></textarea>
       </cork-field-container>
+      <cork-field-container schema='picklist' path='is_archived' class='field-container checkbox' ?hidden=${isNew}>
+        <input 
+          type="checkbox" 
+          id=${this.ctl.idGen.get('is_archived')} 
+          .checked=${this.payload?.is_archived || false}
+          @input=${() => this._onPayloadInput('is_archived', !this.payload?.is_archived)}>
+        <label for=${this.ctl.idGen.get('is_archived')}>Archived</label>
+      </cork-field-container>
       <div ?hidden=${this.ctl.modal.modal}>
-        <button type="submit" class='btn btn--primary'>${this.picklistId ? 'Save Changes' : 'Create Picklist'}</button>
+        <button type="submit" class='btn btn--primary'>${isEdit ? 'Save Changes' : 'Create Picklist'}</button>
+        <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest}>Delete</button>
       </div>
     </form>
   `;

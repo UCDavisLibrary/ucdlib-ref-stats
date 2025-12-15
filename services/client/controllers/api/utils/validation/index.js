@@ -1,5 +1,10 @@
 import handleError from "../handleError.js";
-import { picklistCreateSchema, picklistQuerySchema } from './schemas/picklist.js';
+import { 
+  picklistCreateSchema, 
+  picklistQuerySchema, 
+  picklistUpdateSchema,
+  picklistIdOrNameSchema
+} from './schemas/picklist.js';
 
 /**
  * @description Middleware to validate request data against a Zod schema.
@@ -7,6 +12,8 @@ import { picklistCreateSchema, picklistQuerySchema } from './schemas/picklist.js
  * On success, attaches validated data to req.validated.
  * @param {*} schema - A Zod schema
  * @param {*} opts - Options for validation
+ * @param {Array} opts.reqParts - Array of request parts to validate (e.g., ['body', 'query']). If not provided, all parts are combined.
+ * @param {String} opts.outputKey - Key to attach validated data to on req object. Defaults to 'payload'.
  * @returns
  */
 function validate(schema, opts={}) {
@@ -22,7 +29,7 @@ function validate(schema, opts={}) {
       }
       const parse = await schema.safeParseAsync(input);
       if (parse.success) {
-        req.payload = parse.data;
+        req[opts.outputKey || 'payload'] = parse.data;
         return next();
       }
 
@@ -45,7 +52,9 @@ function formatErrorResponse(zodError) {
 
 const schema = {
   picklistCreate: picklistCreateSchema,
-  picklistQuery: picklistQuerySchema
+  picklistQuery: picklistQuerySchema,
+  picklistUpdate: picklistUpdateSchema,
+  picklistIdOrNameSchema: picklistIdOrNameSchema
 };
 
 export { validate, schema };

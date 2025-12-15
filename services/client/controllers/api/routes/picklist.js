@@ -20,6 +20,47 @@ router.get('/', validate(schema.picklistQuery, {reqParts: ['query']}), async (re
   }
 });
 
+router.get('/:idOrName', async (req, res) => {
+  try {
+    const r = await models.picklist.get(req.params.idOrName, { errorOnMissing: true });
+    if (r.error) {
+      throw r.error;
+    }
+    logger.info('Picklist get successful', {corkTraceId: req.corkTraceId, picklistId: r.res.picklist_id});
+    res.status(200).json(r.res);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
+router.patch('/:idOrName', json(), validate(schema.picklistIdOrNameSchema, {reqParts: ['params']}), validate(schema.picklistUpdate, {reqParts: ['body']}), async (req, res) => {
+  try {
+    logger.info('Picklist update validated', {corkTraceId: req.corkTraceId, picklistIdOrName: req.params.idOrName});
+    const r = await models.picklist.patch(req.params.idOrName, req.payload);
+    if (r.error) {
+      throw r.error;
+    }
+    logger.info('Picklist update successful', {corkTraceId: req.corkTraceId, picklistId: r.res.picklist_id});
+    res.status(200).json(r.res);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
+router.delete('/:idOrName', validate(schema.picklistIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
+  try {
+    logger.info('Picklist delete validated', {corkTraceId: req.corkTraceId, picklistIdOrName: req.params.idOrName});
+    const r = await models.picklist.delete(req.params.idOrName);
+    if (r.error) {
+      throw r.error;
+    }
+    logger.info('Picklist delete successful', {corkTraceId: req.corkTraceId, picklistId: r.res.picklist_id});
+    res.status(200).json(r.res);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
 // create picklist
 router.post('/', json(), validate(schema.picklistCreate, {reqParts: ['body']}), async (req, res) => {
   try {

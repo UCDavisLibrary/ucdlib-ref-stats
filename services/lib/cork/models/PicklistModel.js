@@ -21,9 +21,30 @@ class PicklistModel extends BaseModel {
     return this.service.query(query);
   }
 
+  async get(id) {
+    return this.service.get(id);
+  }
+
   async create(data) {
     const res = await this.service.create(data);
     this.ValidationModel.notify('picklist', res);
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  async patch(id, data) {
+    const res = await this.service.patch(id, data);
+    this.ValidationModel.notify('picklist', res);
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  async delete(id) {
+    const res = await this.service.delete(id);
     if ( res.state === 'loaded' ) {
       clearCache();
     }

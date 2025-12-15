@@ -5,27 +5,6 @@ export function styles() {
     ref-stats-picklists {
       display: block;
     }
-    ref-stats-picklists .picklist-item {
-      margin-bottom: 1.5rem;
-    }
-    ref-stats-picklists .picklist-label {
-      display: inline-block;
-      text-decoration: none;
-      margin-bottom: 0;
-    }
-    ref-stats-picklists .picklist-name {
-      font-weight: bold;
-      color: var(--ucd-black-70);
-      font-size: 1rem;
-      margin-bottom: .5rem;
-    }
-    ref-stats-picklists .picklist-label:hover {
-      text-decoration: underline;
-      color: inherit;
-    }
-    ref-stats-picklists .picklist-description {
-      color: var(--ucdlib-color-gray-dark);
-    }
   `;
 
   return [elementStyles];
@@ -37,10 +16,16 @@ return html`
     <div ?hidden=${this.picklists.length} class='alert'>No picklists found</div>
     <div ?hidden=${!this.picklists.length}>
       ${this.picklists.map(picklist => html`
-        <div class='picklist-item'>
-          <a class='picklist-label h4' href='/picklist/${picklist.name}'>${picklist.label}</a>
-          <div class='picklist-name'>${picklist.name}</div>
-          <div class='picklist-description' ?hidden=${!picklist.description}>${picklist.description || ''}</div>
+        <div class='ucd-link-list-item'>
+          <cork-icon icon='fas.circle-chevron-right' class='ucd-link-list-item--icon'></cork-icon>
+          <div>
+            <a href='/picklist/${picklist.name}' class='ucd-link-list-item--title'>${picklist.label} <span ?hidden=${!picklist.is_archived}>(Archived)</span></a>
+            <div class='ucd-link-list-item--excerpt'>
+              <span>${picklist.name}</span>
+              <span ?hidden=${!picklist.description}> | </span>
+              <span ?hidden=${!picklist.description}>${picklist.description}</span>
+            </div>
+          </div>
         </div>
       `)}
       <ucd-theme-pagination

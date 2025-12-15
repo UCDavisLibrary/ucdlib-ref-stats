@@ -84,6 +84,32 @@ class Picklist {
       client.release();
     }
   }
+
+  async patch(idOrName, data){
+    const client = await pgClient.pool.connect();
+    try {
+      const d = pgClient.prepareObjectForUpdate(data);
+      const sql = `UPDATE ${config.db.tables.picklist} SET ${d.sql} WHERE picklist_id = get_picklist_id($${d.values.length + 1}) RETURNING picklist_id, name;`;
+      let result = await client.query(sql, [...d.values, idOrName]);
+
+      await client.query('COMMIT');
+      return { res: result.rows[0] };
+    } catch (error) {
+        await client.query('ROLLBACK');
+        return { error };
+    } finally {
+      client.release();
+    }
+  }
+
+  async delete(idOrName){
+    const sql = `DELETE FROM ${config.db.tables.picklist} WHERE picklist_id = get_picklist_id($1) RETURNING picklist_id, name;`;
+    const r = await pgClient.query(sql, [idOrName]);
+    if ( r.error ) {
+      return r;
+    }
+    return { res: r.res.rows[0] || null };
+  }
 }
 
 export default new Picklist();
