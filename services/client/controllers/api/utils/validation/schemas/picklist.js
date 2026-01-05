@@ -8,6 +8,13 @@ const picklistBaseSchema = z.object({
   is_archived: z.boolean().optional()
 });
 
+const picklistItemSchema = z.object({
+  label: requiredString().pipe(z.string().max(250)),
+  value: requiredString().pipe(z.string().max(250)),
+  is_archived: z.boolean().optional(),
+  sort_order: z.coerce.number().int().nonnegative().optional()
+});
+
 const picklistCreateSchema = picklistBaseSchema.extend({
   name: requiredString()
     .pipe(urlFriendlyString.max(250))
@@ -25,10 +32,17 @@ const picklistCreateSchema = picklistBaseSchema.extend({
           path: [] 
         });
       }
-    })
+    }),
+  items: z.array(picklistItemSchema).optional()
 });
 
-const picklistUpdateSchema = picklistBaseSchema.partial();
+const picklistItemUpdateSchema = picklistItemSchema.partial().extend({
+  picklist_item_id: z.string().uuid().optional()
+});
+
+const picklistUpdateSchema = picklistBaseSchema.partial().extend({
+  items: z.array(picklistItemUpdateSchema).optional()
+});
 
 const picklistIdOrNameSchema = z.object({
   idOrName: requiredString()

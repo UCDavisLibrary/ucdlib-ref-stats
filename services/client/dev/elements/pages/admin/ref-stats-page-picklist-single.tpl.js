@@ -1,4 +1,5 @@
 import { html, css } from 'lit';
+import '../../components/forms/ref-stats-picklist-form.js';
 
 export function styles() {
   const elementStyles = css`

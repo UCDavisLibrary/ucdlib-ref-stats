@@ -65,6 +65,9 @@ export default class CorkFieldContainer extends Mixin(LitElement)
   willUpdate(props){
     if ( props.has('errors') ){
       this.invalid = !!this.errors.length;
+      if ( this.invalid ) {
+        this.dispatchEvent(new CustomEvent('cork-field-invalid', { detail: { errors: this.errors, schema: this.schema, path: this.path }, bubbles: true, composed: true }));
+      }
       this.updateAriaAttributes();
     }
   }

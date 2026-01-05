@@ -31,8 +31,7 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     this.ctl = {
       modal : new ModalFormController(this, {submitCallback: '_onSubmitClick'}),
       appComponent : new AppComponentController(this),
-      idGen : new IdGenerator(),
-
+      idGen : new IdGenerator()
     }
 
     this._injectModel('PicklistModel', 'AppStateModel');
@@ -109,10 +108,20 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
 
   async _onSubmitClick(){
     let r;
+    let payload = {...this.payload};
+
+    // gather picklist items from child component
+    let picklistItems = this.renderRoot.querySelector('ref-stats-picklist-items-form')?._items || [];
+    picklistItems = picklistItems
+      .filter( item => item.edited )
+      .filter( item => (item.item.label || item.item.value) || item.item.picklist_item_id )
+      .map( item => item.item );
+    payload.items = picklistItems;
+
     if ( this.picklistIdOrName ) {
-      r = await this.PicklistModel.patch(this.picklistIdOrName, this.payload);
+      r = await this.PicklistModel.patch(this.picklistIdOrName, payload);
     } else {
-      r = await this.PicklistModel.create(this.payload);
+      r = await this.PicklistModel.create(payload);
     }
     if ( r?.payload?.error?.response?.status == 422 ) return r;
 

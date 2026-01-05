@@ -1,4 +1,5 @@
 import { html, css } from 'lit';
+import './ref-stats-picklist-items-form.js';
 
 export function styles() {
   const elementStyles = css`
@@ -6,6 +7,9 @@ export function styles() {
       display: block;
       max-width: 500px;
       margin: 0 auto;
+    }
+    ref-stats-picklist-form ref-stats-picklist-items-form {
+      margin-bottom: 3rem;
     }
   `;
 
@@ -33,7 +37,8 @@ export function render() {
           id=${this.ctl.idGen.get('name')} 
           ?disabled=${isEdit}
           .value=${this.payload?.name || ''}
-          required @input=${e => this._onPayloadInput('name', e.target.value)}>
+          required 
+          @input=${e => this._onPayloadInput('name', e.target.value)}>
         <div class='field-description'>
           <span ?hidden=${isEdit}>The name should be URL-friendly: all lowercase and contains only letters, numbers, and hyphens.
           <b>Once saved, the name cannot be changed.</b></span>
@@ -56,6 +61,7 @@ export function render() {
           @input=${() => this._onPayloadInput('is_archived', !this.payload?.is_archived)}>
         <label for=${this.ctl.idGen.get('is_archived')}>Archived</label>
       </cork-field-container>
+      <ref-stats-picklist-items-form .items=${this.payload?.items || []}></ref-stats-picklist-items-form>
       <div ?hidden=${this.ctl.modal.modal}>
         <button type="submit" class='btn btn--primary'>${isEdit ? 'Save Changes' : 'Create Picklist'}</button>
         <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest}>Delete</button>
