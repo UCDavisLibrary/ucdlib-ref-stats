@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString } from "./utils.js";
-import models from '../../../../../../lib/models/index.js';
+import models from '#models';
 
 const picklistBaseSchema = z.object({
   description: toString.pipe(z.string().max(300)).optional(),
@@ -12,7 +12,9 @@ const picklistItemSchema = z.object({
   label: requiredString().pipe(z.string().max(250)),
   value: requiredString().pipe(z.string().max(250)),
   is_archived: z.boolean().optional(),
-  sort_order: z.coerce.number().int().nonnegative().optional()
+  sort_order: z.coerce.number().int().nonnegative().optional(),
+  include_segment: z.array(z.string().max(250)).optional(),
+  exclude_segment: z.array(z.string().max(250)).optional()
 });
 
 const picklistCreateSchema = picklistBaseSchema.extend({
@@ -68,14 +70,6 @@ const picklistIdOrNameSchema = z.object({
 const picklistQuerySchema = z.object({
   page: pageParam,
   per_page: perPageParam(15),
-  active: z.preprocess(
-    v => {
-      if (v === 'true') return true;
-      if (v === 'false') return false;
-      return v;
-    },
-    z.union([z.literal(true), z.literal(false)]).optional()
-  ),
   archived_only: booleanParam,
   active_only: booleanParam
 });

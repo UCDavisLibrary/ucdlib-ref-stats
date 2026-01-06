@@ -27,6 +27,9 @@ router.get('/:idOrName', async (req, res) => {
       throw r.error;
     }
     logger.info('Picklist get successful', {corkTraceId: req.corkTraceId, picklistId: r.res.picklist_id});
+    if ( !req.query.include_items ) {
+      delete r.res.items;
+    }
     res.status(200).json(r.res);
   } catch (e) {
     return handleError(res, req, e);

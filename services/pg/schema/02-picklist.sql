@@ -123,3 +123,31 @@ AS $$
     pi.sort_order,
     pi.label;
 $$;
+
+CREATE OR REPLACE VIEW picklist_with_items AS
+SELECT
+  p.picklist_id,
+  p.name,
+  p.label,
+  p.description,
+  p.created_at,
+  p.updated_at,
+  p.is_archived,
+
+  COALESCE(
+    jsonb_agg(to_jsonb(pi) ORDER BY pi.sort_order, pi.label)
+      FILTER (WHERE pi.picklist_item_id IS NOT NULL),
+    '[]'::jsonb
+  ) AS items
+
+FROM picklist p
+LEFT JOIN picklist_item pi
+  ON pi.picklist_id = p.picklist_id
+GROUP BY
+  p.picklist_id,
+  p.name,
+  p.label,
+  p.description,
+  p.created_at,
+  p.updated_at,
+  p.is_archived;

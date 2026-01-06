@@ -31,9 +31,9 @@ import bundleLoader from '../utils/bundleLoader.js';
 import '@ucd-lib/cork-icon';
 
 // cork models
-import '../../../lib/cork/models/AppStateModel.js';
-import '../../../lib/cork/models/PicklistModel.js';
-import '../../../lib/cork/models/ValidationModel.js';
+import '#lib/cork/models/AppStateModel.js';
+import '#lib/cork/models/PicklistModel.js';
+import '#lib/cork/models/ValidationModel.js';
 Registry.ready();
 
 

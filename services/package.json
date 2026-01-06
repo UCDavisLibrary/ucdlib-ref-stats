@@ -6,6 +6,10 @@
   "author": "spelkey@ucdavis.edu",
   "type": "module",
   "main": "index.js",
+  "imports": {
+    "#models": "./lib/models/index.js",
+    "#lib/*": "./lib/*"
+  },
   "scripts": {
     "client-watch": "cd ./client/build && webpack --config webpack-watch.config.js --watch",
     "client-build-dev": "cd ./client/build && webpack --config webpack-watch.config.js",

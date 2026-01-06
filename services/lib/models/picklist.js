@@ -54,7 +54,7 @@ class Picklist {
    */
   async get(idOrName, opts={}){
     const sql = `
-      SELECT * FROM ${config.db.tables.picklist}
+      SELECT * FROM ${config.db.views.picklistWithItems}
       WHERE picklist_id = get_picklist_id($1)
       `;
     const r = await pgClient.query(sql, [idOrName]);
@@ -71,9 +71,28 @@ class Picklist {
   async create(data){
     const client = await pgClient.pool.connect();
     try {
+      await client.query('BEGIN');
+      const items = data.items;
+      delete data.items;
+
       const d = pgClient.prepareObjectForInsert(data);
       const sql = `INSERT INTO ${config.db.tables.picklist} (${d.keysString}) VALUES (${d.placeholdersString}) RETURNING picklist_id, name;`;
       let result = await client.query(sql, d.values);
+      const picklistId = result.rows[0].picklist_id;
+
+      if ( items?.length ) {
+        for ( let i = 0; i < items.length; i++ ) {
+          const item = items[i];
+          const itemData = {
+            ...item,
+            picklist_id: picklistId,
+            sort_order: item.sort_order || i
+          };
+          const itemD = pgClient.prepareObjectForInsert(itemData);
+          const itemSql = `INSERT INTO ${config.db.tables.picklistItem} (${itemD.keysString}) VALUES (${itemD.placeholdersString});`;
+          await client.query(itemSql, itemD.values);
+        }
+      }
 
       await client.query('COMMIT');
       return { res: result.rows[0] };
@@ -88,9 +107,34 @@ class Picklist {
   async patch(idOrName, data){
     const client = await pgClient.pool.connect();
     try {
+      await client.query('BEGIN');
+      const items = Array.isArray(data.items) ? data.items : [];
+      delete data.items;
+
       const d = pgClient.prepareObjectForUpdate(data);
       const sql = `UPDATE ${config.db.tables.picklist} SET ${d.sql} WHERE picklist_id = get_picklist_id($${d.values.length + 1}) RETURNING picklist_id, name;`;
       let result = await client.query(sql, [...d.values, idOrName]);
+      const picklistId = result.rows[0].picklist_id;
+
+      for ( const item of items ) {
+        if ( item.picklist_item_id ) {
+          // existing item
+          const itemData = { ...item };
+          delete itemData.picklist_item_id;
+          const itemD = pgClient.prepareObjectForUpdate(itemData, { preserveArrays: true });
+          const itemSql = `UPDATE ${config.db.tables.picklistItem} SET ${itemD.sql} WHERE picklist_item_id = $${itemD.values.length + 1};`;
+          await client.query(itemSql, [...itemD.values, item.picklist_item_id]);
+        } else {
+          // new item
+          const itemData = {
+            ...item,
+            picklist_id: picklistId
+          };
+          const itemD = pgClient.prepareObjectForInsert(itemData);
+          const itemSql = `INSERT INTO ${config.db.tables.picklistItem} (${itemD.keysString}) VALUES (${itemD.placeholdersString});`;
+          await client.query(itemSql, itemD.values);
+        }
+      }
 
       await client.query('COMMIT');
       return { res: result.rows[0] };

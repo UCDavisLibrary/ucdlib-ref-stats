@@ -41,7 +41,9 @@ class PicklistService extends BaseService {
     return store.get(id);
   }
 
-  async get(id){
+  async get(picklistId, opts={}){
+    const ido = { ...opts, picklistId };
+    const id = payload.getKey(ido);
     const store = this.store.data.get;
 
     const appStateOptions = {
@@ -51,10 +53,11 @@ class PicklistService extends BaseService {
     await this.checkRequesting(
       id, store,
       () => this.request({
-        url : `${this.baseUrl}/${id}`,
+        url : `${this.baseUrl}/${picklistId}`,
+        qs: opts,
         checkCached : () => store.get(id),
         onUpdate : resp => this.store.set(
-          {...resp, id},
+          payload.generate(ido, resp),
           store,
           null,
           appStateOptions

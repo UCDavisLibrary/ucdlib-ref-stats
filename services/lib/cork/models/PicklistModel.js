@@ -21,8 +21,8 @@ class PicklistModel extends BaseModel {
     return this.service.query(query);
   }
 
-  async get(id) {
-    return this.service.get(id);
+  async get(id, opts={}) {
+    return this.service.get(id, opts);
   }
 
   async create(data) {

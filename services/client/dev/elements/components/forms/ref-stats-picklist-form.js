@@ -67,7 +67,7 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     this.payload = {};
     if ( !this.picklistIdOrName ) return;
 
-    const res = await this.PicklistModel.get(this.picklistIdOrName);
+    const res = await this.PicklistModel.get(this.picklistIdOrName, {include_items: true});
     if ( res?.state === 'loaded' ) {
       this.payload = {...res.payload};
     }
@@ -85,7 +85,7 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
   _onDeleteRequest(){
     this.AppStateModel.showDialogModal({
       title: 'Delete Picklist',
-      content: () => `Are you sure you want to delete this picklist? All data associated with this picklist will be lost. This action cannot be undone.`,
+      content: () => `Are you sure you want to delete this picklist? All data associated with this picklist will be lost. This action cannot be undone. To retain data, archive the picklist instead.`,
       actions: [
         {text: 'Close', value: 'dismiss', invert: true, color: 'secondary'},
         { text: 'Delete', color: 'double-decker', value: 'picklist-delete' }

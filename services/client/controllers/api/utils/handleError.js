@@ -1,4 +1,4 @@
-import logger from '../../../../lib/logger.js';
+import logger from '#lib/logger.js';
 // import { MissingResourceError } from '../../../../lib/errors.js';
 
 function handleError(res, req, error, details) {

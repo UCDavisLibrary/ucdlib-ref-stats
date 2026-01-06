@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- Form registry
 CREATE TABLE IF NOT EXISTS form (
   form_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -32,6 +34,10 @@ CREATE OR REPLACE TRIGGER set_form_field_updated_at
   BEFORE UPDATE ON form_field
   FOR EACH ROW
   EXECUTE FUNCTION set_updated_at();
+
+CREATE INDEX IF NOT EXISTS idx_form_field_label_trgm
+  ON form_field
+  USING GIN (label gin_trgm_ops);
 
 -- Assignment of form fields to forms
 CREATE TABLE IF NOT EXISTS form_field_assignment (

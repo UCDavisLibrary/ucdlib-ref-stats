@@ -76,7 +76,7 @@ class PgClient {
   toUpdateClause(queryObject, kwargs){
     queryObject = this._filterObject(queryObject, kwargs?.includeFields, kwargs?.excludeFields);
     const indexStart = kwargs?.indexStart || 0;
-    return this._toEqualsClause(queryObject, ', ', indexStart);
+    return this._toEqualsClause(queryObject, ', ', indexStart, kwargs?.preserveArrays);
   }
 
   prepareObjectForUpdate(obj, kwargs){
@@ -127,14 +127,14 @@ class PgClient {
     return out;
   }
 
-  _toEqualsClause(queryObject, sep=' AND ', indexStart=0){
+  _toEqualsClause(queryObject, sep=' AND ', indexStart=0, preserveArrays=false){
     let sql = '';
     const values = [];
     if ( queryObject && typeof queryObject === 'object' ){
       let i = indexStart;
       for (const k of Object.keys(queryObject)) {
         // make an IN clause if the value is an array
-        if ( Array.isArray(queryObject[k]) ){
+        if ( Array.isArray(queryObject[k]) && !preserveArrays ){
           const inClause = queryObject[k].map((v, j) => `$${i + j + 1}`).join(', ');
           values.push(...queryObject[k]);
           sql += `${i > indexStart ? sep : ''}${k} IN (${inClause})`;

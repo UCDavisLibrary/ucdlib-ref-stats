@@ -22,6 +22,7 @@ export function render() {
     <div class="l-container">
       <div class="l-basic--flipped">
         <div class="l-content">
+          <p>Picklists are lists of predefined options that can be used in select, radio, and checkbox questions throughout the application. They help standardize responses and ensure data consistency.</p>
           <ref-stats-picklists></ref-stats-picklists>
         </div>
         <div class="l-sidebar-second">

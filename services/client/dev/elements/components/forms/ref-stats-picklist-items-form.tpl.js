@@ -68,6 +68,34 @@ export function render() {
                 required 
                 @input=${e => this._onItemInput(item, 'value', e.target.value)}>
             </cork-field-container>
+            <cork-field-container schema='picklist' path='items.${item.editedOrder}.is_archived' class='field-container checkbox'>
+              <input 
+                type="checkbox" 
+                id=${this.ctl.idGen.get('is_archived--' + i)} 
+                .checked=${item.item.is_archived || false}
+                @input=${() => this._onItemInput(item, 'is_archived', !item.item.is_archived)}>
+              <label for=${this.ctl.idGen.get('is_archived--' + i)}>Archived</label>
+            </cork-field-container>
+            <cork-field-container schema='picklist' path='items.${item.editedOrder}.include_segment' class='field-container'>
+              <label for=${this.ctl.idGen.get('include-segment--' + i)}>Include Segments</label>
+              <input 
+                type="text" 
+                id=${this.ctl.idGen.get('include-segment--' + i)} 
+                .value=${item.include_segment_string || ''}
+                placeholder="e.g. segment1, segment2"
+                @input=${e => this._onSegmentInput(item, true, e.target.value)}>
+              <div class='field-description'>Comma-separated list of segments to include. Will only show this item for users in these segments.</div>
+            </cork-field-container>
+            <cork-field-container schema='picklist' path='items.${item.editedOrder}.exclude_segment' class='field-container'>
+              <label for=${this.ctl.idGen.get('exclude-segment--' + i)}>Exclude Segments</label>
+              <input 
+                type="text" 
+                id=${this.ctl.idGen.get('exclude-segment--' + i)} 
+                .value=${item.exclude_segment_string || ''}
+                placeholder="e.g. segment1, segment2"
+                @input=${e => this._onSegmentInput(item, false, e.target.value)}>
+              <div class='field-description'>Comma-separated list of segments to exclude. Will hide this item for users in these segments.</div>
+            </cork-field-container>
           </div>
         </div>
       `)}

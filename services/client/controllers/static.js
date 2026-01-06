@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 import spaMiddleware from '@ucd-lib/spa-router-middleware';
 
 import loaderHtml from '../html/loader.html.js';
-import logger from '../../lib/logger.js';
-import config from '../../lib/config.js';
+import logger from '#lib/logger.js';
+import config from '#lib/config.js';
 import preloadedIcons from './icons.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,7 +14,7 @@ export default (app) => {
   let assetsDir = path.join(__dirname, '../public');
   logger.info(`Serving static assets from ${assetsDir}`);
 
-  const routes = ['picklist'];
+  const routes = ['picklist', 'field'];
   const appTitle = 'Reference Statistics';
 
   spaMiddleware({

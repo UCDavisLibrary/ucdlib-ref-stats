@@ -73,6 +73,15 @@ const styles = `
     line-height: 1.3rem;
     font-weight: 400;
   }
+  .ucd-link-list-item .ucd-link-list-item--badge {
+    display: inline-block;
+    background-color: var(--ucd-blue-50, #cce0f3);
+    color: var(--ucd-blue, #022851);
+    padding: 0 0.25rem;
+    font-size: .875rem;
+    font-weight: 700;
+
+  }
 
   ${sharedStyles}
   ${brandCssProps}

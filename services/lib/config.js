@@ -13,7 +13,11 @@ class Config {
 
     this.db = {
       tables: {
-        picklist: 'picklist'
+        picklist: 'picklist',
+        picklistItem: 'picklist_item'
+      },
+      views: {
+        picklistWithItems: 'picklist_with_items'
       }
     }
   }

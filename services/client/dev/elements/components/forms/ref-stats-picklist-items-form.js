@@ -34,8 +34,13 @@ export default class RefStatsPicklistItemsForm extends Mixin(LitElement)
 
   willUpdate(props){
     if ( props.has('items') ) {
-      this._items = this.items.map((item, i) => { 
-        return {edited: false, expanded: false, item: {...item, sort_order: i}} 
+      this._items = this.items.map((item, i) => {
+        return {
+          edited: false, 
+          expanded: false,
+          include_segment_string: item.include_segment?.join(', ') || '',
+          exclude_segment_string: item.exclude_segment?.join(', ') || '',
+          item: {...item, sort_order: i}} 
       });
       if ( this._items.length === 0 ) {
         this.addItem();
@@ -74,6 +79,12 @@ export default class RefStatsPicklistItemsForm extends Mixin(LitElement)
     }
 
     this.requestUpdate();
+  }
+
+  _onSegmentInput(item, include, value) {
+    item[include ? 'include_segment_string' : 'exclude_segment_string'] = value;
+    const segments = value.split(',').map( s => s.trim() ).filter( s => s );
+    this._onItemInput(item, include ? 'include_segment' : 'exclude_segment', segments);
   }
 
   setSortOrder(){
