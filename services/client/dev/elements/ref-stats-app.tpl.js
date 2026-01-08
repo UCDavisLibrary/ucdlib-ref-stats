@@ -23,6 +23,8 @@ return html`
     <ref-stats-page-home page-id='home'></ref-stats-page-home>
     <ref-stats-page-picklist page-id='picklist'></ref-stats-page-picklist>
     <ref-stats-page-picklist-single page-id='picklist-single'></ref-stats-page-picklist-single>
+    <ref-stats-page-field page-id='field'></ref-stats-page-field>
+    <ref-stats-page-field-single page-id='field-single'></ref-stats-page-field-single>
   </ucdlib-pages>
   <div class="u-space-mb--huge"></div>
 `;}
@@ -43,6 +45,7 @@ function renderHeader(){
         style-modifiers="highlight"
       >
         <a href="/picklist">Picklist Management</a>
+        <a href="/field">Field Library</a>
       </ucd-theme-quick-links>
     </ucd-theme-header>
   `;

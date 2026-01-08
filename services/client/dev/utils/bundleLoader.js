@@ -3,7 +3,7 @@ import { getLogger } from '@ucd-lib/cork-app-utils';
 const bundles = [
   { 
     name: 'admin',
-    pages: ['picklist', 'picklist-single']
+    pages: ['picklist', 'picklist-single', 'field', 'field-single']
    }
 ];
 

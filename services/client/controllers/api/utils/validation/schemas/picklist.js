@@ -71,7 +71,8 @@ const picklistQuerySchema = z.object({
   page: pageParam,
   per_page: perPageParam(15),
   archived_only: booleanParam,
-  active_only: booleanParam
+  active_only: booleanParam,
+  q: z.string().max(250).optional()
 });
 
 export { 

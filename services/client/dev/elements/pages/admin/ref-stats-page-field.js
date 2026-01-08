@@ -1,11 +1,12 @@
 import { LitElement } from 'lit';
-import {render, styles} from "./ref-stats-page-picklist.tpl.js";
+import {render, styles} from "./ref-stats-page-field.tpl.js";
 
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
-export default class RefStatsPagePicklist extends Mixin(LitElement)
+export default class RefStatsPageField extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
+
 
   static get properties() {
     return {
@@ -24,4 +25,4 @@ export default class RefStatsPagePicklist extends Mixin(LitElement)
 
 }
 
-customElements.define('ref-stats-page-picklist', RefStatsPagePicklist);
+customElements.define('ref-stats-page-field', RefStatsPageField);

@@ -4,7 +4,8 @@ import brandCssProps from '@ucd-lib/theme-sass/css-properties.css';
 import fonts from './fonts.css';
 import headings from './headings.css';
 
-import { styles as corkFieldContainerStyles } from '../elements/components/cork-field-container.tpl.js';
+import { styles as corkFieldContainerStyles } from '#components/cork-field-container.tpl.js';
+import { styles as picklistTypeaheadStyles } from '#components/ref-stats-picklist-typeahead.tpl.js';
 
 function getLitStyles(styles){
   return styles().map(s => s.cssText).join('\n');
@@ -80,7 +81,15 @@ const styles = `
     padding: 0 0.25rem;
     font-size: .875rem;
     font-weight: 700;
-
+  }
+  button.link-button {
+    all: unset;
+    color: var(--ucd-blue-80, #13639E);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  button.link-button:hover {
+    color: var(--tahoe, #00b2e3);
   }
 
   ${sharedStyles}
@@ -88,6 +97,7 @@ const styles = `
   ${fonts}
   ${headings}
   ${getLitStyles(corkFieldContainerStyles)}
+  ${getLitStyles(picklistTypeaheadStyles)}
 `;
 
 let sharedStyleElement = document.createElement('style');

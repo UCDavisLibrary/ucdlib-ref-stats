@@ -14,7 +14,7 @@ class PicklistService extends BaseService {
     return `/api/picklist`;
   }
 
-  async query(query={}){
+  async query(query={}, modelAppStateOptions={}){
     if ( !query.page ) query.page = 1;
     let id = payload.getKey(query);
     const store = this.store.data.query;
@@ -22,6 +22,20 @@ class PicklistService extends BaseService {
     const appStateOptions = {
       errorSettings: {message: 'Unable to retrieve picklists'}
     };
+
+    if ( modelAppStateOptions.errorSettings ) {
+      appStateOptions.errorSettings = {
+        ...appStateOptions.errorSettings,
+        ...modelAppStateOptions.errorSettings
+      };
+    }
+
+    if ( modelAppStateOptions.loaderSettings ){
+      appStateOptions.loaderSettings = {
+        ...appStateOptions.loaderSettings,
+        ...modelAppStateOptions.loaderSettings
+      };
+    }
 
     await this.checkRequesting(
       id, store,

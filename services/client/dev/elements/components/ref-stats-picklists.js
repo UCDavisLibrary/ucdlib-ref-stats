@@ -4,8 +4,7 @@ import {render, styles} from "./ref-stats-picklists.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
-import AppComponentController from '../../controllers/AppComponentController.js';
-import QueryStringController from '../../controllers/QueryStringController.js';
+import {AppComponentController, QueryStringController} from '#controllers';
 
 
 export default class RefStatsPicklists extends Mixin(LitElement)

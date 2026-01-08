@@ -86,6 +86,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Get form field ID by name or ID
+CREATE OR REPLACE FUNCTION get_form_field_id(name_or_id TEXT)
+  RETURNS UUID AS $$
+DECLARE
+  uid UUID;
+BEGIN
+  SELECT form_field_id INTO uid
+  FROM form_field
+  WHERE name = name_or_id
+     OR form_field_id = try_cast_uuid(name_or_id)
+  LIMIT 1;
+  IF uid IS NULL THEN
+    RAISE EXCEPTION USING
+      MESSAGE = format('Form field not found: %s', name_or_id),
+      ERRCODE = 'P4040';
+  END IF;
+  RETURN uid;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Get form fields for a given form by name or ID
 CREATE OR REPLACE FUNCTION get_form_fields(p_form_name_or_id TEXT)
   RETURNS TABLE (
@@ -118,3 +138,45 @@ BEGIN
     ff.name;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE VIEW form_field_full AS
+SELECT
+  ff.*,
+
+  -- Array of associated forms (empty array if none)
+  COALESCE(f_forms.forms, '[]'::jsonb) AS forms,
+
+  -- Associated picklist object (null if none)
+  p_pick.picklist AS picklist
+
+FROM form_field ff
+
+LEFT JOIN LATERAL (
+  SELECT
+    jsonb_agg(
+      jsonb_build_object(
+        'form_id', f.form_id,
+        'name', f.name,
+        'label', f.label,
+        'is_archived', f.is_archived,
+        'assignment_is_archived', ffa.is_archived
+      )
+      ORDER BY f.name
+    ) AS forms
+  FROM form_field_assignment ffa
+  JOIN form f
+    ON f.form_id = ffa.form_id
+  WHERE ffa.form_field_id = ff.form_field_id
+) AS f_forms ON TRUE
+
+LEFT JOIN LATERAL (
+  SELECT
+    jsonb_build_object(
+      'picklist_id', p.picklist_id,
+      'name', p.name,
+      'label', p.label,
+      'is_archived', p.is_archived
+    ) AS picklist
+  FROM picklist p
+  WHERE p.picklist_id = ff.picklist_id
+) AS p_pick ON TRUE;

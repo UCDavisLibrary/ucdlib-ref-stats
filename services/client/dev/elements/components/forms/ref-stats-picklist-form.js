@@ -4,10 +4,9 @@ import {render, styles} from "./ref-stats-picklist-form.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
-import ModalFormController from '../../../controllers/ModalFormController.js';
-import AppComponentController from '../../../controllers/AppComponentController.js';
-import IdGenerator from '../../../utils/IdGenerator.js';
-import textUtils from '../../../../../lib/textUtils.js';
+import { ModalFormController, AppComponentController } from '#controllers';
+import { IdGenerator } from '#client-utils';
+import textUtils from '#lib/textUtils.js';
 
 export default class RefStatsPicklistForm extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {

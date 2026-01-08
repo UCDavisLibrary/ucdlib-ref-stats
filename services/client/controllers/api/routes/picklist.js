@@ -1,8 +1,8 @@
 import { Router, json } from 'express';
 import handleError from '../utils/handleError.js';
 import { validate, schema } from '../utils/validation/index.js';
-import models from '../../../../lib/models/index.js';
-import logger from '../../../../lib/logger.js';
+import models from '#models';
+import logger from '#lib/logger.js';
 
 const router = Router();
 

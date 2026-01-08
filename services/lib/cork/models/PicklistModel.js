@@ -17,8 +17,8 @@ class PicklistModel extends BaseModel {
     this.inject('ValidationModel');
   }
 
-  async query(query) {
-    return this.service.query(query);
+  async query(query, appStateOptions={}) {
+    return this.service.query(query, appStateOptions);
   }
 
   async get(id, opts={}) {

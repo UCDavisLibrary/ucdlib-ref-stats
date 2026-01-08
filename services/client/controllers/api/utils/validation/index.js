@@ -6,6 +6,11 @@ import {
   picklistIdOrNameSchema
 } from './schemas/picklist.js';
 
+import { 
+  fieldCreateSchema,
+  fieldQuerySchema
+} from './schemas/field.js';
+
 /**
  * @description Middleware to validate request data against a Zod schema.
  * Combines req.params, req.query, and req.body for validation.
@@ -54,7 +59,9 @@ const schema = {
   picklistCreate: picklistCreateSchema,
   picklistQuery: picklistQuerySchema,
   picklistUpdate: picklistUpdateSchema,
-  picklistIdOrNameSchema: picklistIdOrNameSchema
+  picklistIdOrNameSchema: picklistIdOrNameSchema,
+  fieldCreate: fieldCreateSchema,
+  fieldQuery: fieldQuerySchema
 };
 
 export { validate, schema };

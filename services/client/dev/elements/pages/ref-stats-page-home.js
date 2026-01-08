@@ -9,7 +9,7 @@ export default class RefStatsPageHome extends Mixin(LitElement)
 
   static get properties() {
     return {
-      
+      pageId: {type: String, attribute: 'page-id'},
     }
   }
 

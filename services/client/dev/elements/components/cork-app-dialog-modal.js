@@ -35,13 +35,8 @@ export default class CorkAppDialogModal extends Mixin(LitElement)
     super();
     this.render = render.bind(this);
 
-    this.modalTitle = '';
-    this.modalContent = null;
-    this.actions = [];
-    this.data = {};
-    this.actionCallback = null;
+    this.clear();
     this.contentMaxHeight = '';
-    this.fullWidth = false;
     this.loading = false;
     this._isOpen = false;
     this.wait = new WaitController(this);
@@ -87,6 +82,15 @@ export default class CorkAppDialogModal extends Mixin(LitElement)
     // round down to nearest 5px to prevent scrollbar flicker
     maxHeight = Math.floor(maxHeight / 5) * 5 + 'px';
     this.contentMaxHeight = maxHeight;
+  }
+
+  clear(){
+    this.modalTitle = '';
+    this.modalContent = null;
+    this.actions = [];
+    this.data = {};
+    this.actionCallback = null;
+    this.fullWidth = false;
   }
 
   /**
@@ -154,6 +158,7 @@ export default class CorkAppDialogModal extends Mixin(LitElement)
     this._isOpen = false;
     document.body.style.overflow = '';
     this.AppStateModel.emit('app-dialog-close', {fromSelf: true});
+    this.clear();
   }
 
 }

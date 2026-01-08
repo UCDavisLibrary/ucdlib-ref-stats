@@ -19,6 +19,11 @@ class Picklist {
       where.push(`is_archived = $${values.length}`);
     }
 
+    if ( params.q ) {
+      values.push(`%${params.q}%`);
+      where.push(`label ILIKE $${values.length}`);
+    }
+
     const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const sql = `
       SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.tables.picklist}

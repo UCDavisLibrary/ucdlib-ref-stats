@@ -8,7 +8,11 @@
   "main": "index.js",
   "imports": {
     "#models": "./lib/models/index.js",
-    "#lib/*": "./lib/*"
+    "#lib/*": "./lib/*",
+    "#components/*": "./client/dev/elements/components/*",
+    "#templates/*": "./client/dev/elements/templates/*",
+    "#controllers": "./client/dev/controllers/index.js",
+    "#client-utils": "./client/dev/utils/index.js"
   },
   "scripts": {
     "client-watch": "cd ./client/build && webpack --config webpack-watch.config.js --watch",
