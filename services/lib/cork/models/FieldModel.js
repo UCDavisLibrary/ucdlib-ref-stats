@@ -17,6 +17,10 @@ class FieldModel extends BaseModel {
     this.inject('ValidationModel');
   }
 
+  async query(query, appStateOptions={}) {
+    return this.service.query(query, appStateOptions);
+  }
+
   async create(data) {
     const res = await this.service.create(data);
     this.ValidationModel.notify('field', res);

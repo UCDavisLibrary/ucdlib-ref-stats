@@ -1,6 +1,9 @@
 import {BaseService, digest} from '@ucd-lib/cork-app-utils';
 import FieldStore from '../stores/FieldStore.js';
 
+import payload from '../utils/payload.js';
+import serviceUtils from '../utils/serviceUtils.js';
+
 class FieldService extends BaseService {
 
   constructor() {
@@ -37,6 +40,29 @@ class FieldService extends BaseService {
         )
       })
     );
+    return store.get(id);
+  }
+
+  async query(query={}, appStateOptions={}){
+    if ( !query.page ) query.page = 1;
+    let id = payload.getKey(query);
+    const store = this.store.data.query;
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}`,
+        qs: query,
+        checkCached : () => store.get(id),
+        onUpdate : resp => this.store.set(
+          payload.generate(query, resp),
+          store,
+          null,
+          serviceUtils.getAppStateOptions('Unable to retrieve fields', appStateOptions)
+        )
+      })
+    );
+
     return store.get(id);
   }
 

@@ -12,6 +12,10 @@ function getLitStyles(styles){
 }
 
 const styles = `
+  ${sharedStyles}
+  ${brandCssProps}
+  ${fonts}
+  ${headings}
   [hidden] {
     display: none !important;
   }
@@ -29,6 +33,11 @@ const styles = `
   }
   .focal-link cork-icon {
     --cork-icon-size: 2rem;
+  }
+  @media (max-width: 991px) {
+    .l-davis-flipped * > * > :last-child {
+      margin-bottom: revert;
+    }
   }
   @media (max-width: 767px) {
     .l-container--narrow.l-container--narrow-desktop {
@@ -91,11 +100,15 @@ const styles = `
   button.link-button:hover {
     color: var(--tahoe, #00b2e3);
   }
-
-  ${sharedStyles}
-  ${brandCssProps}
-  ${fonts}
-  ${headings}
+  .badge {
+    display: inline-block;
+    font-size: .875rem;
+    margin-bottom: .5rem;
+    padding: .1rem .5rem;
+    background-color: #dbeaf7;
+    border-radius: .5rem;
+    color: #fff;
+  }
   ${getLitStyles(corkFieldContainerStyles)}
   ${getLitStyles(picklistTypeaheadStyles)}
 `;

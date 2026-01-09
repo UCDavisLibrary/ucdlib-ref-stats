@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS form_field (
   description TEXT,
   options JSONB NOT NULL DEFAULT '{}'::JSONB,
   picklist_id UUID REFERENCES picklist(picklist_id) ON DELETE SET NULL,
+  arl_required BOOLEAN DEFAULT FALSE NOT NULL,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now(),
   is_archived BOOLEAN DEFAULT FALSE NOT NULL
@@ -125,6 +126,7 @@ BEGIN
     ff.field_type,
     ff.description,
     ff.options,
+    ff.arl_required,
     ff.picklist_id
   FROM form_field_assignment ffa
   JOIN form_field ff

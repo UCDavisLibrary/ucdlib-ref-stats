@@ -2,6 +2,7 @@ import {BaseService, digest} from '@ucd-lib/cork-app-utils';
 import PicklistStore from '../stores/PicklistStore.js';
 
 import payload from '../utils/payload.js';
+import serviceUtils from '../utils/serviceUtils.js';
 
 class PicklistService extends BaseService {
 
@@ -14,28 +15,10 @@ class PicklistService extends BaseService {
     return `/api/picklist`;
   }
 
-  async query(query={}, modelAppStateOptions={}){
+  async query(query={}, appStateOptions={}){
     if ( !query.page ) query.page = 1;
     let id = payload.getKey(query);
     const store = this.store.data.query;
-
-    const appStateOptions = {
-      errorSettings: {message: 'Unable to retrieve picklists'}
-    };
-
-    if ( modelAppStateOptions.errorSettings ) {
-      appStateOptions.errorSettings = {
-        ...appStateOptions.errorSettings,
-        ...modelAppStateOptions.errorSettings
-      };
-    }
-
-    if ( modelAppStateOptions.loaderSettings ){
-      appStateOptions.loaderSettings = {
-        ...appStateOptions.loaderSettings,
-        ...modelAppStateOptions.loaderSettings
-      };
-    }
 
     await this.checkRequesting(
       id, store,
@@ -47,7 +30,7 @@ class PicklistService extends BaseService {
           payload.generate(query, resp),
           store,
           null,
-          appStateOptions
+          serviceUtils.getAppStateOptions('Unable to retrieve picklists', appStateOptions)
         )
       })
     );

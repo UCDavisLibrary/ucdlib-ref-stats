@@ -8,6 +8,7 @@ class FieldStore extends BaseStore {
 
     this.data = {
       create: new LruStore({name: 'field.create'}),
+      query: new LruStore({name: 'field.query'})
     };
     this.events = {};
   }

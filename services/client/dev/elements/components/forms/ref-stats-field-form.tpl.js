@@ -43,9 +43,10 @@ export function render() {
           required 
           @input=${e => this._onPayloadInput('name', e.target.value)}>
         <div class='field-description'>
-          <span ?hidden=${isEdit}>The name should be URL-friendly: all lowercase and contains only letters, numbers, and hyphens. It must be unique.
-          <b>Once saved, the name cannot be changed.</b></span>
-          <span ?hidden=${isNew}>The name cannot be changed.</span>
+          <div ?hidden=${isEdit}>The name should be URL-friendly: all lowercase and contains only letters, numbers, and hyphens.</div>
+          <div ?hidden=${isEdit}>It must also be unique to the system, so that reports can reliably merge fields across forms.</div>
+          <div ?hidden=${isEdit}><b>Once saved, the name cannot be changed.</b></div>
+          <div ?hidden=${isNew}>The name cannot be changed.</div>
         </div>
       </cork-field-container>
       <cork-field-container schema='field' path='description' class='field-container'>
@@ -69,7 +70,7 @@ export function render() {
           `)}
         </select>
       </cork-field-container>
-      <div ?hidden=${this.payload?.field_type !== 'picklist'}>
+      <div ?hidden=${this.payload?.field_type !== 'picklist'} class='u-space-mb'>
         <cork-field-container schema='field' path='picklist_id' class='u-space-mb--small'>
           <label for=${this.ctl.idGen.get('picklist')}>Picklist</label>
           <ref-stats-picklist-typeahead 
