@@ -89,6 +89,43 @@ class Field {
     }
   }
 
+  async patch(idOrName, data){
+    if ( !idOrName ) {
+      if ( data.form_field_id || data.name ) {
+        idOrName = data.form_field_id || data.name;
+      } else {
+        return { error: new Error('No form field identifier provided for patch operation') };
+      }
+    }
+    const client = await pgClient.pool.connect();
+    delete data.form_field_id;
+    delete data.name;
+    try {
+      await client.query('BEGIN');
+
+      const d = pgClient.prepareObjectForUpdate(data);
+      const sql = `UPDATE ${config.db.tables.field} SET ${d.sql} WHERE form_field_id = get_form_field_id($${d.values.length + 1}) RETURNING form_field_id, name;`;
+      let result = await client.query(sql, [...d.values, idOrName]);
+
+      await client.query('COMMIT');
+      return { res: result.rows[0] };
+    } catch (error) {
+        await client.query('ROLLBACK');
+        return { error };
+    } finally {
+      client.release();
+    }
+  }
+
+  async delete(idOrName){
+    const sql = `DELETE FROM ${config.db.tables.field} WHERE form_field_id = get_form_field_id($1) RETURNING form_field_id, name;`;
+    const r = await pgClient.query(sql, [idOrName]);
+    if ( r.error ) {
+      return r;
+    }
+    return { res: r.res.rows[0] || null };
+  }
+
 }
 
 export default new Field();

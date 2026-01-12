@@ -48,10 +48,10 @@ export default class RefStatsFieldForm extends Mixin(LitElement)
     this.payload = {};
     if ( !this.nameOrId ) return;
 
-    // const res = await this.PicklistModel.get(this.picklistIdOrName, {include_items: true});
-    // if ( res?.state === 'loaded' ) {
-    //   this.payload = {...res.payload};
-    // }
+    const res = await this.FieldModel.get(this.nameOrId);
+    if ( res?.state === 'loaded' ) {
+      this.payload = {...res.payload};
+    }
   }
 
   async _onSubmit(e) {
@@ -60,11 +60,10 @@ export default class RefStatsFieldForm extends Mixin(LitElement)
     let r;
 
     if ( this.nameOrId ) {
-      // todo patch
+      r = await this.FieldModel.patch(this.payload);
     } else {
       r = await this.FieldModel.create(this.payload);
     }
-    console.log(r);
     if ( r?.payload?.error?.response?.status == 422 ) return r;
 
     if ( r.state === 'loaded' ){
@@ -118,7 +117,15 @@ export default class RefStatsFieldForm extends Mixin(LitElement)
 
   async _onAppDialogAction(e){
     if ( e.action.value !== 'field-delete' ) return;
-    console.log('TODO: delete field', this.nameOrId);
+    const r = await this.FieldModel.delete(this.nameOrId);
+    if ( r?.state === 'loaded' ){
+      this.AppStateModel.showToast({text: 'Field deleted successfully', type: 'success'});
+      this.dispatchEvent(new CustomEvent('ref-stats-field-updated', {
+        detail: { field: r.payload, deleted: true },
+        bubbles: true,
+        composed: true
+      }));
+    }
 
   }
 

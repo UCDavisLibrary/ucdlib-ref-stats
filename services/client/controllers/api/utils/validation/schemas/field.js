@@ -61,12 +61,35 @@ const srValidatePicklistId = async (data, ctx) => {
   }
 }
 
+const srValidateFieldId = async (data, ctx) => {
+  if ( data.form_field_id ) {
+    const existing = await models.field.get(data.form_field_id);
+    if (existing.error) {
+      throw existing.error;
+    }
+    if (!existing.res) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Field not found',
+        path: ['form_field_id']
+      });
+    }
+  } else {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'form_field_id is required',
+      path: ['form_field_id']
+    });
+  }
+}
+
 const fieldBaseSchema = z.object({
   description: toString.pipe(z.string().max(300)).optional(),
   label: requiredString().pipe(z.string().max(250)),
   field_type: fieldTypeEnum,
   picklist_id: z.string().uuid().nullish(),
-  is_archived: z.boolean().optional()
+  is_archived: z.boolean().optional(),
+  arl_required: z.boolean().optional()
 });
 
 const fieldCreateSchema = fieldBaseSchema.extend({
@@ -74,6 +97,32 @@ const fieldCreateSchema = fieldBaseSchema.extend({
   })
   .superRefine(srNameUnique)
   .superRefine(srValidatePicklistId);
+
+const fieldUpdateSchema = fieldBaseSchema.partial().extend({
+  form_field_id: z.string().uuid()
+})
+.superRefine(srValidateFieldId)
+.superRefine(srValidatePicklistId);
+
+const fieldIdOrNameSchema = z.object({
+  idOrName: requiredString()
+    .superRefine(async (idOrName, ctx) => {
+      const existing = await models.field.get(idOrName);
+
+      if (existing.error) {
+        throw existing.error;
+      }
+
+      if (!existing.res) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Field not found',
+          path: []
+        });
+      }
+      return true;
+    })
+});
 
 
 const fieldQuerySchema = z.object({
@@ -85,5 +134,7 @@ const fieldQuerySchema = z.object({
 
 export {
   fieldCreateSchema,
-  fieldQuerySchema
+  fieldQuerySchema,
+  fieldUpdateSchema,
+  fieldIdOrNameSchema
 }

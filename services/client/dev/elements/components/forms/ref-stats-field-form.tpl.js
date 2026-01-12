@@ -93,6 +93,14 @@ export function render() {
           @input=${() => this._onPayloadInput('is_archived', !this.payload?.is_archived)}>
         <label for=${this.ctl.idGen.get('is_archived')}>Archived</label>
       </cork-field-container>
+      <cork-field-container schema='field' path='arl_required' class='field-container checkbox'>
+        <input 
+          type="checkbox" 
+          id=${this.ctl.idGen.get('arl_required')} 
+          .checked=${this.payload?.arl_required || false}
+          @input=${() => this._onPayloadInput('arl_required', !this.payload?.arl_required)}>
+        <label for=${this.ctl.idGen.get('arl_required')}>Required by Association of Research Libraries (ARL)</label>
+      </cork-field-container>
       <div>
         <button type="submit" class='btn btn--primary'>${isEdit ? 'Save Changes' : 'Create Field'}</button>
         <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest}>Delete</button>

@@ -43,6 +43,34 @@ class FieldService extends BaseService {
     return store.get(id);
   }
 
+  async patch(data){
+    let id = digest(data);
+    const store = this.store.data.patch;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to patch field'}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}`,
+        json: true,
+        fetchOptions: { 
+          method: 'PATCH',
+          body: data
+        },
+        onUpdate : resp => this.store.set(
+          {...resp, id},
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+    return store.get(id);
+  }
+
   async query(query={}, appStateOptions={}){
     if ( !query.page ) query.page = 1;
     let id = payload.getKey(query);
@@ -59,6 +87,59 @@ class FieldService extends BaseService {
           store,
           null,
           serviceUtils.getAppStateOptions('Unable to retrieve fields', appStateOptions)
+        )
+      })
+    );
+
+    return store.get(id);
+  }
+
+  async get(idOrName, opts={}){
+    const ido = { ...opts, idOrName };
+    const id = payload.getKey(ido);
+    const store = this.store.data.get;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to get field'}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}/${idOrName}`,
+        qs: opts,
+        checkCached : () => store.get(id),
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+
+    return store.get(id);
+  }
+
+  async delete(id){
+    const store = this.store.data.delete;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to delete field'}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}/${id}`,
+        fetchOptions: { 
+          method: 'DELETE'
+        },
+        onUpdate : resp => this.store.set(
+          {...resp, id},
+          store,
+          null,
+          appStateOptions
         )
       })
     );

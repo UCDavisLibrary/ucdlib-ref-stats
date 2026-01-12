@@ -8,7 +8,9 @@ import {
 
 import { 
   fieldCreateSchema,
-  fieldQuerySchema
+  fieldQuerySchema,
+  fieldUpdateSchema,
+  fieldIdOrNameSchema
 } from './schemas/field.js';
 
 /**
@@ -61,7 +63,9 @@ const schema = {
   picklistUpdate: picklistUpdateSchema,
   picklistIdOrNameSchema: picklistIdOrNameSchema,
   fieldCreate: fieldCreateSchema,
-  fieldQuery: fieldQuerySchema
+  fieldQuery: fieldQuerySchema,
+  fieldUpdate: fieldUpdateSchema,
+  fieldIdOrNameSchema: fieldIdOrNameSchema
 };
 
 export { validate, schema };

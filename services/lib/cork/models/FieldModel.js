@@ -30,6 +30,27 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  async patch(data) {
+    const res = await this.service.patch(data);
+    this.ValidationModel.notify('field', res);
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  async get(id, opts={}) {
+    return this.service.get(id, opts);
+  }
+  
+  async delete(id) {
+    const res = await this.service.delete(id);
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
 }
 
 const model = new FieldModel();

@@ -21,7 +21,7 @@ export function render() {
       <li>${pageTitle}</li>
     </ol>
     <div class="l-container l-container--narrow l-container--narrow-desktop">
-      <ref-stats-field-form></ref-stats-field-form>
+      <ref-stats-field-form @ref-stats-field-updated=${this._onFieldUpdated}></ref-stats-field-form>
     </div>
   `;
 }

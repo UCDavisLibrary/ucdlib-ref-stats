@@ -33,7 +33,7 @@ export default class RefStatsPageFieldSingle extends Mixin(LitElement)
       qs: new QueryStringController(this)
     }
 
-    this._injectModel('AppStateModel');
+    this._injectModel('AppStateModel', 'FieldModel');
   }
 
   async _onAppStateUpdate(e) {
@@ -48,6 +48,10 @@ export default class RefStatsPageFieldSingle extends Mixin(LitElement)
       }
     }
 
+  }
+
+  _onFieldUpdated(e) {
+    this.AppStateModel.setLocation('/field');
   }
 
 }
