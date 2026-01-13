@@ -1,6 +1,8 @@
 import { html, css } from 'lit';
 import definitions from '#lib/definitions.js';
 
+import '#components/ref-stats-form-typeahead.js';
+
 export function styles() {
   const elementStyles = css`
     ref-stats-fields {
@@ -107,7 +109,13 @@ return html`
           id=${this.ctl.idGen.get('label-search')}>
       </div>
       <div class="field-container">
-        TODO: Add form typeahead filter here
+        <label for=${this.ctl.idGen.get('form-typeahead')}>Filter by form</label>
+        <ref-stats-form-typeahead
+          input-id=${this.ctl.idGen.get('form-typeahead')}
+          .nameOrId=${this.ctl.qs.query.form || ''}
+          @form-typeahead-selected=${this._onFormTypeaheadSelected}>
+        </ref-stats-form-typeahead>
+        <button class="link-button" style='margin-top: .25rem' ?hidden=${!this.ctl.qs.query.form} @click=${this._onFormTypeaheadSelected} type="button">Clear form filter</button>
       </div>
     </div>
     <div ?hidden=${this.fields.length} class='alert'>No fields found</div>

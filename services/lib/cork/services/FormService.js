@@ -1,18 +1,18 @@
 import {BaseService, digest} from '@ucd-lib/cork-app-utils';
-import FieldStore from '../stores/FieldStore.js';
+import FormStore from '../stores/FormStore.js';
 
 import payload from '../utils/payload.js';
 import serviceUtils from '../utils/serviceUtils.js';
 
-class FieldService extends BaseService {
+class FormService extends BaseService {
 
   constructor() {
     super();
-    this.store = FieldStore;
+    this.store = FormStore;
   }
 
   get baseUrl(){
-    return `/api/field`;
+    return `/api/form`;
   }
 
   async create(data){
@@ -20,7 +20,7 @@ class FieldService extends BaseService {
     const store = this.store.data.create;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to create field'}
+      errorSettings: {message: 'Unable to create form'}
     };
 
     await this.checkRequesting(
@@ -48,7 +48,7 @@ class FieldService extends BaseService {
     const store = this.store.data.patch;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to update field'}
+      errorSettings: {message: 'Unable to update form'}
     };
 
     await this.checkRequesting(
@@ -86,7 +86,7 @@ class FieldService extends BaseService {
           payload.generate(query, resp),
           store,
           null,
-          serviceUtils.getAppStateOptions('Unable to retrieve fields', appStateOptions)
+          serviceUtils.getAppStateOptions('Unable to retrieve forms', appStateOptions)
         )
       })
     );
@@ -100,7 +100,7 @@ class FieldService extends BaseService {
     const store = this.store.data.get;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to get field'}
+      errorSettings: {message: 'Unable to get form'}
     };
 
     await this.checkRequesting(
@@ -125,7 +125,7 @@ class FieldService extends BaseService {
     const store = this.store.data.delete;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to delete field'}
+      errorSettings: {message: 'Unable to delete form'}
     };
 
     await this.checkRequesting(
@@ -149,5 +149,5 @@ class FieldService extends BaseService {
 
 }
 
-const service = new FieldService();
+const service = new FormService();
 export default service;

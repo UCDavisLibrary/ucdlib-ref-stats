@@ -56,7 +56,7 @@ export const pageParam = z.preprocess(
   z.number().int().positive("Page must be a positive integer")
 );
 
-export const perPageParam = (defaultValue = 15, maxValue = 50) =>
+export const perPageParam = (defaultValue = 15, maxValue = 100) =>
   z.preprocess(
     v => {
       if (v == null || v === '') return defaultValue;

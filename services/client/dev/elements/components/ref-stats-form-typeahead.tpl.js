@@ -2,7 +2,7 @@ import { html, css } from 'lit';
 
 export function styles() {
   const elementStyles = css`
-    ref-stats-picklist-typeahead {
+    ref-stats-form-typeahead {
       display: block;
     }
   `;
@@ -10,13 +10,14 @@ export function styles() {
   return [elementStyles];
 }
 
+
 export function render() { 
   return html`
     <div class="typeahead-container">
       <input
         id=${this.inputId || ''}
         type="text"
-        placeholder="Start typing to search picklists..."
+        placeholder="Start typing to search forms..."
         .value=${this.value}
         @input=${this._onValueInput}
         autocomplete="off"

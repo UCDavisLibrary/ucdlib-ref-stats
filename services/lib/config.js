@@ -15,7 +15,8 @@ class Config {
       tables: {
         picklist: 'picklist',
         picklistItem: 'picklist_item',
-        field: 'form_field'
+        field: 'form_field',
+        form: 'form'
       },
       views: {
         picklistWithItems: 'picklist_with_items',

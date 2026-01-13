@@ -25,6 +25,8 @@ return html`
     <ref-stats-page-picklist-single page-id='picklist-single'></ref-stats-page-picklist-single>
     <ref-stats-page-field page-id='field'></ref-stats-page-field>
     <ref-stats-page-field-single page-id='field-single'></ref-stats-page-field-single>
+    <ref-stats-page-form-admin page-id='form-admin'></ref-stats-page-form-admin>
+    <ref-stats-page-form-admin-single page-id='form-admin-single'></ref-stats-page-form-admin-single>
   </ucdlib-pages>
   <div class="u-space-mb--huge"></div>
 `;}
@@ -44,8 +46,9 @@ function renderHeader(){
         title="Admin"
         style-modifiers="highlight"
       >
-        <a href="/picklist">Picklist Management</a>
+        <a href="/form-admin">Form Administration</a>
         <a href="/field">Field Library</a>
+        <a href="/picklist">Picklist Management</a>
       </ucd-theme-quick-links>
     </ucd-theme-header>
   `;

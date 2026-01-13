@@ -13,6 +13,13 @@ import {
   fieldIdOrNameSchema
 } from './schemas/field.js';
 
+import { 
+  formCreateSchema,
+  formQuerySchema,
+  formUpdateSchema,
+  formIdOrNameSchema
+} from './schemas/form.js';
+
 /**
  * @description Middleware to validate request data against a Zod schema.
  * Combines req.params, req.query, and req.body for validation.
@@ -65,7 +72,11 @@ const schema = {
   fieldCreate: fieldCreateSchema,
   fieldQuery: fieldQuerySchema,
   fieldUpdate: fieldUpdateSchema,
-  fieldIdOrNameSchema: fieldIdOrNameSchema
+  fieldIdOrNameSchema: fieldIdOrNameSchema,
+  formCreate: formCreateSchema,
+  formQuery: formQuerySchema,
+  formUpdate: formUpdateSchema,
+  formIdOrNameSchema: formIdOrNameSchema
 };
 
 export { validate, schema };

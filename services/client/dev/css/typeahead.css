@@ -1,0 +1,44 @@
+.typeahead-container .suggestion-item {
+  all: unset;
+  display: block;
+  width: 100%;
+  padding: .25rem .5rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--ucd-blue-60, #B0D0ED);
+  box-sizing: border-box;
+}
+.typeahead-container .suggestion-item:hover, .suggestion-item:focus {
+  background-color: var(--ucd-gold-30, #FFF9E6);
+  color: inherit;
+}
+.typeahead-container .more-suggestions {
+  font-size: .875rem;
+  color: var(--ucd-black-60, #666);
+  padding: .5rem;
+}
+.typeahead-container .error {
+  color: var(--double-decker, #c10230);
+  padding: .5rem;
+  font-weight: bold;
+}
+.typeahead-container .no-suggestions {
+  padding: .5rem;
+  color: var(--ucd-black-60, #666);
+}
+.typeahead-container .suggestions {
+  border: 1px solid var(--ucd-black-30);
+  overflow-y: auto;
+  background-color: var(--ucd-white, #fff);
+  box-sizing: border-box;
+}
+.typeahead-container {
+  position: relative;
+  width: 100%;
+}
+.typeahead-container input {
+  width: 100%;
+}
+.typeahead-container .suggestion-name {
+  font-size: .875rem;
+  color: var(--ucd-black-60, #666);
+}
