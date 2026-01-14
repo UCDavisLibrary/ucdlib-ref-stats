@@ -2,6 +2,7 @@ import * as z from "zod";
 import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString } from "./utils.js";
 import models from '#models';
 import definitions from '#lib/definitions.js';
+import logger from '#lib/logger.js';
 
 const fieldTypeEnum = z.enum(definitions.fieldTypes.map(ft => ft.value));
 
@@ -9,7 +10,13 @@ const srNameUnique = async (data, ctx) => {
   if ( !data.name ) return;
   const existing = await models.field.get(data.name);
   if (existing.error) {
-    throw existing.error;
+    logger.error('Database error validating field uniqueness', { error: existing.error });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A database error occurred',
+      fatal: true
+    });
+    return;
   }
   if ( !existing.res ) {
     return;
@@ -29,9 +36,15 @@ const srValidatePicklistId = async (data, ctx) => {
   // just picklist_id was patched
   if ( !data.field_type && data.picklist_id !== undefined && data.form_field_id ) {
     const existing = await models.field.get(data.form_field_id);
-    if (existing.error) {
-      throw existing.error;
-    }
+  if (existing.error) {
+    logger.error('Database error validating picklist ID', { error: existing.error });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A database error occurred',
+      fatal: true
+    });
+    return;
+  }
     if (existing.res) {
       fieldType = existing.res.field_type;
     }
@@ -47,7 +60,13 @@ const srValidatePicklistId = async (data, ctx) => {
         const existing = await models.picklist.get(data.picklist_id);
   
         if (existing.error) {
-          throw existing.error;
+          logger.error('Database error validating picklist ID', { error: existing.error });
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'A database error occurred',
+            fatal: true
+          });
+          return;
         }
 
         if (!existing.res) {
@@ -64,9 +83,15 @@ const srValidatePicklistId = async (data, ctx) => {
 const srValidateFieldId = async (data, ctx) => {
   if ( data.form_field_id ) {
     const existing = await models.field.get(data.form_field_id);
-    if (existing.error) {
-      throw existing.error;
-    }
+  if (existing.error) {
+    logger.error('Database error validating field ID', { error: existing.error });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A database error occurred',
+      fatal: true
+    });
+    return;
+  }
     if (!existing.res) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -110,7 +135,13 @@ const fieldIdOrNameSchema = z.object({
       const existing = await models.field.get(idOrName);
 
       if (existing.error) {
-        throw existing.error;
+        logger.error('Database error validating field ID or name', { error: existing.error });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'A database error occurred',
+          fatal: true
+        });
+        return;
       }
 
       if (!existing.res) {
@@ -129,12 +160,14 @@ const fieldQuerySchema = z.object({
   page: pageParam,
   per_page: perPageParam(15),
   q: z.string().max(250).optional(),
-  form: z.string().optional()
+  form: z.string().optional(),
+  '-form': z.string().optional()
 });
 
 export {
   fieldCreateSchema,
   fieldQuerySchema,
   fieldUpdateSchema,
-  fieldIdOrNameSchema
+  fieldIdOrNameSchema,
+  srValidateFieldId
 }

@@ -11,7 +11,8 @@ class FieldStore extends BaseStore {
       query: new LruStore({name: 'field.query'}),
       get: new LruStore({name: 'field.get'}),
       patch: new LruStore({name: 'field.patch'}),
-      delete: new LruStore({name: 'field.delete'})
+      delete: new LruStore({name: 'field.delete'}),
+      assign: new LruStore({name: 'field.assign'})
     };
     this.events = {};
   }

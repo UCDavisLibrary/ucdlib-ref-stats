@@ -1,12 +1,19 @@
 import * as z from "zod";
 import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString } from "./utils.js";
 import models from '#models';
+import logger from '#lib/logger.js';
 
 const srNameUnique = async (data, ctx) => {
   if ( !data.name ) return;
   const existing = await models.form.get(data.name);
   if (existing.error) {
-    throw existing.error;
+    logger.error('Database error validating form name uniqueness', { error: existing.error });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A database error occurred',
+      fatal: true
+    });
+    return;
   }
   if ( !existing.res ) {
     return;
@@ -24,7 +31,13 @@ const srValidateFormId = async (data, ctx) => {
   if ( data.form_id ) {
     const existing = await models.form.get(data.form_id);
     if (existing.error) {
-      throw existing.error;
+      logger.error('Database error validating form ID', { error: existing.error });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A database error occurred',
+        fatal: true
+      });
+      return;
     }
     if (!existing.res) {
       ctx.addIssue({
@@ -89,5 +102,6 @@ export {
   formCreateSchema,
   formQuerySchema,
   formUpdateSchema,
-  formIdOrNameSchema
+  formIdOrNameSchema,
+  srValidateFormId
 }

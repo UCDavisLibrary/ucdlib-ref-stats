@@ -1,10 +1,12 @@
-import { LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import {render, styles} from "./ref-stats-field-assignment.tpl.js";
 
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 import {AppComponentController} from '#controllers';
+
+import '#components/ref-stats-field-typeahead.js';
 
 export default class RefStatsFieldAssignment extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
@@ -14,7 +16,8 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       formNameOrId: {type: String, attribute: 'form-name-or-id' },
       fieldNameOrId: {type: String, attribute: 'field-name-or-id' },
       fields: {type: Array },
-      forms: { type: Array }
+      forms: { type: Array },
+      fieldToAdd: { state: true }
     }
   }
 
@@ -53,10 +56,86 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       if ( r.payload.max_page > 1 ) {
         console.warn('RefStatsFieldAssignment: more than 100 fields assigned to form, only first 100 loaded');
       }
-      console.log(this.fields);
 
     } else if ( this.fieldNameOrId ) {
 
+    }
+  }
+
+  async _onArchiveClick(id) {
+    const fieldId = this.fieldNameOrId || id;
+    const formId = this.formNameOrId || id;
+    const res = await this.FieldModel.archiveAssignment(fieldId, formId);
+    if ( res.state === 'loaded' ) {
+      this.AppStateModel.showToast({text: 'Field assignment archived successfully', type: 'success'});
+      this._loadData();
+    }
+  }
+
+  async _onUnarchiveClick(id) {
+    const fieldId = this.fieldNameOrId || id;
+    const formId = this.formNameOrId || id;
+    const res = await this.FieldModel.unarchiveAssignment(fieldId, formId);
+    if ( res.state === 'loaded' ) {
+      this.AppStateModel.showToast({text: 'Field assignment unarchived successfully', type: 'success'});
+      this._loadData();
+    }
+  }
+
+  _onAddFieldClick(){
+    if ( this.formNameOrId ) {
+      this.fieldToAdd = null;
+      this.AppStateModel.showDialogModal({
+        title: 'Add Field to Form',
+        content: () => html`
+          <ref-stats-field-typeahead
+            @field-typeahead-selected=${(e) => {
+              this.fieldToAdd = e.detail.field.form_field_id;
+            }} 
+            .excludeForm=${this.formNameOrId}
+            relative-dropdown
+          >
+          </ref-stats-field-typeahead>
+        `,
+        actions: [
+          {text: 'Close', value: 'dismiss', invert: true, color: 'secondary'},
+          { text: 'Add', color: 'secondary', value: 'add-field-to-form' }
+        ]
+      })
+    }
+  }
+
+  _onRemoveFieldClick(id){
+    const fieldId = this.fieldNameOrId || id;
+    const formId = this.formNameOrId || id;
+    this.AppStateModel.showDialogModal({
+      title: 'Remove Field from Form',
+      content: () => html`
+        Are you sure you want to remove this field from the form? This will remove responses to this field in previous submissions.
+      `,
+      data: { fieldId, formId },
+      actions: [
+        {text: 'Cancel', value: 'dismiss', invert: true, color: 'secondary'},
+        { text: 'Remove', color: 'secondary', value: 'remove-field-from-form' }
+      ]
+    })
+    
+  }
+
+  async _onAppDialogAction(e){
+    if ( e.action.value === 'add-field-to-form' ) {
+      if ( !this.fieldToAdd || !this.formNameOrId ) return;
+      const r = await this.FieldModel.assign(this.fieldToAdd, this.formNameOrId);
+      if ( r.state === 'loaded' ) {
+        this.AppStateModel.showToast({text: 'Field assigned to form successfully', type: 'success'});
+        this._loadData();
+      }
+    } else if ( e.action.value === 'remove-field-from-form' ) {
+      const r = await this.FieldModel.unassign(e.data.fieldId, e.data.formId);
+      if ( r.state === 'loaded' ) {
+        this.AppStateModel.showToast({text: 'Field removed from form successfully', type: 'success'});
+        this._loadData();
+      }
     }
   }
 

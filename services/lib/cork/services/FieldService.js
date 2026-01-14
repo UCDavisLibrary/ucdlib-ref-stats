@@ -147,6 +147,43 @@ class FieldService extends BaseService {
     return store.get(id);
   }
 
+  async assign(data){
+    let id = digest(data);
+    const store = this.store.data.assign;
+
+    let errorMessage = 'Unable to assign field';
+    if ( data.action === 'unassign' ) {
+      errorMessage = 'Unable to unassign field';
+    } else if ( data.action === 'archive' ) {
+      errorMessage = 'Unable to archive field assignment';
+    } else if ( data.action === 'unarchive' ) {
+      errorMessage = 'Unable to unarchive field assignment';
+    }
+
+    const appStateOptions = {
+      errorSettings: {message: errorMessage, showValidationErrors: true}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : '/api/assignment',
+        json: true,
+        fetchOptions: { 
+          method: 'POST',
+          body: data
+        },
+        onUpdate : resp => this.store.set(
+          {...resp, id},
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+    return store.get(id);
+  }
+
 }
 
 const service = new FieldService();

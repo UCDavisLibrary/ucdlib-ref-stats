@@ -28,6 +28,13 @@ export function render() {
 function _renderFields(){
   if ( !this.formNameOrId ) return html``;
   return html`
+    <div class='icon-header'>
+      <cork-icon icon='fas.keyboard' class='redbud'></cork-icon>
+      <h2 class='icon-header--title'>Form Fields</h2>
+    </div>
+    <div ?hidden=${this.fields.length > 0}>
+      No fields assigned to this form.
+    </div>
     <div>
       ${this.fields.map( f => html`
         <div>
@@ -38,17 +45,24 @@ function _renderFields(){
           </div>
           <div class='ucd-link-list-item--excerpt'>${f.field.name}</div>
           <ul class='list--pipe actions text--smaller'>
-            <li>
+            <li ?hidden=${f.assignment_is_archived}>
               <cork-icon icon='fas.eye-slash'></cork-icon>
-              <button class='link-button'>Archive</button>
+              <button class='link-button' @click=${() => this._onArchiveClick(f.field.form_field_id)}>Archive</button>
+            </li>
+            <li ?hidden=${!f.assignment_is_archived}>
+              <cork-icon icon='fas.eye'></cork-icon>
+              <button class='link-button' @click=${() => this._onUnarchiveClick(f.field.form_field_id)}>Unarchive</button>
             </li>
             <li>
               <cork-icon icon='fas.trash'></cork-icon>
-              <button class='link-button'>Delete</button>
+              <button class='link-button' @click=${() => this._onRemoveFieldClick(f.field.form_field_id)}>Remove</button>
             </li>
           </ul>
         </div>
         `)}
+    </div>
+    <div class="alignable-promo__buttons category-brand--redbud u-space-mt--medium">
+      <button class="btn btn--invert u-space-mx--flush" @click=${this._onAddFieldClick}>Add Field To Form</button>
     </div>
   `;
 }

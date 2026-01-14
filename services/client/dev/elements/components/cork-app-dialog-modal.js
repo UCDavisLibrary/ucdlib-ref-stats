@@ -139,11 +139,12 @@ export default class CorkAppDialogModal extends Mixin(LitElement)
       }
       if ( cb?.abortModalAction ) return;
     }
+    const data = this.data || {};
     if ( !action.disableClose ){
       this.close();
     }
-    this.logger.info(`Dialog action: ${actionValue}`, this.data);
-    this.AppStateModel.emit('app-dialog-action', {action, data: this.data});
+    this.logger.info(`Dialog action: ${actionValue}`, data);
+    this.AppStateModel.emit('app-dialog-action', {action, data});
   }
 
   open(){

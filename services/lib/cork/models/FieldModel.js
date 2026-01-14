@@ -51,6 +51,40 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  async assign(fieldId, formId){
+    const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'assign' });
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  async unassign(fieldId, formId){
+    const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'unassign' });
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  async archiveAssignment(fieldId, formId){
+    const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'archive' });
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  async unarchiveAssignment(fieldId, formId){
+    const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'unarchive' });
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  
+
 }
 
 const model = new FieldModel();

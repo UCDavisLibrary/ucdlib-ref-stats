@@ -21,6 +21,11 @@ class Field {
       where.push(`EXISTS (SELECT 1 FROM jsonb_array_elements(fff.forms) AS form_obj WHERE form_obj->>'form_id' = $${values.length} OR form_obj->>'name' = $${values.length})`);
     }
 
+    if ( params['-form'] ){
+      values.push(params['-form']);
+      where.push(`NOT EXISTS (SELECT 1 FROM jsonb_array_elements(fff.forms) AS form_obj WHERE form_obj->>'form_id' = $${values.length} OR form_obj->>'name' = $${values.length})`);
+    }
+
     const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const sql = `
       SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.views.fieldFull} fff

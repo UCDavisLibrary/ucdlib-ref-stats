@@ -24,7 +24,13 @@ const picklistCreateSchema = picklistBaseSchema.extend({
       const existing = await models.picklist.get(name);
 
       if (existing.error) {
-        throw existing.error;
+        logger.error('Database error validating picklist name uniqueness', { error: existing.error });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'A database error occurred',
+          fatal: true
+        });
+        return;
       }
 
       if (existing.res) {
@@ -52,7 +58,13 @@ const picklistIdOrNameSchema = z.object({
       const existing = await models.picklist.get(idOrName);
 
       if (existing.error) {
-        throw existing.error;
+        logger.error('Database error validating picklist ID or name', { error: existing.error });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'A database error occurred',
+          fatal: true
+        });
+        return;
       }
 
       if (!existing.res) {

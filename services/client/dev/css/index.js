@@ -76,6 +76,30 @@ const styles = `
     border-radius: .5rem;
     color: #fff;
   }
+  .icon-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .icon-header cork-icon {
+    --cork-icon-size: 2rem;
+    color: var(--category-brand, #73abdd);
+  }
+  .icon-header .icon-header--title {
+    margin: 0;
+    padding: 0;
+    color: var(--forced-contrast-heading-primary, #022851);
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1.2;
+    font-size: 1.092rem;
+  }
+  @media (min-width: 768px) {
+    .icon-header .icon-header--title {
+      font-size: 1.428rem;
+    }
+  }
   ${getLitStyles(corkFieldContainerStyles)}
   ${getLitStyles(picklistTypeaheadStyles)}
   ${getLitStyles(formTypeaheadStyles)}
