@@ -1,6 +1,7 @@
 import { html, css } from 'lit';
 import '#components/forms/ref-stats-form-form.js';
 import '#components/ref-stats-field-assignment.js';
+import { focalLink } from '#templates';
 
 export function styles() {
   const elementStyles = css`
@@ -30,7 +31,14 @@ export function render() {
           <ref-stats-form-form @ref-stats-form-updated=${this._onFormUpdated}></ref-stats-form-form>
         </div>
         <div class="l-sidebar-second" ?hidden=${!this.nameOrId}>
-          <ref-stats-field-assignment form-name-or-id=${this.nameOrId}></ref-stats-field-assignment>
+          ${focalLink({
+            text: 'View Form',
+            icon: 'fas.rectangle-list',
+            href: `/form/${this.nameOrId}`,
+            brandColor: 'gunrock'
+          })}
+          <ref-stats-field-assignment form-name-or-id=${this.nameOrId} class='u-space-mt--large'></ref-stats-field-assignment>
+
         </div>
       </div>
     </div>

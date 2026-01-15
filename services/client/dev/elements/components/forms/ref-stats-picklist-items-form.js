@@ -66,13 +66,17 @@ export default class RefStatsPicklistItemsForm extends Mixin(LitElement)
     } else {
       item.edited = false;
     }
+
+    if ( prop === 'value' ){
+      item.valueHasBeenEdited = true;
+    }
     
     this.setEditedOrder();
 
-    if ( prop === 'label' && !item.item.value ){
+    if ( prop === 'label' && !item.item?.picklist_item_id ){
       if ( item.labelTimeout ) clearTimeout(item.labelTimeout);
       item.labelTimeout = setTimeout(() => {
-        if ( item.item.value ) return;
+        if ( item.valueHasBeenEdited ) return;
         item.item.value = textUtils.toUrlFriendly(item.item.label);
         this.requestUpdate();
       }, 500);

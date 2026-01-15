@@ -6,6 +6,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { AppComponentController, QueryStringController } from '#controllers';
 import { IdGenerator } from '#client-utils';
+import definitions from '#lib/definitions.js';
 
 import '#components/forms/ref-stats-picklist-form.js';
 
@@ -80,7 +81,7 @@ export default class RefStatsFieldForm extends Mixin(LitElement)
   _onPayloadInput(prop, value){
     this.payload[prop] = value;
 
-    if ( prop === 'field_type' && value !== 'picklist' ) {
+    if ( prop === 'field_type' && !definitions.fieldTypeUsesPickList(value) ) {
       delete this.payload.picklist_id;
     }
     this.requestUpdate();

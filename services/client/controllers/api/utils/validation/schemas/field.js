@@ -6,6 +6,7 @@ import logger from '#lib/logger.js';
 
 const fieldTypeEnum = z.enum(definitions.fieldTypes.map(ft => ft.value));
 
+
 const srNameUnique = async (data, ctx) => {
   if ( !data.name ) return;
   const existing = await models.field.get(data.name);
@@ -49,11 +50,11 @@ const srValidatePicklistId = async (data, ctx) => {
       fieldType = existing.res.field_type;
     }
   }
-  if (fieldType === 'picklist') {
+  if ( definitions.fieldTypeUsesPickList(fieldType) ) {
     if (!data.picklist_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'A picklist is required when field_type is picklist',
+        message: 'A picklist is required for the specified field type',
         path: ['picklist_id']
       });
     } else {

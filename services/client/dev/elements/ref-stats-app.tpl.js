@@ -20,7 +20,10 @@ return html`
   <ucdlib-pages
     selected=${this.page}
     attr-for-selected='page-id'>
+    <ref-stats-page-form-single page-id='form-single'></ref-stats-page-form-single>
     <ref-stats-page-home page-id='home'></ref-stats-page-home>
+
+    <!-- Admin Pages -->
     <ref-stats-page-picklist page-id='picklist'></ref-stats-page-picklist>
     <ref-stats-page-picklist-single page-id='picklist-single'></ref-stats-page-picklist-single>
     <ref-stats-page-field page-id='field'></ref-stats-page-field>

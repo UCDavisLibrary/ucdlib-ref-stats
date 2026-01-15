@@ -15,8 +15,9 @@ import '@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.
 import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
-// app pages
+// pages loaded upfront
 import './pages/ref-stats-page-home.js';
+import './pages/ref-stats-page-form-single.js';
 
 // app global components
 import './components/cork-app-dialog-modal.js';
@@ -25,7 +26,7 @@ import './components/cork-app-loader.js';
 import './components/cork-app-toast.js';
 import './components/cork-field-container.js';
 
-import bundleLoader from '../utils/bundleLoader.js';
+import { bundleLoader } from '#client-utils';
 
 // icon elements and model
 import '@ucd-lib/cork-icon';

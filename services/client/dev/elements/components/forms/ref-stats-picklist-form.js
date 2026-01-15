@@ -113,6 +113,12 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     let picklistItems = this.renderRoot.querySelector('ref-stats-picklist-items-form')?._items || [];
     picklistItems = picklistItems
       .filter( item => item.edited )
+      .map( item => {
+        if ( !item.item?.picklist_item_id && item.item.label && !item.valueHasBeenEdited ){
+          item.item.value = textUtils.toUrlFriendly(item.item.label);
+        }
+        return item;
+      })
       .filter( item => (item.item.label || item.item.value) || item.item.picklist_item_id )
       .map( item => item.item );
     payload.items = picklistItems;

@@ -51,7 +51,14 @@ export default class RefStatsPageFieldSingle extends Mixin(LitElement)
   }
 
   _onFieldUpdated(e) {
-    this.AppStateModel.setLocation('/field');
+    if ( e.detail.deleted ){
+      this.AppStateModel.setLocation('/field');
+    } else if (this.nameOrId ){
+      this.AppStateModel.refresh();
+    } else if ( e.detail?.field?.name ){
+      this.AppStateModel.setLocation(`/field/${e.detail.field.name}`);
+    }
+    
   }
 
 }

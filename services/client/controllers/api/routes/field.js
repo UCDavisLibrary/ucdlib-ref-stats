@@ -3,6 +3,7 @@ import handleError from '../utils/handleError.js';
 import { validate, schema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
+import definitions from '#lib/definitions.js';
 
 const router = Router();
 
@@ -37,7 +38,7 @@ router.get('/:idOrName', async (req, res) => {
 });
 
 const transformPayload = (req, res, next) => {
-  if ( req.body?.field_type && req.body.field_type !== 'picklist' ) {
+  if ( req.body?.field_type && !definitions.fieldTypeUsesPickList(req.body.field_type) ) {
     req.body.picklist_id = null;
   }
   next();

@@ -70,7 +70,7 @@ export function render() {
           `)}
         </select>
       </cork-field-container>
-      <div ?hidden=${this.payload?.field_type !== 'picklist'} class='u-space-mb'>
+      <div ?hidden=${!definitions.fieldTypeUsesPickList(this.payload?.field_type)} class='u-space-mb'>
         <cork-field-container schema='field' path='picklist_id' class='u-space-mb--small'>
           <label for=${this.ctl.idGen.get('picklist')}>Picklist</label>
           <ref-stats-picklist-typeahead 

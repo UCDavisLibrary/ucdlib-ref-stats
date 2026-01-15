@@ -48,6 +48,16 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     }
   }
 
+  _onAppStateUpdate(e) {
+    if ( !this.ctl.appComponent.isOnActivePage ) return;
+    const nameOrId = e.location.path?.[1];
+    if ( this.formNameOrId && nameOrId === this.formNameOrId ) {
+      this._loadData();
+    } else if ( this.fieldNameOrId && nameOrId === this.fieldNameOrId ) {
+      this._loadData();
+    }
+  }
+
   async _loadData() {
     if ( this.formNameOrId ) {
       const r = await this.FieldModel.query({ form: this.formNameOrId, page: 1, per_page: 100 });

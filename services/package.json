@@ -10,7 +10,7 @@
     "#models": "./lib/models/index.js",
     "#lib/*": "./lib/*",
     "#components/*": "./client/dev/elements/components/*",
-    "#templates/*": "./client/dev/elements/templates/*",
+    "#templates": "./client/dev/elements/templates/index.js",
     "#controllers": "./client/dev/controllers/index.js",
     "#client-utils": "./client/dev/utils/index.js"
   },

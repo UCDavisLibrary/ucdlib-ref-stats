@@ -1,5 +1,5 @@
 import { html, css } from 'lit';
-import focalLink from '#templates/focal-link.js';
+import { focalLink } from '#templates';
 
 import '#components/ref-stats-forms.js';
 
