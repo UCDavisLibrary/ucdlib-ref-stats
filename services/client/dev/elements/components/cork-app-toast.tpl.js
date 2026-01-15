@@ -21,7 +21,7 @@ export function styles() {
       gap: .5rem;
       padding: 1rem 1.5rem;
       border-radius: 5rem;
-      background-color: var(--ucd-blue-20, #F7FAFD);
+      background-color: var(--ucd-blue-40, #dbeaf7);
       box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.20);
       font-size: 1rem;
     }

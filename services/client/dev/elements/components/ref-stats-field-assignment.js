@@ -17,7 +17,8 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       fieldNameOrId: {type: String, attribute: 'field-name-or-id' },
       fields: {type: Array },
       forms: { type: Array },
-      fieldToAdd: { state: true }
+      fieldToAdd: { state: true },
+      formToAdd: { state: true }
     }
   }
 
@@ -33,6 +34,10 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     this.fieldNameOrId = null;
     this.fields = [];
     this.forms = [];
+
+    this.ctl = {
+      appComponent : new AppComponentController(this),
+    }
 
     this._injectModel('AppStateModel', 'FormModel', 'FieldModel');
   }
@@ -58,7 +63,9 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       }
 
     } else if ( this.fieldNameOrId ) {
-
+      const r = await this.FieldModel.get(this.fieldNameOrId);
+      if ( r.state !== 'loaded' ) return;
+      this.forms = r.payload.forms || [];
     }
   }
 
@@ -102,6 +109,24 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
           { text: 'Add', color: 'secondary', value: 'add-field-to-form' }
         ]
       })
+    } else if ( this.fieldNameOrId ) {
+      this.formToAdd = null;
+      this.AppStateModel.showDialogModal({
+        title: 'Add Field to Form',
+        content: () => html`
+          <ref-stats-form-typeahead
+            @form-typeahead-selected=${(e) => {
+              this.formToAdd = e.detail.form.form_id;
+            }} 
+            relative-dropdown
+          >
+          </ref-stats-form-typeahead>
+        `,
+        actions: [
+          {text: 'Close', value: 'dismiss', invert: true, color: 'secondary'},
+          { text: 'Add', color: 'secondary', value: 'add-field-to-form' }
+        ]
+      })
     }
   }
 
@@ -123,13 +148,29 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
   }
 
   async _onAppDialogAction(e){
+    if ( !this.ctl.appComponent.isOnActivePage ) return;
     if ( e.action.value === 'add-field-to-form' ) {
-      if ( !this.fieldToAdd || !this.formNameOrId ) return;
-      const r = await this.FieldModel.assign(this.fieldToAdd, this.formNameOrId);
-      if ( r.state === 'loaded' ) {
-        this.AppStateModel.showToast({text: 'Field assigned to form successfully', type: 'success'});
-        this._loadData();
+      if ( this.formNameOrId ) {
+        if ( !this.fieldToAdd ) return;
+        const r = await this.FieldModel.assign(this.fieldToAdd, this.formNameOrId);
+        if ( r.state === 'loaded' ) {
+          this.AppStateModel.showToast({text: 'Field assigned to form successfully', type: 'success'});
+          this._loadData();
+        }
       }
+      if ( this.fieldNameOrId ) {
+        if ( !this.formToAdd ) return;
+        if ( this.forms.find( f => f.form_id === this.formToAdd ) ) {
+          this.AppStateModel.showToast({text: 'Field is already assigned to that form', type: 'error'});
+          return;
+        }
+        const r = await this.FieldModel.assign(this.fieldNameOrId, this.formToAdd);
+        if ( r.state === 'loaded' ) {
+          this.AppStateModel.showToast({text: 'Field assigned to form successfully', type: 'success'});
+          this._loadData();
+        }
+      }
+
     } else if ( e.action.value === 'remove-field-from-form' ) {
       const r = await this.FieldModel.unassign(e.data.fieldId, e.data.formId);
       if ( r.state === 'loaded' ) {

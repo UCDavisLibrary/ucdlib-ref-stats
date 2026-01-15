@@ -18,7 +18,8 @@ export default class RefStatsFormTypeahead extends Mixin(LitElement)
       suggestionLimit: { type: Number, attribute: 'suggestion-limit' },
       totalSuggestions: { state: true },
       fetchError: { state: true },
-      selectedSuggestion: { type: Object }
+      selectedSuggestion: { type: Object },
+      relativeDropdown: { type: Boolean, attribute: 'relative-dropdown' }
     }
   }
 
@@ -43,6 +44,10 @@ export default class RefStatsFormTypeahead extends Mixin(LitElement)
   willUpdate(props){
     if ( props.has('nameOrId') ) {
       this.getByNameOrId();
+    }
+
+    if ( props.has('relativeDropdown') ) {
+      this.ctl.dropdown.openCustomStyles.position = this.relativeDropdown ? 'relative' : 'absolute';
     }
   }
 

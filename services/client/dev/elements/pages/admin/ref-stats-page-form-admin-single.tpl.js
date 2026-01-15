@@ -32,9 +32,7 @@ export function render() {
         <div class="l-sidebar-second" ?hidden=${!this.nameOrId}>
           <ref-stats-field-assignment form-name-or-id=${this.nameOrId}></ref-stats-field-assignment>
         </div>
-        
       </div>
-      
     </div>
   `;
 }

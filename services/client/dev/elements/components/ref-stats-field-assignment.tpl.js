@@ -22,6 +22,49 @@ export function styles() {
 export function render() { 
   return html`
     ${_renderFields.call(this)}
+    ${_renderForms.call(this)}
+  `;
+}
+
+function _renderForms(){
+  if ( !this.fieldNameOrId ) return html``;
+  return html`
+    <div class='icon-header'>
+      <cork-icon icon='fas.keyboard' class='redbud'></cork-icon>
+      <h2 class='icon-header--title'>Forms</h2>
+    </div>
+    <div ?hidden=${this.forms.length > 0}>
+      This field is not assigned to any forms.
+    </div>
+    <div>
+      ${this.forms.map( form => html`
+        <div>
+          <div>
+            <a href="/form-admin/${form.name}" class='ucd-link-list-item--title'>${form.label}</a>
+            <div class='ucd-link-list-item--badge' ?hidden=${!form.assignment_is_archived}>Archived</div>
+            <div class='ucd-link-list-item--badge' ?hidden=${!form.is_archived}>Form Archived</div>
+          </div>
+          <div class='ucd-link-list-item--excerpt'>${form.name}</div>
+          <ul class='list--pipe actions text--smaller'>
+            <li ?hidden=${form.assignment_is_archived}>
+              <cork-icon icon='fas.eye-slash'></cork-icon>
+              <button class='link-button' @click=${() => this._onArchiveClick(form.form_id)}>Archive</button>
+            </li>
+            <li ?hidden=${!form.assignment_is_archived}>
+              <cork-icon icon='fas.eye'></cork-icon>
+              <button class='link-button' @click=${() => this._onUnarchiveClick(form.form_id)}>Unarchive</button>
+            </li>
+            <li>
+              <cork-icon icon='fas.trash'></cork-icon>
+              <button class='link-button' @click=${() => this._onRemoveFieldClick(form.form_id)}>Remove</button>
+            </li>
+          </ul>
+        </div>
+      `)}
+    </div>
+    <div class="alignable-promo__buttons category-brand--redbud u-space-mt--medium">
+      <button class="btn btn--invert u-space-mx--flush" @click=${this._onAddFieldClick}>Add This Field To New Form</button>
+    </div>
   `;
 }
 
