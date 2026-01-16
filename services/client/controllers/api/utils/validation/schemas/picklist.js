@@ -11,6 +11,7 @@ const picklistBaseSchema = z.object({
 const picklistItemSchema = z.object({
   label: requiredString().pipe(z.string().max(250)),
   value: requiredString().pipe(z.string().max(250)),
+  description: toString.pipe(z.string().max(300)).optional(),
   is_archived: z.boolean().optional(),
   sort_order: z.coerce.number().int().nonnegative().optional(),
   include_segment: z.array(z.string().max(250)).optional(),

@@ -76,6 +76,16 @@ export function render() {
                 @input=${() => this._onItemInput(item, 'is_archived', !item.item.is_archived)}>
               <label for=${this.ctl.idGen.get('is_archived--' + i)}>Archived</label>
             </cork-field-container>
+            <cork-field-container schema='picklist' path='items.${item.editedOrder}.description' class='field-container'>
+              <label for=${this.ctl.idGen.get('description--' + i)}>Description</label>
+              <textarea
+                id=${this.ctl.idGen.get('description--' + i)}
+                .value=${item.item.description || ''}
+                rows='3'
+                @input=${e => this._onItemInput(item, 'description', e.target.value)}
+              ></textarea>
+              <div class='field-description'>Descriptions will display for checkbox and raio fields</div>
+            </cork-field-container>
             <cork-field-container schema='picklist' path='items.${item.editedOrder}.include_segment' class='field-container'>
               <label for=${this.ctl.idGen.get('include-segment--' + i)}>Include Segments</label>
               <input 

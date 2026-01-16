@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS picklist_item (
   picklist_id UUID NOT NULL REFERENCES picklist(picklist_id) ON DELETE CASCADE,
   value VARCHAR(255) NOT NULL,
   label TEXT,
+  description TEXT,
   meta JSONB NOT NULL DEFAULT '{}'::JSONB,
   sort_order INTEGER NOT NULL DEFAULT 0,
   include_segment TEXT[] NOT NULL DEFAULT '{}',
