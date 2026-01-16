@@ -10,6 +10,8 @@ export default class RefStatsPageFormSingle extends Mixin(LitElement)
   static get properties() {
     return {
       pageId: {type: String, attribute: 'page-id'},
+      nameOrId: {type: String },
+      data: {type: Object }
     }
   }
 
@@ -20,6 +22,22 @@ export default class RefStatsPageFormSingle extends Mixin(LitElement)
   constructor() {
     super();
     this.render = render.bind(this);
+
+    this.nameOrId = null;
+    this.data = {};
+
+    this._injectModel('AppStateModel', 'FormModel');
+  }
+
+  async _onAppStateUpdate(e) {
+    if ( e.page !== this.pageId ) return;
+    this.nameOrId = e.location.path[1];
+    this.data = {};
+    
+    const res = await this.FormModel.get(this.nameOrId);
+      if ( res?.state === 'loaded' ) {
+        this.data = {...res.payload};
+      }
   }
 
 }

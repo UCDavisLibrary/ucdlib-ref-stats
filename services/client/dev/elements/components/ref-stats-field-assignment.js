@@ -60,7 +60,7 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
 
   async _loadData() {
     if ( this.formNameOrId ) {
-      const r = await this.FieldModel.query({ form: this.formNameOrId, page: 1, per_page: 100 });
+      const r = await this.FieldModel.query({ form: this.formNameOrId, page: 1, per_page: 500 });
       if ( r.state !== 'loaded' ) return;
       this.fields = r.payload.results.map( f => {
         const out = { field: f };
@@ -69,7 +69,7 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
         return out;
       });
       if ( r.payload.max_page > 1 ) {
-        console.warn('RefStatsFieldAssignment: more than 100 fields assigned to form, only first 100 loaded');
+        console.warn('RefStatsFieldAssignment: more than 500 fields assigned to form, only first 500 loaded');
       }
 
     } else if ( this.fieldNameOrId ) {

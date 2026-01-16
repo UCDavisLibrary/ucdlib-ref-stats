@@ -159,6 +159,15 @@ class Picklist {
     }
     return { res: r.res.rows[0] || null };
   }
+
+  async getPicklistItems(picklistNameOrId, segments=[]){
+    const sql = `SELECT * FROM get_picklist_items( $1, $2);`;
+    const r = await pgClient.query(sql, [picklistNameOrId, segments]);
+    if ( r.error ) {
+      return r;
+    }
+    return { res: r.res.rows  };
+  }
 }
 
 export default new Picklist();

@@ -1,9 +1,8 @@
 import { html, css } from 'lit';
-import '#components/ref-stats-form-entry-field.js';
 
 export function styles() {
   const elementStyles = css`
-    ref-stats-form-entry {
+    ref-stats-form-entry-field {
       display: block;
     }
   `;
@@ -12,8 +11,7 @@ export function styles() {
 }
 
 export function render() { 
-return html`
+  return html`
   ${this.ctl.formEntry.render()}
-
-
-`;}
+  `;
+}

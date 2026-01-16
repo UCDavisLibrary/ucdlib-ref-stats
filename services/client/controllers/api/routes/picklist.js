@@ -20,6 +20,27 @@ router.get('/', validate(schema.picklistQuery, {reqParts: ['query']}), async (re
   }
 });
 
+router.get('/_bulk-items/:idOrNames', async (req, res) => {
+  try {
+
+    const idOrNames = (req.params.idOrNames || '').split(',').map(s => s.trim()).filter(s => s);
+    const segments = (req.query.segments || '').split(',').map(s => s.trim()).filter(s => s);
+    logger.info('Picklist bulk items request', req.context.logSignal, { picklistIdOrNames: idOrNames });
+    const results = {};
+    for ( const idOrName of idOrNames ) {
+      const r = await models.picklist.getPicklistItems(idOrName, segments);
+      if ( r.error ) {
+        throw r.error;
+      }
+      results[idOrName] = r.res;
+    }
+    logger.info('Picklist bulk items successful', req.context.logSignal, { picklistCount: Object.keys(results).length });
+    res.status(200).json(results);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
 router.get('/:idOrName', async (req, res) => {
   try {
     const r = await models.picklist.get(req.params.idOrName, { errorOnMissing: true });

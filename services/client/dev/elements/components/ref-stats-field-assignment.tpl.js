@@ -38,7 +38,7 @@ function _renderForms(){
     </div>
     <div>
       ${this.forms.map( form => html`
-        <div>
+        <div class='u-space-mb--small'>
           <div>
             <a href="/form-admin/${form.name}" class='ucd-link-list-item--title'>${form.label}</a>
             <div class='ucd-link-list-item--badge' ?hidden=${!form.assignment_is_archived}>Archived</div>
@@ -80,7 +80,7 @@ function _renderFields(){
     </div>
     <div>
       ${this.fields.map( f => html`
-        <div>
+        <div class='u-space-mb--small'>
           <div>
             <a href="/field/${f.field.name}" class='ucd-link-list-item--title'>${f.field.label}</a>
             <div class='ucd-link-list-item--badge' ?hidden=${!f.assignment_is_archived}>Archived</div>

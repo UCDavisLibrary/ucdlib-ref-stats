@@ -146,6 +146,30 @@ class PicklistService extends BaseService {
 
     return store.get(id);
   }
+
+  async formItems(formId, picklistIds=[]){
+    const store = this.store.data.formItems;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to get picklist items for form'}
+    };
+
+    await this.checkRequesting(
+      formId, store,
+      () => this.request({
+        url : `${this.baseUrl}/_bulk-items/${picklistIds.join(',')}`,
+        qs: {segments: [ `form:${formId}` ]},
+        checkCached : () => store.get(formId),
+        onUpdate : resp => this.store.set(
+          { ...resp, id: formId },
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+    return store.get(formId);
+  }
 }
 
 const service = new PicklistService();

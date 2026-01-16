@@ -159,10 +159,11 @@ const fieldIdOrNameSchema = z.object({
 
 const fieldQuerySchema = z.object({
   page: pageParam,
-  per_page: perPageParam(15),
+  per_page: perPageParam(15, 500),
   q: z.string().max(250).optional(),
   form: z.string().optional(),
-  '-form': z.string().optional()
+  '-form': z.string().optional(),
+  active_only: booleanParam
 });
 
 export {

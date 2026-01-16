@@ -9,7 +9,8 @@ class Definitions {
       { value: 'select', label: 'Select', usesPickList: true },
       { value: 'checkbox-multiple', label: 'Checkbox', usesPickList: true },
       { value: 'checkbox-single', label: 'Checkbox (Single)' },
-      { value: 'radio', label: 'Radio', usesPickList: true }
+      { value: 'radio', label: 'Radio', usesPickList: true },
+      { value: 'typeahead', label: 'Typeahead', usesPickList: true }
     ];
   }
 

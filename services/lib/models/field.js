@@ -16,6 +16,14 @@ class Field {
       where.push(`label ILIKE $${values.length}`);
     }
 
+    if ( params.active_only ) {
+      values.push(false);
+      where.push(`is_archived = $${values.length}`);
+    } else if ( params.archived_only ) {
+      values.push(true);
+      where.push(`is_archived = $${values.length}`);
+    }
+
     if ( params.form ){
       values.push(params.form);
       where.push(`EXISTS (SELECT 1 FROM jsonb_array_elements(fff.forms) AS form_obj WHERE form_obj->>'form_id' = $${values.length} OR form_obj->>'name' = $${values.length})`);

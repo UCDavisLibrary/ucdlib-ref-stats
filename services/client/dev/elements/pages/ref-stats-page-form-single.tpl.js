@@ -13,5 +13,12 @@ export function styles() {
 
 export function render() { 
   return html`
-    <ref-stats-form-entry></ref-stats-form-entry>
+    <div><h1 class="page-title">${this.data?.label || ''}</h1></div>
+    <ol class="breadcrumbs">
+      <li><a href="/">Home</a></li>
+      <li>${this.data?.label || ''}</li>
+    </ol>
+    <div class="l-container">
+      <ref-stats-form-entry></ref-stats-form-entry>
+    </div>
   `;}

@@ -11,7 +11,8 @@ class PicklistStore extends BaseStore {
       query: new LruStore({name: 'picklist.query'}),
       get: new LruStore({name: 'picklist.get'}),
       patch: new LruStore({name: 'picklist.patch'}),
-      delete: new LruStore({name: 'picklist.delete'})
+      delete: new LruStore({name: 'picklist.delete'}),
+      formItems: new LruStore({name: 'picklist.formItems'})
     };
     this.events = {};
   }

@@ -96,10 +96,7 @@ AS $$
   FROM picklist_item pi
   JOIN picklist p ON p.picklist_id = get_picklist_id(p_picklist_name_or_id)
   WHERE
-    NOT p.is_archived
-    AND NOT pi.is_archived
-
-    AND pi.picklist_id = p.picklist_id
+    pi.picklist_id = p.picklist_id
 
     AND (
       -- no segments provided - only global items
