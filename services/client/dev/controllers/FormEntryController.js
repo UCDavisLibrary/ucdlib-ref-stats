@@ -1,6 +1,7 @@
 import { Registry } from '@ucd-lib/cork-app-utils';
 import AppComponentController from './AppComponentController.js';
 import { forms, fields } from '#templates';
+import { IdGenerator } from '#client-utils';
 import { html } from 'lit';
 
 export default class FormEntryController {
@@ -11,12 +12,14 @@ export default class FormEntryController {
 
     this.models = {
       AppStateModel: Registry.getModel('AppStateModel'),
+      FormEntryModel: Registry.getModel('FormEntryModel'),
       FormModel: Registry.getModel('FormModel'),
       FieldModel: Registry.getModel('FieldModel'),
       PicklistModel: Registry.getModel('PicklistModel')
     }
 
     this.appComponentController = new AppComponentController(host);
+    this.idGen = new IdGenerator();
 
     this.form = {};
     this.formNameOrId = null;
@@ -30,6 +33,42 @@ export default class FormEntryController {
 
   get hostIsField(){
     return this.host.tagName === 'REF-STATS-FORM-ENTRY-FIELD';
+  }
+
+  get payload(){
+    const d = this.models.FormEntryModel.store.data.payload.get(this.form?.form_id) || {};
+    return d.payload || {};
+  }
+
+  setPayload(payload){
+    this.models.FormEntryModel.store.set(
+      {state: 'loaded', id: this.form?.form_id, payload},
+      this.models.FormEntryModel.store.data.payload
+    )
+  }
+
+  setPayloadField(fieldName, value){
+    const payload = {...this.payload};
+    payload[fieldName] = value;
+    this.setPayload(payload);
+  }
+
+  togglePayloadArrayItem(fieldName, value){
+    const payload = {...this.payload};
+    if ( !Array.isArray(payload[fieldName]) ) {
+      payload[fieldName] = [];
+    }
+    if ( payload[fieldName].includes(value) ) {
+      payload[fieldName] = payload[fieldName].filter( v => v !== value );
+    } else {
+      payload[fieldName].push(value);
+    }
+    this.setPayload(payload);
+  }
+
+  _onPayloadUpdate(e){
+    if ( e.id !== this.form?.form_id ) return;
+    this.host.requestUpdate();
   }
 
 
@@ -52,7 +91,6 @@ export default class FormEntryController {
         this.getForm(),
         this.getFields()
       ]);
-      console.log('fields for form entry field', this.fields);
 
       this.picklistItems = {};
       const picklists = this.fields.filter(f => f.picklist_id && f.field_type !== 'typeahead').map(f => f.picklist_id);
@@ -62,7 +100,6 @@ export default class FormEntryController {
           this.picklistItems = r.payload;
         }
       }
-      console.log('picklist items for form entry field', this.picklistItems);
     }
 
     this.host.requestUpdate();
@@ -123,9 +160,11 @@ export default class FormEntryController {
 
   hostConnected() {
     this.models.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate.bind(this));
+    this.models.FormEntryModel.EventBus.on('formentry-payload-update', this._onPayloadUpdate.bind(this));
   }
 
   hostDisconnected() {
     this.models.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate.bind(this));
+    this.models.FormEntryModel.EventBus.off('formentry-payload-update', this._onPayloadUpdate.bind(this));
   }
 }

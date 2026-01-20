@@ -2,6 +2,7 @@
 import sharedStyles from '@ucd-lib/theme-sass/style-ucdlib.css';
 import brandCssProps from '@ucd-lib/theme-sass/css-properties.css';
 import fonts from './fonts.css';
+import forms from './forms.css';
 import headings from './headings.css';
 import linkList from './link-list.css';
 import typeahead from './typeahead.css';
@@ -18,6 +19,7 @@ const styles = `
   ${sharedStyles}
   ${brandCssProps}
   ${fonts}
+  ${forms}
   ${headings}
   ${linkList}
   ${typeahead}
@@ -49,15 +51,7 @@ const styles = `
       width: 92%;
     }
   }
-  .field-description {
-    font-size: 0.875rem;
-    color: var(--ucd-black-60);
-    margin-top: 0.25rem;
-  }
-  input[disabled],
-  textarea[disabled] {
-    background-color: #f0f0f0;
-  }
+
   button.link-button {
     all: unset;
     color: var(--ucd-blue-80, #13639E);

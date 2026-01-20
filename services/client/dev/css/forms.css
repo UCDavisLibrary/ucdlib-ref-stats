@@ -1,0 +1,14 @@
+  .field-description {
+    font-size: 0.875rem;
+    color: var(--ucd-black-60);
+    margin-top: 0.25rem;
+  }
+  .checkbox-item .field-description, .radio-item .field-description, .checkbox-single .field-description {
+    margin-left: 2.4rem;
+    margin-top: -.25rem;
+    margin-bottom: .5rem;
+  }
+  input[disabled],
+  textarea[disabled] {
+    background-color: #f0f0f0;
+  }

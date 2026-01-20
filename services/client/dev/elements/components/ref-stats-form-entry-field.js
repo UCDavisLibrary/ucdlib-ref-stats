@@ -11,7 +11,12 @@ export default class RefStatsFormEntryField extends Mixin(LitElement)
 
   static get properties() {
     return {
-      field: { type: String }
+      field: { type: String },
+      multiple: { type: Boolean },
+      max: { type: Number },
+      min: { type: Number },
+      step: { type: Number },
+      placeholder: { type: String }
     }
   }
 
@@ -28,11 +33,12 @@ export default class RefStatsFormEntryField extends Mixin(LitElement)
     }
 
     this.field = null;
+    this.multiple = false;
 
   }
 
   willUpdate(props){
-    const watchedProps = ['field'];
+    const watchedProps = ['field', 'multiple', 'max', 'min', 'step', 'placeholder'];
     if ( watchedProps.some( p => props.has(p) ) ) {
       this.ctl.formEntry.update();
     }

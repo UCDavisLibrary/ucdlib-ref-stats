@@ -11,6 +11,7 @@ import '@ucd-lib/theme-elements/ucdlib/ucdlib-branding-bar/ucdlib-branding-bar.j
 import '@ucd-lib/theme-elements/brand/ucd-theme-quick-links/ucd-theme-quick-links.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-pagination/ucd-theme-pagination.js';
+import '@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-select.js';
 
 import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
@@ -34,6 +35,7 @@ import '@ucd-lib/cork-icon';
 // cork models
 import '#lib/cork/models/AppStateModel.js';
 import '#lib/cork/models/FieldModel.js';
+import '#lib/cork/models/FormEntryModel.js';
 import '#lib/cork/models/FormModel.js';
 import '#lib/cork/models/PicklistModel.js';
 import '#lib/cork/models/ValidationModel.js';
