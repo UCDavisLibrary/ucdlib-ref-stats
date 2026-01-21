@@ -26,6 +26,7 @@ import './components/cork-app-error.js';
 import './components/cork-app-loader.js';
 import './components/cork-app-toast.js';
 import './components/cork-field-container.js';
+import './components/ref-stats-picklist-item-quick-add.js';
 
 import { bundleLoader } from '#client-utils';
 

@@ -5,6 +5,8 @@ import models from '#models';
 const picklistBaseSchema = z.object({
   description: toString.pipe(z.string().max(300)).optional(),
   label: requiredString().pipe(z.string().max(250)),
+  sort_alpha: z.boolean().optional(),
+  user_can_add_items: z.boolean().optional(),
   is_archived: z.boolean().optional()
 });
 

@@ -58,6 +58,7 @@ router.get('/:idOrName', async (req, res) => {
 });
 
 router.patch('/:idOrName', json(), validate(schema.picklistIdOrNameSchema, {reqParts: ['params']}), validate(schema.picklistUpdate, {reqParts: ['body']}), async (req, res) => {
+  // todo: when doing auth, allow normal user to add picklist items if user_can_add_items is true
   try {
     logger.info('Picklist update validated', req.context.logSignal, {picklistIdOrName: req.params.idOrName});
     const r = await models.picklist.patch(req.params.idOrName, req.payload);

@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS picklist (
   description TEXT,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now(),
+  sort_alpha BOOLEAN DEFAULT FALSE NOT NULL,
+  user_can_add_items BOOLEAN DEFAULT FALSE NOT NULL,
   is_archived BOOLEAN DEFAULT FALSE NOT NULL
 );
 
@@ -130,6 +132,8 @@ SELECT
   p.description,
   p.created_at,
   p.updated_at,
+  p.sort_alpha,
+  p.user_can_add_items,
   p.is_archived,
 
   COALESCE(
@@ -148,4 +152,6 @@ GROUP BY
   p.description,
   p.created_at,
   p.updated_at,
+  p.sort_alpha,
+  p.user_can_add_items,
   p.is_archived;

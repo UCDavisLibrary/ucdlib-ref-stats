@@ -19,6 +19,12 @@ export function styles() {
 export function render() { 
   const isNew = !this.picklistIdOrName;
   const isEdit = !!this.picklistIdOrName;
+  const items = Array.isArray(this.payload?.items) ? [...this.payload.items] : [];
+  if ( this.payload?.sort_alpha  ){
+    items.sort((a,b) => {
+      return a.label.localeCompare(b.label, undefined, {sensitivity: 'base'});
+    });
+  }
   return html`
     <form @submit="${this._onSubmit}" novalidate>
       <cork-field-container schema='picklist' path='label' class='field-container'>
@@ -53,6 +59,22 @@ export function render() {
           rows="4"
           @input=${e => this._onPayloadInput('description', e.target.value)}></textarea>
       </cork-field-container>
+      <cork-field-container schema='picklist' path='sort_alpha' class='field-container checkbox'>
+        <input 
+          type="checkbox" 
+          id=${this.ctl.idGen.get('sort_alpha')} 
+          .checked=${this.payload?.sort_alpha || false}
+          @input=${() => this._onPayloadInput('sort_alpha', !this.payload?.sort_alpha)}>
+        <label for=${this.ctl.idGen.get('sort_alpha')}>Sort Items Alphabetically</label>
+      </cork-field-container>
+      <cork-field-container schema='picklist' path='user_can_add_items' class='field-container checkbox'>
+        <input 
+          type="checkbox" 
+          id=${this.ctl.idGen.get('user_can_add_items')} 
+          .checked=${this.payload?.user_can_add_items || false}
+          @input=${() => this._onPayloadInput('user_can_add_items', !this.payload?.user_can_add_items)}>
+        <label for=${this.ctl.idGen.get('user_can_add_items')}>Allow Users to Add Items</label>
+      </cork-field-container>
       <cork-field-container schema='picklist' path='is_archived' class='field-container checkbox' ?hidden=${isNew}>
         <input 
           type="checkbox" 
@@ -61,7 +83,7 @@ export function render() {
           @input=${() => this._onPayloadInput('is_archived', !this.payload?.is_archived)}>
         <label for=${this.ctl.idGen.get('is_archived')}>Archived</label>
       </cork-field-container>
-      <ref-stats-picklist-items-form .items=${this.payload?.items || []}></ref-stats-picklist-items-form>
+      <ref-stats-picklist-items-form .items=${items} .disableMoveButtons=${this.payload?.sort_alpha || false}></ref-stats-picklist-items-form>
       <div ?hidden=${this.ctl.modal.modal}>
         <button type="submit" class='btn btn--primary'>${isEdit ? 'Save Changes' : 'Create Picklist'}</button>
         <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest}>Delete</button>

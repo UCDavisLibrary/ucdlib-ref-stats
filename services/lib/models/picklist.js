@@ -115,11 +115,18 @@ class Picklist {
       await client.query('BEGIN');
       const items = Array.isArray(data.items) ? data.items : [];
       delete data.items;
+      let picklistId, result;
 
-      const d = pgClient.prepareObjectForUpdate(data);
-      const sql = `UPDATE ${config.db.tables.picklist} SET ${d.sql} WHERE picklist_id = get_picklist_id($${d.values.length + 1}) RETURNING picklist_id, name;`;
-      let result = await client.query(sql, [...d.values, idOrName]);
-      const picklistId = result.rows[0].picklist_id;
+      if ( Object.keys(data).length ){
+        const d = pgClient.prepareObjectForUpdate(data);
+        const sql = `UPDATE ${config.db.tables.picklist} SET ${d.sql} WHERE picklist_id = get_picklist_id($${d.values.length + 1}) RETURNING picklist_id, name;`;
+        result = await client.query(sql, [...d.values, idOrName]);
+        picklistId = result.rows[0].picklist_id;
+      } else {
+        const sql = `SELECT picklist_id, name FROM ${config.db.tables.picklist} WHERE picklist_id = get_picklist_id($1);`;
+        result = await client.query(sql, [idOrName]);
+        picklistId = result.rows[0].picklist_id;
+      }
 
       for ( const item of items ) {
         if ( item.picklist_item_id ) {

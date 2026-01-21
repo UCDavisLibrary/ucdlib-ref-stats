@@ -40,6 +40,62 @@ export default class FormEntryController {
     return d.payload || {};
   }
 
+  get fieldPicklistItems(){
+    const field = this.fields.find( f => this.host.field === f.name );
+    const picklistItems = [...(this.picklistItems?.[field?.picklist_id] || [])];
+    if ( !picklistItems.length ) return picklistItems;
+
+    if ( field?.picklist?.sort_alpha ) {
+      picklistItems.sort((a,b) => {
+        return a.label.localeCompare(b.label, undefined, {sensitivity: 'base'});
+      });
+    }
+    return picklistItems;
+
+  }
+
+  getFieldElement(fieldNameOrId){
+    const field = this.fields.find( f => f.name === fieldNameOrId || f.field_id === fieldNameOrId );
+    if ( !field ) return null;
+    const formElement = this.formElement;
+    if ( !formElement ) return null;
+    let fieldElement = formElement.renderRoot.querySelector(`ref-stats-form-entry-field[field="${field.name}"]`);
+    if ( fieldElement ) return fieldElement;
+    fieldElement = formElement.renderRoot.querySelector(`ref-stats-form-entry-field[field="${field.field_id}"]`);
+    return fieldElement;
+  }
+
+  get formElement(){
+    if ( this.hostIsForm ) {
+      return this.host;
+    }
+    if ( this.hostIsField ) {
+      return this.host.closest('ref-stats-form-entry');
+    }
+    return null;
+  }
+
+  /**
+   * @description Handle picklist item added event emitted from ref-stats-picklist-item-quick-add
+   * Finds the corresponding picklist field and updates the form payload with the new picklist item
+   * @param {*} e 
+   * @returns 
+   */
+  async _onPicklistItemAdded(e) {
+    const picklistId = e.detail.picklist.picklist_id;
+    const itemValue = e.detail.item.value;
+    const field = this.fields.find( f => f.picklist_id === picklistId );
+    if ( !field ) return;
+    const fieldElement = this.getFieldElement(field.name);
+    if ( !fieldElement ) return;
+    await fieldElement.ctl.formEntry.getPicklistItems();
+    if ( fieldElement.multiple ){
+      this.togglePayloadArrayItem(field.name, itemValue);
+    } else {
+      this.setPayloadField(field.name, itemValue);
+    }
+  }
+
   setPayload(payload){
     this.models.FormEntryModel.store.set(
       {state: 'loaded', id: this.form?.form_id, payload},
@@ -77,32 +133,25 @@ export default class FormEntryController {
 
     if ( !this.appComponentController.isOnActivePage ) return;
     this.formNameOrId = e.location.path?.[1];
-
-    // Attached to a form entry element
-    if ( this.hostIsForm && this.formNameOrId ) {
-      await this.getForm();
-      this.host.requestUpdate();
-      return;
-    }
-
-    // Attached to a form entry field element
-    if ( this.hostIsField && this.formNameOrId ) {
-      await Promise.all([
-        this.getForm(),
-        this.getFields()
-      ]);
-
-      this.picklistItems = {};
-      const picklists = this.fields.filter(f => f.picklist_id && f.field_type !== 'typeahead').map(f => f.picklist_id);
-      if ( picklists.length ) {
-        const r = await this.models.PicklistModel.getFormItems(this.form.form_id, picklists);
-        if ( r.state === 'loaded' ){
-          this.picklistItems = r.payload;
-        }
-      }
-    }
+    if ( !this.formNameOrId ) return;
+    await Promise.all([
+      this.getForm(),
+      this.getFields()
+    ]);
+    await this.getPicklistItems();
 
     this.host.requestUpdate();
+  }
+
+  async getPicklistItems(){
+    this.picklistItems = {};
+    const picklists = this.fields.filter(f => f.picklist_id && f.field_type !== 'typeahead').map(f => f.picklist_id);
+    if ( picklists.length ) {
+      const r = await this.models.PicklistModel.getFormItems(this.form.form_id, picklists);
+      if ( r.state === 'loaded' ){
+        this.picklistItems = r.payload;
+      }
+    }
   }
 
   async getForm(){

@@ -3,12 +3,11 @@ import {ifDefined} from 'lit/directives/if-defined.js';
 
 function checkboxMulti(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
-  const picklistItems = ctl.picklistItems[field.picklist_id] || [];
   return html`
-    <cork-field-container schema=${ctl.form?.name} path=${field.name} class='field-container'>
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
       <label>${field.label}</label>
       <div class='checkbox'>
-        ${picklistItems.map( item => html`
+        ${ctl.fieldPicklistItems.map( item => html`
           <div class='checkbox-item'>
             <div>
               <input 
@@ -31,12 +30,11 @@ function checkboxMulti(ctl) {
 
 function radio(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
-  const picklistItems = ctl.picklistItems[field.picklist_id] || [];
   return html`
-    <cork-field-container schema=${ctl.form?.name} path=${field.name} class='field-container'>
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
       <label>${field.label}</label>
       <div class='radio'>
-        ${picklistItems.map( item => html`
+        ${ctl.fieldPicklistItems.map( item => html`
           <div class='radio-item'>
             <div>
               <input 
@@ -59,7 +57,6 @@ function radio(ctl) {
 
 function select(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
-  const picklistItems = ctl.picklistItems[field.picklist_id] || [];
   const onChange = (e) => {
     if ( this.multiple ) {
       ctl.setPayloadField(field.name, e.detail.map( o => o.value ));
@@ -68,13 +65,13 @@ function select(ctl) {
     }
   };
   return html`
-    <cork-field-container schema=${ctl.form?.name} path=${field.name} class='field-container'>
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
       <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
       <ucd-theme-slim-select @change=${onChange}>
         <select
           id=${ctl.idGen.get(`field-${field.name}`)}
           ?multiple=${this.multiple}>
-          ${picklistItems.map( item => html`
+          ${ctl.fieldPicklistItems.map( item => html`
             <option 
               value=${item.value}
               ?selected=${this.multiple ? (ctl.payload?.[field.name] || []).includes(item.value) : ctl.payload?.[field.name] === item.value}>
@@ -90,7 +87,7 @@ function select(ctl) {
 function checkbox(ctl){
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
-    <div class='field-container checkbox-single'>
+    <div class='checkbox-single ${this.noFieldContainer ? '' : 'field-container'}'>
       <cork-field-container schema=${ctl.form?.name} path=${field.name} class='checkbox'>
         <input 
           type="checkbox"
@@ -110,7 +107,7 @@ function checkbox(ctl){
 function number(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
-    <cork-field-container schema=${ctl.form?.name} path=${field.name} class='field-container'>
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
       <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
       <input 
         type="number"
@@ -126,10 +123,45 @@ function number(ctl) {
   `;
 }
 
+function text(ctl) {
+  const field = ctl.fields.find( f => this.field === f.name );
+  return html`
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <input 
+        type="text"
+        id=${ctl.idGen.get(`field-${field.name}`)}
+        .value=${ctl.payload?.[field.name] || ''}
+        placeholder=${ifDefined(this.placeholder)}
+        @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
+      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+    </cork-field-container>
+  `;
+}
+
+function textarea(ctl) {
+  const field = ctl.fields.find( f => this.field === f.name );
+  return html`
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <textarea 
+        id=${ctl.idGen.get(`field-${field.name}`)}
+        .value=${ctl.payload?.[field.name] || ''}
+        placeholder=${ifDefined(this.placeholder)}
+        rows=${ifDefined(this.rows)}
+        @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
+      </textarea>
+      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+    </cork-field-container>
+  `;
+}
+
 export default {
   'checkbox-multiple': checkboxMulti,
   'radio': radio,
   'select': select,
   'checkbox-single': checkbox,
-  'number': number
+  'number': number,
+  'text': text,
+  'textarea': textarea
 }

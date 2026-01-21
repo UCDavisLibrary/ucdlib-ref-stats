@@ -14,7 +14,8 @@ export default class RefStatsPicklistItemsForm extends Mixin(LitElement)
   static get properties() {
     return {
       items: {type: Array},
-      _items: {type: Array}
+      _items: {type: Array},
+      disableMoveButtons: {type: Boolean, attribute: 'disable-move-buttons'}
     }
   }
 
@@ -26,6 +27,7 @@ export default class RefStatsPicklistItemsForm extends Mixin(LitElement)
     super();
     this.render = render.bind(this);
     this.items = [];
+    this.disableMoveButtons = false;
 
     this.ctl = {
       idGen : new IdGenerator()

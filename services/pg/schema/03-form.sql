@@ -177,6 +177,7 @@ LEFT JOIN LATERAL (
       'picklist_id', p.picklist_id,
       'name', p.name,
       'label', p.label,
+      'sort_alpha', p.sort_alpha,
       'is_archived', p.is_archived
     ) AS picklist
   FROM picklist p

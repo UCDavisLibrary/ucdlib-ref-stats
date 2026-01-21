@@ -10,6 +10,7 @@ import typeahead from './typeahead.css';
 import { styles as corkFieldContainerStyles } from '#components/cork-field-container.tpl.js';
 import { styles as picklistTypeaheadStyles } from '#components/ref-stats-picklist-typeahead.tpl.js';
 import { styles as formTypeaheadStyles } from '#components/ref-stats-form-typeahead.tpl.js';
+import { styles as picklistItemQuickAddStyles } from '#components/ref-stats-picklist-item-quick-add.tpl.js';
 
 function getLitStyles(styles){
   return styles().map(s => s.cssText).join('\n');
@@ -97,6 +98,7 @@ const styles = `
   ${getLitStyles(corkFieldContainerStyles)}
   ${getLitStyles(picklistTypeaheadStyles)}
   ${getLitStyles(formTypeaheadStyles)}
+  ${getLitStyles(picklistItemQuickAddStyles)}
 `;
 
 let sharedStyleElement = document.createElement('style');

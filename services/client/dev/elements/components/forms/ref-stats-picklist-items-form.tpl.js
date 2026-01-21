@@ -52,8 +52,8 @@ export function render() {
             </div>
             <div class='picklist-item__actions'>
               <cork-icon-button icon='fas.ellipsis' @click=${() => this._onExpandToggle(item)} color='medium'></cork-icon-button>
-              <cork-icon-button icon='fas.arrow-up' @click=${() => this._onMoveItemUp(i)} color='medium' ?disabled=${i === 0}></cork-icon-button>
-              <cork-icon-button icon='fas.arrow-down' @click=${() => this._onMoveItemDown(i)} color='medium' ?disabled=${i === this._items.length -1}></cork-icon-button>
+              <cork-icon-button icon='fas.arrow-up' @click=${() => this._onMoveItemUp(i)} color='medium' ?disabled=${i === 0 || this.disableMoveButtons}></cork-icon-button>
+              <cork-icon-button icon='fas.arrow-down' @click=${() => this._onMoveItemDown(i)} color='medium' ?disabled=${i === this._items.length -1 || this.disableMoveButtons}></cork-icon-button>
               <cork-icon-button icon='fas.trash' @click=${() => this._onDeleteItem(i)} color='medium' ?hidden=${item.item.picklist_item_id}></cork-icon-button>
             </div>
           </div>
