@@ -84,4 +84,4 @@ const schema = {
   assignment: assignmentSchema
 };
 
-export { validate, schema };
+export { validate, schema, formatErrorResponse };

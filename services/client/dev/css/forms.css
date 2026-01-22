@@ -12,3 +12,21 @@
   textarea[disabled] {
     background-color: #f0f0f0;
   }
+  .form-entry-action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    align-items: center;
+  }
+  fieldset.radio, fieldset.checkbox {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+  fieldset.radio > legend, fieldset.checkbox > legend {
+    all: unset;
+    display: block;
+    padding-bottom: 0.25rem;
+    color: var(--ucd-blue-100, #022851);
+    font-weight: 700;
+  }

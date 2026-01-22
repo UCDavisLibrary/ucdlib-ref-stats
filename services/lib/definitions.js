@@ -6,6 +6,7 @@ class Definitions {
       { value: 'textarea', label: 'Textarea' },
       { value: 'number', label: 'Number' },
       { value: 'date', label: 'Date' },
+      { value: 'datetime', label: 'Date & Time' },
       { value: 'select', label: 'Select', usesPickList: true },
       { value: 'checkbox-multiple', label: 'Checkbox', usesPickList: true },
       { value: 'checkbox-single', label: 'Checkbox (Single)' },

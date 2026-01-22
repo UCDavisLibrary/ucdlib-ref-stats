@@ -202,6 +202,31 @@ export default class FormEntryController {
     return html``;
   }
 
+  renderActionButtons(){
+    if ( this.form?.is_archived ) return html``;
+    return html`
+      <div class="form-entry-action-buttons">
+        <button type="submit" class="btn btn--primary">Submit</button>
+        <button type="button" class="btn btn--invert" @click=${this._onReset.bind(this)}>Reset</button>
+      </div>
+    `;
+  }
+
+  _onSubmit(e){
+    e.preventDefault();
+    this.submit();
+  }
+
+  async submit(){
+    console.log('Form Submitted', this.payload);
+    const r = await this.models.FormEntryModel.create(this.form.name, this.payload);
+    console.log('Form Entry Result', r);
+  }
+
+  _onReset(){
+    this.setPayload({});
+  }
+
   _onAppStateUpdate(e) {
     this.update(e);
   }

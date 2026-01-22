@@ -5,8 +5,8 @@ function checkboxMulti(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label>${field.label}</label>
-      <div class='checkbox'>
+      <fieldset class='checkbox'>
+        <legend>${field.label}</legend>
         ${ctl.fieldPicklistItems.map( item => html`
           <div class='checkbox-item'>
             <div>
@@ -23,7 +23,7 @@ function checkboxMulti(ctl) {
             <div class='field-description' ?hidden=${!item.description}>${item.description}</div>
           </div>
           `)}
-      </div>
+      </fieldset>
     </cork-field-container>
   `;
 }
@@ -32,8 +32,8 @@ function radio(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label>${field.label}</label>
-      <div class='radio'>
+      <fieldset class='radio'>
+        <legend>${field.label}</legend>
         ${ctl.fieldPicklistItems.map( item => html`
           <div class='radio-item'>
             <div>
@@ -41,7 +41,7 @@ function radio(ctl) {
                 type="radio" 
                 name=${field.name}
                 id=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}
-                .checked=${(ctl.payload?.[field.name] || []).includes(item.value)}
+                .checked=${ctl.payload?.[field.name] === item.value}
                 @input=${() => ctl.setPayloadField(field.name, item.value)}>
               <label for=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}>
                 ${item.label}
@@ -50,7 +50,7 @@ function radio(ctl) {
             <div class='field-description' ?hidden=${!item.description}>${item.description}</div>
           </div>
           `)}
-      </div>
+      </fieldset>
     </cork-field-container>
   `;
 }
@@ -156,6 +156,42 @@ function textarea(ctl) {
   `;
 }
 
+function date(ctl) {
+  const field = ctl.fields.find( f => this.field === f.name );
+  return html`
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <input 
+        type="date"
+        id=${ctl.idGen.get(`field-${field.name}`)}
+        .value=${ctl.payload?.[field.name] || ''}
+        placeholder=${ifDefined(this.placeholder)}
+        min=${ifDefined(this.min)}
+        max=${ifDefined(this.max)}
+        @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
+      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+    </cork-field-container>
+  `;
+}
+
+function datetime(ctl) {
+  const field = ctl.fields.find( f => this.field === f.name );
+  return html`
+    <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <input 
+        type="datetime-local"
+        id=${ctl.idGen.get(`field-${field.name}`)}
+        .value=${ctl.payload?.[field.name] || ''}
+        placeholder=${ifDefined(this.placeholder)}
+        min=${ifDefined(this.min)}
+        max=${ifDefined(this.max)}
+        @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
+      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+    </cork-field-container>
+  `;
+}
+
 export default {
   'checkbox-multiple': checkboxMulti,
   'radio': radio,
@@ -163,5 +199,7 @@ export default {
   'checkbox-single': checkbox,
   'number': number,
   'text': text,
-  'textarea': textarea
+  'textarea': textarea,
+  'date': date,
+  'datetime': datetime
 }

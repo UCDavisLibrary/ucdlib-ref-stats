@@ -6,7 +6,7 @@ export function styles() {
       display: block;
     }
     cork-field-container[invalid] > label,
-    cork-field-container[invalid] legend {
+    cork-field-container[invalid] > fieldset > legend {
       color: var(--cork-field-container-invalid-label-color, var(--double-decker, #C10230 ));
     }
     cork-field-container > .cork-field-container__errors {

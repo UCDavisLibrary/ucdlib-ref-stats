@@ -7,6 +7,7 @@ class FormEntryStore extends BaseStore {
     super();
 
     this.data = {
+      create: new LruStore({name: 'formentry.create'}),
       payload: new LruStore({name: 'formentry.payload'})
     };
     this.events = {};
