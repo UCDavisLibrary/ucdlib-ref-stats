@@ -17,7 +17,9 @@ class Config {
         picklistItem: 'picklist_item',
         field: 'form_field',
         form: 'form',
-        assignment: 'form_field_assignment'
+        assignment: 'form_field_assignment',
+        formEntry: 'form_entry',
+        formEntryFieldValue: 'form_entry_field_value'
       },
       views: {
         picklistWithItems: 'picklist_with_items',

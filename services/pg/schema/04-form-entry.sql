@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS form_entry_field_value (
   form_entry_id UUID NOT NULL REFERENCES form_entry(form_entry_id) ON DELETE CASCADE,
   form_field_id UUID NOT NULL REFERENCES form_field(form_field_id) ON DELETE CASCADE,
   value TEXT NOT NULL,
+  value_json JSONB NOT NULL,
   picklist_item_id UUID REFERENCES picklist_item(picklist_item_id) ON DELETE SET NULL,
   created_at timestamp NOT NULL DEFAULT now(),
   UNIQUE (form_entry_id, form_field_id)

@@ -139,6 +139,35 @@ class Field {
     return { res: r.res.rows[0] || null };
   }
 
+async picklistItemsExist(fieldIdOrName, picklistItemValues = []) {
+  if (typeof picklistItemValues === 'string') {
+    picklistItemValues = [picklistItemValues];
+  }
+
+  if (!picklistItemValues.length) {
+    return { res: false }; 
+  }
+
+  const sql = `
+    SELECT COUNT(DISTINCT pi.value) AS match_count
+    FROM ${config.db.tables.picklistItem} pi
+    JOIN ${config.db.tables.field} f ON f.picklist_id = pi.picklist_id
+    WHERE f.form_field_id = get_form_field_id($1)
+    AND pi.value = ANY($2::text[]);
+  `;
+
+  const r = await pgClient.query(sql, [fieldIdOrName, picklistItemValues]);
+
+  if (r.error) {
+    return r;
+  }
+
+  const matchCount = Number(r.res.rows[0]?.match_count || 0);
+
+  return { res: matchCount === picklistItemValues.length };
+}
+
+
 }
 
 export default new Field();

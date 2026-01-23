@@ -18,6 +18,18 @@ export const toString = z.preprocess(
   }, z.string()
 );
 
+export const requiredArray = (msg = 'Required', itemSchema) => {
+  itemSchema = itemSchema || z.string();
+  return z.preprocess(
+    v => {
+      if ( !Array.isArray(v) ) return [];
+      return v;
+    },
+    z.array(itemSchema).min(1, msg)
+  );
+}
+
+
 /**
  * @description Validates a value as a required number, allowing string inputs with commas and decimal points
  * Delineates between "required" and "not a number" validation errors
