@@ -14,7 +14,7 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     }
     form = form.res;
 
-    const entrySchema = schema.formEntry?.[form.name]?.create;
+    const entrySchema = schema.formEntry?.[form.name]?.[req.body?.original_form_entry_id ? 'update' : 'create'];
     if ( !entrySchema ) {
       throw new Error(`No form entry schema found for form: ${form.name}`);
     }
@@ -26,6 +26,7 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     logger.info('Form entry validated', req.context.logSignal, { formId: form.form_id});
     delete validated.data._formId;
 
+    // todo: if new versioning is added, check if same user as og
     const r = await models.formEntry.create(form.form_id, validated.data);
     if ( r.error ) {
       throw r.error;

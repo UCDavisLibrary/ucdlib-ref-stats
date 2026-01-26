@@ -26,19 +26,43 @@ function srPicklistItemsExist(field){
   }
 } 
 
+const srOriginalFormEntryExists = async (data, ctx) => {
+  if ( !data.original_form_entry_id ) return;
+  const existing = await models.formEntry.get(data.original_form_entry_id, data._formId);
+  if (existing.error) {
+    logger.error('Database error validating original form entry existence', { error: existing.error });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A database error occurred',
+      fatal: true
+    });
+    return;
+  }
+  if ( !existing.res) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Original form entry not found or does not belong to this form',
+      path: ['original_form_entry_id']
+    });
+  }
+}
+
 const instructionStatsBase = z.object({
   '_formId': z.string(),
   'participant-count': requiredNumber(),
-  'instructor-session-type': requiredString().superRefine(srPicklistItemsExist('instructor-session-type'))
+  'instructor-session-type': requiredString().superRefine(srPicklistItemsExist('instructor-session-type')),
+  'department': requiredArray().superRefine(srPicklistItemsExist('department'))
 });
 
-const instructionStatsCreate = instructionStatsBase.extend({
-  'department': requiredArray().superRefine(srPicklistItemsExist('department')),
-});
+
+const instructionStatsUpdate = instructionStatsBase.partial().extend({
+  'original_form_entry_id': z.uuid()
+}).superRefine(srOriginalFormEntryExists);
 
 export default {
 
   'instruction-statistics': {
-    'create': instructionStatsCreate
+    'create': instructionStatsBase,
+    'update': instructionStatsUpdate
   }
 };

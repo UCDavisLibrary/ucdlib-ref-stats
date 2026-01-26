@@ -99,6 +99,7 @@ class AppStateModelImpl extends AppStateModel {
   addErrorRequest(req) {
     if ( req.errorSettings?.suppressError ) return;
     if ( req?.payload?.error?.response?.status == 422 && !req?.errorSettings?.showValidationErrors ) return; // validation errors handled by form
+    this.errorRequests = this.errorRequests.filter(r => r.payload.id !== req.payload.id);
     this.errorRequests.push(req);
     if ( this._errorVisible || this._showErrorTimer ) return;
 

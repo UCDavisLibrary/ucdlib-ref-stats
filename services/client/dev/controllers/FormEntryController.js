@@ -201,7 +201,11 @@ export default class FormEntryController {
         return html`<p>Form Not Found!</p>`;
       }
 
-      return template.render.call(this.host, this);
+      return [
+        this._renderFormVersionWarning(),
+        this._renderFormEntrySummary(),
+        template.render.call(this.host, this)
+      ];
     }
 
     if ( this.hostIsField ) {
@@ -213,6 +217,25 @@ export default class FormEntryController {
     }
 
     return html``;
+  }
+
+  _renderFormEntrySummary(){
+    if ( !this.formEntry ) return html``;
+    return html`
+      <div class="alert">
+        <div><span class="bold primary">Submitted:</span><span> ${new Date(this.formEntry.created_at).toLocaleString()}</span></div>
+        <div><span class="bold primary">Edited:</span><span> ${this.formEntry.form_entry_id !== this.formEntry.original_form_entry_id ? 'Yes' : 'No'}</span></div>
+      </div>
+    `;
+  }
+
+  _renderFormVersionWarning(){
+    if ( !this.formEntry || this.formEntry.is_latest_version ) return html``;
+    return html`
+      <div class="alert">
+        There is a <a href="/form/${this.formNameOrId}/${this.formEntry.versions[this.formEntry.versions.length - 1]}">newer version</a> of this submission available.
+      </div>
+    `
   }
 
   renderActionButtons(){
@@ -231,20 +254,29 @@ export default class FormEntryController {
   }
 
   async submit(){
-    const r = await this.models.FormEntryModel.create(this.form.name, this.payload);
+    const r = await this.models.FormEntryModel.create(this.form.name, {...this.payload, ...(this.formEntry ? { original_form_entry_id: this.formEntry?.original_form_entry_id } : {})});
     if ( r.state !== 'loaded' ) return;
-    this.models.AppStateModel.showToast({text: 'Submission successful', type: 'success'});
-    this.models.AppStateModel.refresh();
+    if ( this.formEntry ){
+      this.models.AppStateModel.showToast({text: 'Update successful', type: 'success'});
+      this.models.AppStateModel.setLocation(`/form/${this.formNameOrId}/${r.payload.form_entry_id}`);
+    } else {
+      this.models.AppStateModel.showToast({text: 'Submission successful', type: 'success'});
+      this.models.AppStateModel.refresh();
+    }
   }
 
   _onReset(){
-    this.setPayload({});
+    if ( this.formEntry?.fields ) {
+      this.setPayload({...this.formEntry.fields});
+    } else {
+      this.setPayload({});
+    }
   }
 
   async _onAppStateUpdate(e) {
     await this.update(e);
     if ( this.formEntry?.fields ) {
-      this.setPayload(this.formEntry.fields);
+      this.setPayload({...this.formEntry.fields});
     } else {
       this.setPayload({});
     }

@@ -21,9 +21,10 @@ class FormEntry {
     try {
       await client.query('BEGIN');
 
-      const d = pgClient.prepareObjectForInsert({ form_id: formId});
+      const d = pgClient.prepareObjectForInsert({ form_id: formId, original_form_entry_id: data.original_form_entry_id || null });
+      delete data.original_form_entry_id;
       const sql = `INSERT INTO ${config.db.tables.formEntry} (${d.keysString}) VALUES (${d.placeholdersString}) RETURNING form_entry_id;`;
-      let result = await client.query(sql, d.values);
+      const result = await client.query(sql, d.values);
       const formEntryId = result.rows[0].form_entry_id;
 
       for ( const [fieldName, fieldValue] of Object.entries(data) ) {
