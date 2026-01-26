@@ -45,6 +45,21 @@ CREATE OR REPLACE TRIGGER trg_form_entry_set_latest
   FOR EACH ROW
   EXECUTE FUNCTION form_entry_set_latest();
 
+CREATE OR REPLACE FUNCTION form_entry_set_og_id()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.original_form_entry_id IS NULL THEN
+    NEW.original_form_entry_id := NEW.form_entry_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_form_entry_set_og_id
+  BEFORE INSERT ON form_entry
+  FOR EACH ROW
+  EXECUTE FUNCTION form_entry_set_og_id();
+
 -- Only most recent version of each form entry
 CREATE OR REPLACE VIEW form_entry_latest AS
 SELECT *
@@ -105,6 +120,13 @@ CREATE INDEX IF NOT EXISTS idx_form_entry_field_value_form_field_id
   
 
 CREATE OR REPLACE VIEW form_entry_with_fields AS
+WITH chain_versions AS (
+  SELECT
+    COALESCE(original_form_entry_id, form_entry_id) AS chain_id,
+    jsonb_agg(form_entry_id ORDER BY created_at ASC, form_entry_id ASC) AS versions
+  FROM form_entry
+  GROUP BY 1
+)
 SELECT
   fe.form_entry_id,
   fe.form_id,
@@ -113,11 +135,14 @@ SELECT
   fe.impersonated_by,
   fe.original_form_entry_id,
   fe.is_latest_version,
+  cv.versions,
   COALESCE(
-    jsonb_object_agg(ff.name, fev.value ORDER BY ff.name),
+    jsonb_object_agg(ff.name, fev.value_json) FILTER (WHERE ff.name IS NOT NULL),
     '{}'::jsonb
   ) AS fields
 FROM form_entry fe
+LEFT JOIN chain_versions cv
+  ON cv.chain_id = COALESCE(fe.original_form_entry_id, fe.form_entry_id)
 LEFT JOIN form_entry_field_value fev
   ON fev.form_entry_id = fe.form_entry_id
 LEFT JOIN form_field ff
@@ -128,8 +153,9 @@ GROUP BY
   fe.created_at,
   fe.submitted_by,
   fe.impersonated_by,
+  fe.original_form_entry_id,
   fe.is_latest_version,
-  fe.original_form_entry_id;
+  cv.versions;
 
 CREATE OR REPLACE VIEW form_entry_latest_with_fields AS
 SELECT *

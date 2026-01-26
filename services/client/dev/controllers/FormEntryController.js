@@ -134,13 +134,26 @@ export default class FormEntryController {
     if ( !this.appComponentController.isOnActivePage ) return;
     this.formNameOrId = e.location.path?.[1];
     if ( !this.formNameOrId ) return;
-    await Promise.all([
-      this.getForm(),
-      this.getFields()
-    ]);
+    this.entryId = e.location.path?.[2] || null;
+    const promises = [ this.getForm(), this.getFields()];
+    if ( this.entryId ) {
+      promises.push( this.getFormEntry() );
+    }
+    await Promise.all(promises);
     await this.getPicklistItems();
 
     this.host.requestUpdate();
+  }
+
+  async getFormEntry(){
+    this.formEntry = null;
+    if ( this.entryId && this.formNameOrId ) {
+      const r = await this.models.FormEntryModel.get(this.entryId, this.formNameOrId);
+      if ( r.state === 'loaded' ) {
+        this.formEntry = r.payload;
+      }
+    }
+    return this.formEntry;
   }
 
   async getPicklistItems(){
@@ -218,17 +231,23 @@ export default class FormEntryController {
   }
 
   async submit(){
-    console.log('Form Submitted', this.payload);
     const r = await this.models.FormEntryModel.create(this.form.name, this.payload);
-    console.log('Form Entry Result', r);
+    if ( r.state !== 'loaded' ) return;
+    this.models.AppStateModel.showToast({text: 'Submission successful', type: 'success'});
+    this.models.AppStateModel.refresh();
   }
 
   _onReset(){
     this.setPayload({});
   }
 
-  _onAppStateUpdate(e) {
-    this.update(e);
+  async _onAppStateUpdate(e) {
+    await this.update(e);
+    if ( this.formEntry?.fields ) {
+      this.setPayload(this.formEntry.fields);
+    } else {
+      this.setPayload({});
+    }
   }
 
 

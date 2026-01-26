@@ -26,6 +26,10 @@ class FormEntryModel extends BaseModel {
     return res;
   }
 
+  get(entryId, form, opts={}) {
+    return this.service.get(entryId, form, opts);
+  }
+
 }
 
 const model = new FormEntryModel();

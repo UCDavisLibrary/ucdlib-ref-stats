@@ -31,7 +31,23 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
       throw r.error;
     }
 
-    res.status(200).json({ message: 'Form entry created' });
+    res.status(200).json(r.res);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
+router.get('/:idOrName/:entryId', async (req, res) => {
+  try {
+    const r = await models.formEntry.get(req.params.entryId, req.params.idOrName, { errorOnMissing: true });
+    if (r.error) {
+      throw r.error;
+    }
+    if ( !r.res ) {
+      return res.status(404).json({ message: 'Form entry not found' });
+    }
+    logger.info('Form entry get successful', req.context.logSignal, { formId: r.res.form_id, formEntryId: r.res.form_entry_id });
+    res.status(200).json(r.res);
   } catch (e) {
     return handleError(res, req, e);
   }

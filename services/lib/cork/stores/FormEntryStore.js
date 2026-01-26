@@ -8,7 +8,8 @@ class FormEntryStore extends BaseStore {
 
     this.data = {
       create: new LruStore({name: 'formentry.create'}),
-      payload: new LruStore({name: 'formentry.payload'})
+      payload: new LruStore({name: 'formentry.payload'}),
+      get: new LruStore({name: 'formentry.get'})
     };
     this.events = {};
   }

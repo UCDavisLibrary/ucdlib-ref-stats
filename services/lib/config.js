@@ -23,7 +23,8 @@ class Config {
       },
       views: {
         picklistWithItems: 'picklist_with_items',
-        fieldFull: 'form_field_full'
+        fieldFull: 'form_field_full',
+        formEntryFull: 'form_entry_full'
       }
     }
   }

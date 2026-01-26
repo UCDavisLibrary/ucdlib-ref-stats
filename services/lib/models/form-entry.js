@@ -63,6 +63,27 @@ class FormEntry {
       client.release();
     }
   }
+
+  async get(formEntryId, formNameOrId = null, opts={}){
+    const params = [formEntryId];
+    const sql = `
+      SELECT * FROM ${config.db.views.formEntryFull} fe
+      WHERE fe.form_entry_id = try_cast_uuid($1)
+      ${ formNameOrId ? `AND fe.form_id = get_form_id($2)` : '' }
+      `;
+    if ( formNameOrId ) {
+      params.push(formNameOrId);
+    }
+    const r = await pgClient.query(sql, params);
+    const missing = r.error?.code === 'P4040';
+
+    if ( missing && opts.errorOnMissing ){
+      return r;
+    } else if ( r.error && !missing ) {
+      return r;
+    }
+    return { res: missing ? null : r.res?.rows?.[0] || null };
+  }
 }
 
 export default new FormEntry();
