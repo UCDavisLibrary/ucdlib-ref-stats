@@ -6,6 +6,23 @@ import logger from '#lib/logger.js';
 
 const router = Router();
 
+router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (req, res) => {
+    try {
+      logger.info('Form entry query validated', req.context.logSignal);
+      if ( req.payload.form ) {
+        req.payload.form = req.payload.form.split(',').map(f => f.trim());
+      }
+      const r = await models.formEntry.query(req.payload);
+      if (r.error) {
+        throw r.error;
+      }
+      logger.info('Form entry query successful',  req.context.logSignal, {resultCount: r.res.total_count});
+      res.status(200).json(r.res);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
 router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
   try {
     let form = await models.form.get(req.params.idOrName);

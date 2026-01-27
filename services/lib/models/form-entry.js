@@ -5,6 +5,50 @@ import models from '#models';
 
 class FormEntry {
 
+  async query(params={}){
+    const page = params.page || 1;
+    const perPage = params.per_page || 15;
+    const offset = (page - 1) * perPage;
+    
+    const where = [];
+    const values = [];
+
+    if ( params.is_latest_version ) {
+      values.push(true);
+      where.push(`is_latest_version = $${values.length}`);
+    } 
+
+    if ( params.form ){
+      values.push(params.form);
+      where.push(`form_id IN (SELECT get_form_id(fid) FROM unnest($${values.length}::text[]) AS fid)`);
+    }
+
+    const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
+    const sql = `
+      SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.views.formEntryFull} fe
+      ${whereSQL}
+      ORDER BY created_at DESC
+      LIMIT $${values.length + 1} OFFSET $${values.length + 2}
+    `;
+    const r = await pgClient.query(sql, [...values, perPage, offset]);
+    if ( r.error ) {
+      return r;
+    }
+    const total_count = r.res.rows.length > 0 ? parseInt(r.res.rows[0].total_count) : 0;
+    const results = r.res.rows.map(row => {
+      delete row.total_count;
+      return row;
+    });
+    return { res: {
+      results,
+      offset,
+      per_page: perPage,
+      page,
+      max_page: Math.ceil(total_count / perPage),
+      total_count
+    }};
+  }
+
   async create(formNameOrId, data){
     let fields = await models.field.query({form: formNameOrId , perPage: 1000});
     if ( fields.error ) {

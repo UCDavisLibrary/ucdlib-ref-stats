@@ -130,14 +130,14 @@ export default class FormEntryController {
 
   async update(e){
     if ( !e ) e = await this.models.AppStateModel.get();
-
-    if ( !this.appComponentController.isOnActivePage ) return;
     this.formNameOrId = e.location.path?.[1];
     if ( !this.formNameOrId ) return;
     this.entryId = e.location.path?.[2] || null;
     const promises = [ this.getForm(), this.getFields()];
     if ( this.entryId ) {
       promises.push( this.getFormEntry() );
+    } else {
+      this.formEntry = null;
     }
     await Promise.all(promises);
     await this.getPicklistItems();
@@ -146,7 +146,6 @@ export default class FormEntryController {
   }
 
   async getFormEntry(){
-    this.formEntry = null;
     if ( this.entryId && this.formNameOrId ) {
       const r = await this.models.FormEntryModel.get(this.entryId, this.formNameOrId);
       if ( r.state === 'loaded' ) {
@@ -242,8 +241,9 @@ export default class FormEntryController {
     if ( this.form?.is_archived ) return html``;
     return html`
       <div class="form-entry-action-buttons">
-        <button type="submit" class="btn btn--primary">Submit</button>
+        <button type="submit" class="btn btn--primary">${this.formEntry ? 'Update' : 'Submit'}</button>
         <button type="button" class="btn btn--invert" @click=${this._onReset.bind(this)}>Reset</button>
+        <a href="/form/${this.formNameOrId}" class="btn btn--invert" ?hidden=${!this.formEntry}>New Submission</a>
       </div>
     `;
   }
@@ -274,6 +274,7 @@ export default class FormEntryController {
   }
 
   async _onAppStateUpdate(e) {
+    if ( !this.hostIsForm || !this.appComponentController.isOnActivePage ) return;
     await this.update(e);
     if ( this.formEntry?.fields ) {
       this.setPayload({...this.formEntry.fields});

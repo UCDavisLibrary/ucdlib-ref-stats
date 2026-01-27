@@ -1,7 +1,6 @@
 import * as z from "zod";
-import { requiredString, booleanParam, toString, requiredNumber, requiredArray } from "./utils.js";
+import { requiredString, booleanParam, toString, requiredNumber, requiredArray, pageParam, perPageParam } from "./utils.js";
 import models from '#models';
-import definitions from '#lib/definitions.js';
 import logger from '#lib/logger.js';
 
 function srPicklistItemsExist(field){
@@ -59,7 +58,15 @@ const instructionStatsUpdate = instructionStatsBase.partial().extend({
   'original_form_entry_id': z.uuid()
 }).superRefine(srOriginalFormEntryExists);
 
+const querySchema = z.object({
+  page: pageParam,
+  per_page: perPageParam(15),
+  form: z.string().optional(),
+  is_latest_version: booleanParam
+});
+
 export default {
+  'query': querySchema,
 
   'instruction-statistics': {
     'create': instructionStatsBase,
