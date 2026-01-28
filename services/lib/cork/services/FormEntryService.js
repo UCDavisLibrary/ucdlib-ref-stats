@@ -70,6 +70,29 @@ class FormEntryService extends BaseService {
     return store.get(id);
   }
 
+  async query(query={}, appStateOptions={}){
+    if ( !query.page ) query.page = 1;
+    let id = digest(query);
+    const store = this.store.data.query;
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}`,
+        qs: query,
+        checkCached : () => store.get(id),
+        onUpdate : resp => this.store.set(
+          {...resp, id},
+          store,
+          null,
+          serviceUtils.getAppStateOptions('Unable to retrieve submissions', appStateOptions)
+        )
+      })
+    );
+
+    return store.get(id);
+  }
+
 }
 
 const service = new FormEntryService();

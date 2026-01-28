@@ -30,6 +30,10 @@ class FormEntryModel extends BaseModel {
     return this.service.get(entryId, form, opts);
   }
 
+  query(query, appStateOptions={}) {
+    return this.service.query(query, appStateOptions);
+  }
+
 }
 
 const model = new FormEntryModel();

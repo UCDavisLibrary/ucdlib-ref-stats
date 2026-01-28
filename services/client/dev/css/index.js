@@ -11,6 +11,7 @@ import { styles as corkFieldContainerStyles } from '#components/cork-field-conta
 import { styles as picklistTypeaheadStyles } from '#components/ref-stats-picklist-typeahead.tpl.js';
 import { styles as formTypeaheadStyles } from '#components/ref-stats-form-typeahead.tpl.js';
 import { styles as picklistItemQuickAddStyles } from '#components/ref-stats-picklist-item-quick-add.tpl.js';
+import { styles as formEntryQueryStyles } from '#components/ref-stats-form-entry-query.tpl.js';
 
 function getLitStyles(styles){
   return styles().map(s => s.cssText).join('\n');
@@ -99,6 +100,7 @@ const styles = `
   ${getLitStyles(picklistTypeaheadStyles)}
   ${getLitStyles(formTypeaheadStyles)}
   ${getLitStyles(picklistItemQuickAddStyles)}
+  ${getLitStyles(formEntryQueryStyles)}
 `;
 
 let sharedStyleElement = document.createElement('style');

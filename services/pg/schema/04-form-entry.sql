@@ -119,7 +119,7 @@ CREATE INDEX IF NOT EXISTS idx_form_entry_field_value_form_field_id
   ON form_entry_field_value (form_field_id);
   
 
-CREATE OR REPLACE VIEW form_entry_with_fields AS
+CREATE OR REPLACE VIEW form_entry_full AS
 WITH chain_versions AS (
   SELECT
     COALESCE(original_form_entry_id, form_entry_id) AS chain_id,
@@ -130,6 +130,7 @@ WITH chain_versions AS (
 SELECT
   fe.form_entry_id,
   fe.form_id,
+  f.name AS form_name,
   fe.created_at,
   fe.submitted_by,
   fe.impersonated_by,
@@ -137,10 +138,13 @@ SELECT
   fe.is_latest_version,
   cv.versions,
   COALESCE(
-    jsonb_object_agg(ff.name, fev.value_json) FILTER (WHERE ff.name IS NOT NULL),
+    jsonb_object_agg(ff.name, fev.value_json)
+      FILTER (WHERE ff.name IS NOT NULL),
     '{}'::jsonb
   ) AS fields
 FROM form_entry fe
+JOIN form f
+  ON f.form_id = fe.form_id
 LEFT JOIN chain_versions cv
   ON cv.chain_id = COALESCE(fe.original_form_entry_id, fe.form_entry_id)
 LEFT JOIN form_entry_field_value fev
@@ -150,14 +154,10 @@ LEFT JOIN form_field ff
 GROUP BY
   fe.form_entry_id,
   fe.form_id,
+  f.name,
   fe.created_at,
   fe.submitted_by,
   fe.impersonated_by,
   fe.original_form_entry_id,
   fe.is_latest_version,
   cv.versions;
-
-CREATE OR REPLACE VIEW form_entry_latest_with_fields AS
-SELECT *
-FROM form_entry_with_fields
-WHERE is_latest_version = TRUE;
