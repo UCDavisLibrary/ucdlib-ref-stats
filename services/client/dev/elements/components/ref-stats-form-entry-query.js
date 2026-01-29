@@ -1,4 +1,4 @@
-import { LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import {render} from "./ref-stats-form-entry-query.tpl.js";
 
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
@@ -7,6 +7,23 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import {AppComponentController, QueryStringController} from '#controllers';
 import { IdGenerator } from '#client-utils';
 
+/**
+ * @typedef {Object} RefStatsDisplayField
+ * @description Fields that will be displayed in the form entry results (either as a column or in the expandable details section)
+ * @property {String} field - The name of the field to display
+ * @property {String} label - (optional) The label to use when displaying the field. If not provided, the field's label from the form definition will be used.
+ * @property {Number} desktopFr - (optional) The fractional unit for this field column in desktop view. If not provided, field will not be a column in desktop view.
+ * @property {Number} mobileFr - (optional) The fractional unit for this field column in mobile view. If not provided, field will not be a column in mobile view.
+ */
+
+/**
+ * @description Element for querying and displaying form entries
+ * @property {Array} formNameOrId - Array of form names or ids to query entries for
+ * @property {Boolean} latestVersion - Only retrieve most recent version of each form entry
+ * @property {RefStatsDisplayField[]} displayedFields - Array of form fields to display in the results
+ * @property {String} orderByField - Field name to order results by. Prepend with '-' for descending order.
+ * @property {Number} mobileThreshold - Width in pixels below which the mobile layout will be used. Default is 768.
+ */
 export default class RefStatsFormEntryQuery extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -14,12 +31,14 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     return {
       formNameOrId: { type: Array },
       latestVersion: { type: Boolean, attribute: 'latest-version' },
+      orderByField: { type: String, attribute: 'order-by-field' },
       displayedFields: { type: Array },
+      mobileThreshold: { type: Number, attribute: 'mobile-threshold' },
       maxPage: {type: Number },
       formEntries: {type: Array },
       formFields: { type: Object },
-      mobileThreshold: { type: Number },
-      expandedEntries: { type: Array }
+      expandedEntries: { type: Array },
+      picklistItems: { type: Object }
     }
   }
 
@@ -29,12 +48,14 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
 
     this.formEntries = [];
     this.formNameOrId = [];
+    this.orderByField = '';
     this.latestVersion = false;
     this.maxPage = 1;
     this.formFields = {};
     this.mobileThreshold = 768;
     this.expandedEntries = [];
     this.displayedFields = [];
+    this.picklistItems = {};
 
     this.ctl = {
       appComponent : new AppComponentController(this),
@@ -44,9 +65,12 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
 
     this.id = this.ctl.idGen.get('self');
 
-    this._injectModel('FormEntryModel', 'AppStateModel', 'FieldModel');
+    this._injectModel('FormEntryModel', 'AppStateModel', 'FieldModel', 'PicklistModel');
   }
 
+  /**
+   * @description Callback for app state updates
+   */
   async _onAppStateUpdate(e) {
     if ( !this.ctl.appComponent.isOnActivePage ) return;
     await this.ctl.qs.updateComplete;
@@ -54,6 +78,11 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     await this.query();
   }
 
+  /**
+   * @description Query for form entries based on current properties and query string params. 
+   * Also retrieves other data required for display (form fields, picklist items).
+   * @returns 
+   */
   async query(){
     const q = {...this.ctl.qs.query};
     if ( this.formNameOrId.length ) {
@@ -61,6 +90,9 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     }
     if ( this.latestVersion ) {
       q.is_latest_version = true;
+    }
+    if ( this.orderByField ) {
+      q.orderByField = this.orderByField;
     }
 
     const promises = [this.FormEntryModel.query(q)];
@@ -78,17 +110,31 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     this.maxPage = res.payload.max_page;
 
     this.formFields = {};
-    formFields.forEach((r, i) => {
+    const picklists = new Set();
+    formFields.forEach(r => {
       if ( r.state === 'loaded' ) {
         for ( const field of r.payload.results ) {
           this.formFields[field.name] = field;
+          if ( field.picklist_id && field.field_type !== 'typeahead' ) {
+            picklists.add(field.picklist_id);
+          }
         }
       }
     });
-
-    console.log(this.formEntries, this.formFields);
+    if ( picklists.size ) {
+      const r = await this.PicklistModel.getItems(Array.from(picklists));
+      if ( r.state === 'loaded' ) {
+        this.picklistItems = r.payload;
+      }
+    } else {
+      this.picklistItems = {};
+    }
   }
 
+  /**
+   * @description Toggle whether a form entry details section is expanded or collapsed
+   * @param {String} entryId - The ID of the form entry to toggle
+   */
   toggleEntryExpanded(entryId){
     const idx = this.expandedEntries.indexOf(entryId);
     if ( idx === -1 ) {
@@ -99,15 +145,56 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     this.requestUpdate();
   }
 
+  /**
+   * @description Callback for page change events from pagination control
+   * @param {*} e 
+   */
   _onPageChange(e){
     this.ctl.qs.setParam('page', e.detail.page);
     this.ctl.qs.setLocation();
   }
 
+  /**
+   * @description Get the display label for a given field
+   * @param {String} fieldName - The name of the field
+   * @returns {String}
+   */
   getFieldLabel(fieldName){
+    const displayField = this.displayedFields.find(f => f.field === fieldName);
+    if ( displayField?.label ) {
+      return displayField.label;
+    }
     if ( fieldName === '_created_at' ) return 'Submitted At';
     const field = this.formFields[fieldName];
     return field ? field.label : fieldName;
+  }
+
+  /**
+   * @description Get the display value for a given field in a form entry
+   * @param {Object} formEntry - The form entry object
+   * @param {String} fieldName - The name of the field
+   * @returns {String|TemplateResult}
+   */
+  getFieldValue(formEntry, fieldName){
+    if ( fieldName === '_created_at' ) {
+      const d = new Date(formEntry.created_at);
+      const date = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      const time = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      return html`<div>${date}</div><div>${time}</div>`;
+    }
+    const fieldValue = formEntry.fields[fieldName];
+    const fieldValueArray = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
+
+    const field = this.formFields[fieldName];
+    if ( field.picklist_id && this.picklistItems[field.picklist_id] ) {
+      const labels = fieldValueArray.map( v => {
+        const item = this.picklistItems[field.picklist_id].find( pi => pi.value === v );
+        return item ? item.label : v;
+      });
+      return labels.join(', ');
+    }
+    
+    return fieldValueArray.join(', ') || '';
   }
 
 }

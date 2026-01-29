@@ -66,7 +66,7 @@ class PicklistService extends BaseService {
   }
 
   async create(data){
-    let id = digest(data);
+    let id = await digest(data);
     const store = this.store.data.create;
 
     const appStateOptions = {
@@ -94,7 +94,7 @@ class PicklistService extends BaseService {
   }
 
   async patch(id, data){
-    let storeId = digest({id, data});
+    let storeId = await digest({id, data});
     const store = this.store.data.patch;
 
     const appStateOptions = {
@@ -147,28 +147,29 @@ class PicklistService extends BaseService {
     return store.get(id);
   }
 
-  async formItems(formId, picklistIds=[]){
-    const store = this.store.data.formItems;
+  async items(picklistIds, formId){
+    let id = await digest({formId, picklistIds});
+    const store = this.store.data.items;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to get picklist items for form'}
+      errorSettings: {message: 'Unable to get picklist items'}
     };
 
     await this.checkRequesting(
-      formId, store,
+      id, store,
       () => this.request({
         url : `${this.baseUrl}/_bulk-items/${picklistIds.join(',')}`,
-        qs: {segments: [ `form:${formId}` ]},
-        checkCached : () => store.get(formId),
+        qs: formId ? {segments: [ `form:${formId}` ]} : undefined,
+        checkCached : () => store.get(id),
         onUpdate : resp => this.store.set(
-          { ...resp, id: formId },
+          { ...resp, id },
           store,
           null,
           appStateOptions
         )
       })
     );
-    return store.get(formId);
+    return store.get(id);
   }
 }
 

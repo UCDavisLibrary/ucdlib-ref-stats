@@ -159,7 +159,7 @@ export default class FormEntryController {
     this.picklistItems = {};
     const picklists = this.fields.filter(f => f.picklist_id && f.field_type !== 'typeahead').map(f => f.picklist_id);
     if ( picklists.length ) {
-      const r = await this.models.PicklistModel.getFormItems(this.form.form_id, picklists);
+      const r = await this.models.PicklistModel.getItems(picklists, this.form.form_id);
       if ( r.state === 'loaded' ){
         this.picklistItems = r.payload;
       }

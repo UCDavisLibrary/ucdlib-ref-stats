@@ -16,7 +16,7 @@ class FormService extends BaseService {
   }
 
   async create(data){
-    let id = digest(data);
+    let id = await digest(data);
     const store = this.store.data.create;
 
     const appStateOptions = {
@@ -44,7 +44,7 @@ class FormService extends BaseService {
   }
 
   async patch(data){
-    let id = digest(data);
+    let id = await digest(data);
     const store = this.store.data.patch;
 
     const appStateOptions = {

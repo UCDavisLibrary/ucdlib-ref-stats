@@ -51,8 +51,8 @@ class PicklistModel extends BaseModel {
     return res;
   }
 
-  async getFormItems(formId, picklistIds=[]) {
-    return this.service.formItems(formId, picklistIds);
+  async getItems(picklistIds, formId) {
+    return this.service.items(picklistIds, formId);
   }
 
 }

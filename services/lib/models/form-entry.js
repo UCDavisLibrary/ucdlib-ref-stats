@@ -9,6 +9,18 @@ class FormEntry {
     const page = params.page || 1;
     const perPage = params.per_page || 15;
     const offset = (page - 1) * perPage;
+
+    let orderByField;
+    if ( params.orderByField ) {
+      orderByField = params.orderByField;
+      if ( orderByField.startsWith('-')){
+        orderByField = `'${orderByField.slice(1)}' DESC`;
+      } else if ( orderByField.startsWith('+') ) {
+        orderByField = `'${orderByField.slice(1)}' ASC`;
+      } else {
+        orderByField = `'${orderByField}' ASC`;
+      }
+    }
     
     const where = [];
     const values = [];
@@ -27,7 +39,9 @@ class FormEntry {
     const sql = `
       SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.views.formEntryFull} fe
       ${whereSQL}
-      ORDER BY created_at DESC
+      ${ orderByField ? 
+        `ORDER BY fields->>${orderByField} NULLS LAST` : 
+        `ORDER BY created_at DESC NULLS LAST`}
       LIMIT $${values.length + 1} OFFSET $${values.length + 2}
     `;
     const r = await pgClient.query(sql, [...values, perPage, offset]);

@@ -16,7 +16,7 @@ class FormEntryService extends BaseService {
   }
 
   async create(formId, data){
-    let id = digest({formId, data});
+    let id = await digest({formId, data});
     const store = this.store.data.create;
 
     const appStateOptions = {
@@ -72,7 +72,7 @@ class FormEntryService extends BaseService {
 
   async query(query={}, appStateOptions={}){
     if ( !query.page ) query.page = 1;
-    let id = digest(query);
+    let id = await digest(query);
     const store = this.store.data.query;
 
     await this.checkRequesting(

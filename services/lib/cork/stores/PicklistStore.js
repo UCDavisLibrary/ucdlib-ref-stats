@@ -12,7 +12,7 @@ class PicklistStore extends BaseStore {
       get: new LruStore({name: 'picklist.get'}),
       patch: new LruStore({name: 'picklist.patch'}),
       delete: new LruStore({name: 'picklist.delete'}),
-      formItems: new LruStore({name: 'picklist.formItems'})
+      items: new LruStore({name: 'picklist.items'})
     };
     this.events = {};
   }

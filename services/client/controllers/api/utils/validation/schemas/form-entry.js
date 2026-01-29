@@ -46,6 +46,37 @@ const srOriginalFormEntryExists = async (data, ctx) => {
   }
 }
 
+const srOrderByFieldExists = async (value, ctx) => {
+  if ( !value ) return;
+  console.log('Validating orderByField:', value);
+  if ( value.startsWith('-') || value.startsWith('+') ) {
+    value = value.substring(1);
+  }
+  if ( !value ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Invalid orderByField value',
+    });
+    return;
+  }
+  const field = await models.field.get(value);
+  if ( field.error ) {
+    logger.error('Database error validating orderByField existence', { error: field.error });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'A database error occurred',
+      fatal: true
+    });
+    return;
+  }
+  if ( !field.res ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `orderByField field not found: ${value}`,
+    });
+  }
+}
+
 const instructionStatsBase = z.object({
   '_formId': z.string(),
   'participant-count': requiredNumber(),
@@ -62,7 +93,8 @@ const querySchema = z.object({
   page: pageParam,
   per_page: perPageParam(15),
   form: z.string().optional(),
-  is_latest_version: booleanParam
+  is_latest_version: booleanParam,
+  orderByField: z.string().optional().superRefine(srOrderByFieldExists)
 });
 
 export default {

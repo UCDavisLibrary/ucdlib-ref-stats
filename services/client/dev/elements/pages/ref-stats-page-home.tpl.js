@@ -12,7 +12,10 @@ export function styles() {
 
 export function render() { 
   const fields = [
-    { field: '_created_at', desktopFr: 2, mobileFr: 1 },
+    {field: '_created_at', desktopFr: 1, mobileFr: 1},
+    {field: 'instructor-session-type', desktopFr: 1},
+    {field: 'participant-count', desktopFr: 1, label: 'Participants'},
+    {field: 'department'},
   ];
   return html`
     <div class='l-container u-space-mt--large'>
