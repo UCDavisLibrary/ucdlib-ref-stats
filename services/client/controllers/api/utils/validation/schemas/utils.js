@@ -18,6 +18,12 @@ export const toString = z.preprocess(
   }, z.string()
 );
 
+export const requiredIsoDate = (msg = 'Required') =>
+  z.preprocess(
+    v => (v == null ? '' : v),
+    z.string().trim().date(msg)
+  );
+
 export const requiredArray = (msg = 'Required', itemSchema) => {
   itemSchema = itemSchema || z.string();
   return z.preprocess(

@@ -7,6 +7,8 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import {AppComponentController, QueryStringController} from '#controllers';
 import { IdGenerator } from '#client-utils';
 
+import '#components/cork-date-display.js';
+
 /**
  * @typedef {Object} RefStatsDisplayField
  * @description Fields that will be displayed in the form entry results (either as a column or in the expandable details section)
@@ -177,21 +179,26 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
    */
   getFieldValue(formEntry, fieldName){
     if ( fieldName === '_created_at' ) {
-      const d = new Date(formEntry.created_at);
-      const date = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-      const time = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-      return html`<div>${date}</div><div>${time}</div>`;
+      return html`<cork-date-display iso=${formEntry.created_at}></cork-date-display>`;
     }
     const fieldValue = formEntry.fields[fieldName];
     const fieldValueArray = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
 
     const field = this.formFields[fieldName];
-    if ( field.picklist_id && this.picklistItems[field.picklist_id] ) {
+    if ( field?.picklist_id && this.picklistItems[field.picklist_id] ) {
       const labels = fieldValueArray.map( v => {
         const item = this.picklistItems[field.picklist_id].find( pi => pi.value === v );
         return item ? item.label : v;
       });
       return labels.join(', ');
+    }
+
+    if ( field?.field_type === 'date' || field?.field_type === 'datetime' ) {
+      return html`<cork-date-display
+        iso=${fieldValueArray[0] || ''}
+        ?date-only=${field?.field_type === 'date'}
+      ></cork-date-display>
+      `;
     }
     
     return fieldValueArray.join(', ') || '';

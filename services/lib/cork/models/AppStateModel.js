@@ -20,6 +20,8 @@ class AppStateModelImpl extends AppStateModel {
     this.errorRequests = [];
     this._errorVisible = false;
     this._showErrorTimer = null;
+
+    this.inject('ValidationModel');
   }
 
   set(update) {
@@ -34,6 +36,8 @@ class AppStateModelImpl extends AppStateModel {
 
       update.page = page;
     }
+    
+    this.ValidationModel?.dismissAll();
 
     return super.set(update);
   }

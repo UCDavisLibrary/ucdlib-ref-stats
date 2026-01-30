@@ -21,6 +21,10 @@ class ValidationModel extends BaseModel {
       return;
     }
   }
+
+  dismissAll(){
+    this.store.emit(this.store.events.VALIDATION_SUCCESS, { allSchemas: true });
+  }
 }
 
 const model = new ValidationModel();

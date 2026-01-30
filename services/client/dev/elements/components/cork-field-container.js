@@ -105,7 +105,7 @@ export default class CorkFieldContainer extends Mixin(LitElement)
    * @returns
    */
   _onValidationSuccess(e) {
-    if ( e.schema !== this.schema ) return;
+    if ( e.schema !== this.schema && !e.allSchemas ) return;
     this.errors = [];
   }
 

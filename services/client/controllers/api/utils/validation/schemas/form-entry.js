@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { requiredString, booleanParam, toString, requiredNumber, requiredArray, pageParam, perPageParam } from "./utils.js";
+import { requiredString, booleanParam, toString, requiredNumber, requiredArray, pageParam, perPageParam , requiredIsoDate} from "./utils.js";
 import models from '#models';
 import logger from '#lib/logger.js';
 
@@ -77,18 +77,6 @@ const srOrderByFieldExists = async (value, ctx) => {
   }
 }
 
-const instructionStatsBase = z.object({
-  '_formId': z.string(),
-  'participant-count': requiredNumber(),
-  'instructor-session-type': requiredString().superRefine(srPicklistItemsExist('instructor-session-type')),
-  'department': requiredArray().superRefine(srPicklistItemsExist('department'))
-});
-
-
-const instructionStatsUpdate = instructionStatsBase.partial().extend({
-  'original_form_entry_id': z.uuid()
-}).superRefine(srOriginalFormEntryExists);
-
 const querySchema = z.object({
   page: pageParam,
   per_page: perPageParam(15),
@@ -96,6 +84,20 @@ const querySchema = z.object({
   is_latest_version: booleanParam,
   orderByField: z.string().optional().superRefine(srOrderByFieldExists)
 });
+
+const instructionStatsBase = z.object({
+  '_formId': z.string(),
+  'participant-count': requiredNumber(),
+  'instructor-session-type': requiredString().superRefine(srPicklistItemsExist('instructor-session-type')),
+  'department': requiredArray().superRefine(srPicklistItemsExist('department')),
+  'date': requiredIsoDate()
+});
+
+
+const instructionStatsUpdate = instructionStatsBase.extend({
+  'original_form_entry_id': z.uuid()
+}).superRefine(srOriginalFormEntryExists);
+
 
 export default {
   'query': querySchema,
