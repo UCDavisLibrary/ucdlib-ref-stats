@@ -24,7 +24,7 @@ import {
   assignmentSchema
 } from './schemas/assignment.js';
 
-import formEntrySchemas from './schemas/form-entry.js';
+import formEntrySchemas, { buildDynamicFormEntrySchema } from './schemas/form-entry.js';
 
 /**
  * @description Middleware to validate request data against a Zod schema.
@@ -87,4 +87,4 @@ const schema = {
   formEntry: formEntrySchemas
 };
 
-export { validate, schema, formatErrorResponse };
+export { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema };

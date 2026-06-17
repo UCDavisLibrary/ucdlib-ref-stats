@@ -24,6 +24,41 @@ export const requiredIsoDate = (msg = 'Required') =>
     z.string().trim().date(msg)
   );
 
+/**
+ * @description Validates an optional ISO date string (YYYY-MM-DD). Allows empty/null.
+ */
+export const isoDate = z.preprocess(
+  v => (v == null ? '' : v),
+  z.string().trim().refine(
+    v => !v || /^\d{4}-\d{2}-\d{2}$/.test(v),
+    'Must be a valid date (YYYY-MM-DD)'
+  )
+);
+
+/**
+ * @description Validates a required local datetime string (YYYY-MM-DDTHH:mm[:ss]).
+ * Matches the format produced by datetime-local inputs.
+ * @param {String} msg - Required validation message. Default: 'Required'
+ */
+export const requiredIsoDatetime = (msg = 'Required') =>
+  z.preprocess(
+    v => (v == null ? '' : v),
+    z.string().trim().min(1, msg)
+  ).pipe(
+    z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/, 'Must be a valid date and time')
+  );
+
+/**
+ * @description Validates an optional local datetime string (YYYY-MM-DDTHH:mm[:ss]). Allows empty/null.
+ */
+export const isoDatetime = z.preprocess(
+  v => (v == null ? '' : v),
+  z.string().trim().refine(
+    v => !v || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(v),
+    'Must be a valid date and time'
+  )
+);
+
 export const requiredArray = (msg = 'Required', itemSchema) => {
   itemSchema = itemSchema || z.string();
   return z.preprocess(

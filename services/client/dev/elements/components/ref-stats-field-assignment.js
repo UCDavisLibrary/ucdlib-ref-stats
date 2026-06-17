@@ -7,6 +7,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import {AppComponentController} from '#controllers';
 
 import '#components/ref-stats-field-typeahead.js';
+import '#components/forms/ref-stats-field-settings-form.js';
 
 export default class RefStatsFieldAssignment extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
@@ -18,7 +19,9 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       fields: {type: Array },
       forms: { type: Array },
       fieldToAdd: { state: true },
-      formToAdd: { state: true }
+      formToAdd: { state: true },
+      fieldType: { state: true },
+      fieldObj: { state: true }
     }
   }
 
@@ -34,6 +37,8 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     this.fieldNameOrId = null;
     this.fields = [];
     this.forms = [];
+    this.fieldType = null;
+    this.fieldObj = null;
 
     this.ctl = {
       appComponent : new AppComponentController(this),
@@ -65,7 +70,9 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       this.fields = r.payload.results.map( f => {
         const out = { field: f };
         const form = f.forms.find( form => form.form_id === this.formNameOrId || form.name === this.formNameOrId );
-        out.assignment_is_archived = !!form?.assignment_is_archived
+        out.assignment_is_archived = !!form?.assignment_is_archived;
+        out.assignment_settings = form?.assignment_settings || {};
+        out.formName = form?.name || this.formNameOrId;
         return out;
       });
       if ( r.payload.max_page > 1 ) {
@@ -76,6 +83,8 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       const r = await this.FieldModel.get(this.fieldNameOrId);
       if ( r.state !== 'loaded' ) return;
       this.forms = r.payload.forms || [];
+      this.fieldType = r.payload.field_type || null;
+      this.fieldObj = r.payload;
     }
   }
 
@@ -155,6 +164,28 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       ]
     })
     
+  }
+
+  /**
+   * @description Open the field settings modal for a given field-form assignment
+   * @param {Object} field - field object with form_field_id, name, field_type
+   * @param {Object} form - form object with form_id, name
+   * @param {Object} assignmentSettings - current assignment_settings
+   */
+  _onSettingsClick(field, form, assignmentSettings) {
+    this.AppStateModel.showDialogModal({
+      content: () => html`
+        <ref-stats-field-settings-form
+          fieldId=${field.form_field_id}
+          formId=${form.form_id || form.name}
+          fieldType=${field.field_type}
+          fieldName=${field.name}
+          formName=${form.name}
+          .assignmentSettings=${assignmentSettings || {}}
+          @ucdlib-rs-field-assignment-action=${() => this._loadData()}
+        ></ref-stats-field-settings-form>
+      `
+    });
   }
 
   async _onAppDialogAction(e){

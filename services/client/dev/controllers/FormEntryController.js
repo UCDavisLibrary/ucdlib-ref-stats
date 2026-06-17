@@ -3,6 +3,7 @@ import AppComponentController from './AppComponentController.js';
 import { forms, fields } from '#templates';
 import { IdGenerator } from '#client-utils';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 export default class FormEntryController {
   constructor(host, opts={}){
@@ -190,20 +191,55 @@ export default class FormEntryController {
     return this.fields;
   }
 
+  /**
+   * @description Renders a default form layout for forms without a hardcoded template.
+   * Fields are sorted by sort_order from form_field_assignment.
+   * @returns {import('lit').TemplateResult}
+   */
+  _renderDefaultForm() {
+    const formId = this.form?.form_id;
+    const sorted = [...this.fields].sort((a, b) => {
+      const aOrder = a.forms?.find(f => f.form_id === formId)?.sort_order ?? 0;
+      const bOrder = b.forms?.find(f => f.form_id === formId)?.sort_order ?? 0;
+      return aOrder - bOrder;
+    });
+    return html`
+      <form @submit=${this._onSubmit.bind(this)}>
+        ${sorted.map(f => {
+          const s = f.forms?.find(form => form.form_id === formId)?.assignment_settings || {};
+          return html`<ref-stats-form-entry-field
+            field="${f.name}"
+            ?multiple=${!!s.multiple}
+            ?required=${!!s.required}
+            ?no-field-container=${!!s.noFieldContainer}
+            min=${ifDefined(s.min)}
+            max=${ifDefined(s.max)}
+            step=${ifDefined(s.step)}
+            placeholder=${ifDefined(s.placeholder)}
+            rows=${ifDefined(s.rows)}
+            description=${ifDefined(s.description)}
+            label=${ifDefined(s.label)}
+          ></ref-stats-form-entry-field>`;
+        })}
+        ${this.renderActionButtons()}
+      </form>
+    `;
+  }
+
   render(){
     if ( this.hostIsForm ) {
       if ( this.form?.is_archived ){
         return html`<div class='alert'>This form has been archived and is no longer available for data entry.</div>`;
       }
       const template = forms.find(f => f.name === this.form?.name);
-      if ( !template ) {
+      if ( !template && !this.form?.form_id ) {
         return html`<p>Form Not Found!</p>`;
       }
 
       return [
         this._renderFormVersionWarning(),
         this._renderFormEntrySummary(),
-        template.render.call(this.host, this)
+        template ? template.render.call(this.host, this) : this._renderDefaultForm()
       ];
     }
 

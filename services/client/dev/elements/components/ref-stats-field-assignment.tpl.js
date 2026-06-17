@@ -46,6 +46,10 @@ function _renderForms(){
           </div>
           <div class='ucd-link-list-item--excerpt'>${form.name}</div>
           <ul class='list--pipe actions text--smaller'>
+            <li>
+              <cork-icon icon='fas.sliders'></cork-icon>
+              <button class='link-button' @click=${() => this._onSettingsClick(this.fieldObj, form, form.assignment_settings)}>Settings</button>
+            </li>
             <li ?hidden=${form.assignment_is_archived}>
               <cork-icon icon='fas.eye-slash'></cork-icon>
               <button class='link-button' @click=${() => this._onArchiveClick(form.form_id)}>Archive</button>
@@ -88,6 +92,10 @@ function _renderFields(){
           </div>
           <div class='ucd-link-list-item--excerpt'>${f.field.name}</div>
           <ul class='list--pipe actions text--smaller'>
+            <li>
+              <cork-icon icon='fas.sliders'></cork-icon>
+              <button class='link-button' @click=${() => this._onSettingsClick(f.field, { form_id: this.formNameOrId, name: f.formName }, f.assignment_settings)}>Settings</button>
+            </li>
             <li ?hidden=${f.assignment_is_archived}>
               <cork-icon icon='fas.eye-slash'></cork-icon>
               <button class='link-button' @click=${() => this._onArchiveClick(f.field.form_field_id)}>Archive</button>

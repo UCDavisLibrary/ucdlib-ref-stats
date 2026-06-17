@@ -1,6 +1,6 @@
 import { Router, json } from 'express';
 import handleError from '../utils/handleError.js';
-import { validate, schema, formatErrorResponse } from '../utils/validation/index.js';
+import { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
 
@@ -31,10 +31,13 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     }
     form = form.res;
 
-    const entrySchema = schema.formEntry?.[form.name]?.[req.body?.original_form_entry_id ? 'update' : 'create'];
-    if ( !entrySchema ) {
-      throw new Error(`No form entry schema found for form: ${form.name}`);
-    }
+    const isUpdate = !!req.body?.original_form_entry_id;
+    const baseSchema = schema.formEntry?.[form.name]?.create || null;
+
+    const fieldsResult = await models.field.query({ form: form.form_id, perPage: 1000 });
+    if ( fieldsResult.error ) throw fieldsResult.error;
+
+    const entrySchema = buildDynamicFormEntrySchema(fieldsResult.res.results, { isUpdate, baseSchema, formId: form.form_id });
 
     const validated = await entrySchema.safeParseAsync({...req.body, _formId: form.form_id});
     if ( !validated.success ) {

@@ -18,7 +18,10 @@ export default class RefStatsFormEntryField extends Mixin(LitElement)
       step: { type: Number },
       placeholder: { type: String },
       rows: { type: Number },
-      noFieldContainer: { type: Boolean, attribute: 'no-field-container' }
+      noFieldContainer: { type: Boolean, attribute: 'no-field-container' },
+      required: { type: Boolean },
+      description: { type: String },
+      label: { type: String }
     }
   }
 
@@ -40,7 +43,7 @@ export default class RefStatsFormEntryField extends Mixin(LitElement)
   }
 
   willUpdate(props){
-    const watchedProps = ['field', 'multiple', 'max', 'min', 'step', 'placeholder', 'rows', 'noFieldContainer'];
+    const watchedProps = ['field', 'multiple', 'max', 'min', 'step', 'placeholder', 'rows', 'noFieldContainer', 'required', 'description', 'label'];
     if ( watchedProps.some( p => props.has(p) ) ) {
       this.ctl.formEntry.update();
     }

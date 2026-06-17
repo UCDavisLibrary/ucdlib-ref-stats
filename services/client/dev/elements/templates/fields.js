@@ -6,7 +6,7 @@ function checkboxMulti(ctl) {
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
       <fieldset class='checkbox'>
-        <legend>${field.label}</legend>
+        <legend>${this.label || field.label}</legend>
         ${ctl.fieldPicklistItems.map( item => html`
           <div class='checkbox-item'>
             <div>
@@ -33,7 +33,7 @@ function radio(ctl) {
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
       <fieldset class='radio'>
-        <legend>${field.label}</legend>
+        <legend>${this.label || field.label}</legend>
         ${ctl.fieldPicklistItems.map( item => html`
           <div class='radio-item'>
             <div>
@@ -66,11 +66,12 @@ function select(ctl) {
   };
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${this.label || field.label}</label>
       <ucd-theme-slim-select @change=${onChange}>
         <select
           id=${ctl.idGen.get(`field-${field.name}`)}
           ?multiple=${this.multiple}>
+          ${!this.multiple ? html`<option value="" ?selected=${!ctl.payload?.[field.name]}>-- Select an option --</option>` : null}
           ${ctl.fieldPicklistItems.map( item => html`
             <option 
               value=${item.value}
@@ -96,10 +97,10 @@ function checkbox(ctl){
           .checked=${!!ctl.payload?.[field.name]}
           @input=${() => ctl.setPayloadField(field.name, !ctl.payload?.[field.name])}>
         <label for=${ctl.idGen.get(`field-${field.name}`)}>
-          ${field.label}
+          ${this.label || field.label}
         </label>
       </cork-field-container>
-      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+      <div class='field-description' ?hidden=${!(this.description || field.description)}>${this.description || field.description}</div>
     </div>
   `;
 }
@@ -108,17 +109,18 @@ function number(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${this.label || field.label}</label>
       <input 
         type="number"
         id=${ctl.idGen.get(`field-${field.name}`)}
         .value=${ctl.payload?.[field.name] !== undefined || null ? ctl.payload?.[field.name] : ''}
+        ?required=${this.required}
         min=${ifDefined(this.min)}
         max=${ifDefined(this.max)}
         step=${ifDefined(this.step)}
         placeholder=${ifDefined(this.placeholder)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value ? Number(e.target.value) : null)}>
-      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+      <div class='field-description' ?hidden=${!(this.description || field.description)}>${this.description || field.description}</div>
     </cork-field-container>
   `;
 }
@@ -127,14 +129,15 @@ function text(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${this.label || field.label}</label>
       <input 
         type="text"
         id=${ctl.idGen.get(`field-${field.name}`)}
         .value=${ctl.payload?.[field.name] || ''}
+        ?required=${this.required}
         placeholder=${ifDefined(this.placeholder)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
-      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+      <div class='field-description' ?hidden=${!(this.description || field.description)}>${this.description || field.description}</div>
     </cork-field-container>
   `;
 }
@@ -143,15 +146,16 @@ function textarea(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
-      <textarea 
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${this.label || field.label}</label>
+      <textarea
         id=${ctl.idGen.get(`field-${field.name}`)}
         .value=${ctl.payload?.[field.name] || ''}
+        ?required=${this.required}
         placeholder=${ifDefined(this.placeholder)}
         rows=${ifDefined(this.rows)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
       </textarea>
-      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+      <div class='field-description' ?hidden=${!(this.description || field.description)}>${this.description || field.description}</div>
     </cork-field-container>
   `;
 }
@@ -160,16 +164,17 @@ function date(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${this.label || field.label}</label>
       <input 
         type="date"
         id=${ctl.idGen.get(`field-${field.name}`)}
         .value=${ctl.payload?.[field.name] || ''}
+        ?required=${this.required}
         placeholder=${ifDefined(this.placeholder)}
         min=${ifDefined(this.min)}
         max=${ifDefined(this.max)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
-      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+      <div class='field-description' ?hidden=${!(this.description || field.description)}>${this.description || field.description}</div>
     </cork-field-container>
   `;
 }
@@ -178,16 +183,17 @@ function datetime(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
     <cork-field-container schema=${ctl.form?.name} path=${field.name} class=${this.noFieldContainer ? '' : 'field-container'}>
-      <label for=${ctl.idGen.get(`field-${field.name}`)}>${field.label}</label>
+      <label for=${ctl.idGen.get(`field-${field.name}`)}>${this.label || field.label}</label>
       <input 
         type="datetime-local"
         id=${ctl.idGen.get(`field-${field.name}`)}
         .value=${ctl.payload?.[field.name] || ''}
+        ?required=${this.required}
         placeholder=${ifDefined(this.placeholder)}
         min=${ifDefined(this.min)}
         max=${ifDefined(this.max)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
-      <div class='field-description' ?hidden=${!field.description}>${field.description}</div>
+      <div class='field-description' ?hidden=${!(this.description || field.description)}>${this.description || field.description}</div>
     </cork-field-container>
   `;
 }

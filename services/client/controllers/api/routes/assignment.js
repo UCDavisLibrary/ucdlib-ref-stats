@@ -18,7 +18,9 @@ router.post('/', json(), validate(schema.assignment, {reqParts: ['body']}), asyn
       r = await models.assignment.patch(req.payload.form_field_id, req.payload.form_id, { is_archived: true });
     } else if ( req.payload.action === 'unarchive' ) {
       r = await models.assignment.patch(req.payload.form_field_id, req.payload.form_id, { is_archived: false });
-    } 
+    } else if ( req.payload.action === 'settings' ) {
+      r = await models.assignment.patch(req.payload.form_field_id, req.payload.form_id, { assignment_settings: req.payload.assignment_settings ?? {} });
+    }
     if (r.error) {
       throw r.error;
     }

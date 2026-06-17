@@ -29,7 +29,19 @@ const srValidateAssignmentExists = async (data, ctx) => {
 const assignmentSchema = z.object({
   form_id: requiredString(),
   form_field_id: requiredString(),
-  action: z.enum(['assign', 'unassign', 'archive', 'unarchive'])
+  action: z.enum(['assign', 'unassign', 'archive', 'unarchive', 'settings']),
+  assignment_settings: z.object({
+    required: z.boolean().optional(),
+    multiple: z.boolean().optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    step: z.number().optional(),
+    placeholder: z.string().optional(),
+    rows: z.number().int().optional(),
+    noFieldContainer: z.boolean().optional(),
+    description: z.string().optional(),
+    label: z.string().optional()
+  }).optional()
 }).superRefine(srValidateFormId).superRefine(srValidateFieldId).superRefine(srValidateAssignmentExists);
 
 export {

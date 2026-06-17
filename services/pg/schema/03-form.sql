@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS form_field_assignment (
   form_id UUID NOT NULL REFERENCES form(form_id) ON DELETE CASCADE,
   form_field_id UUID NOT NULL REFERENCES form_field(form_field_id) ON DELETE CASCADE,
   sort_order INTEGER NOT NULL DEFAULT 0,
+  assignment_settings JSONB NOT NULL DEFAULT '{}',
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now(),
   is_archived BOOLEAN DEFAULT FALSE NOT NULL,
@@ -161,7 +162,9 @@ LEFT JOIN LATERAL (
         'name', f.name,
         'label', f.label,
         'is_archived', f.is_archived,
-        'assignment_is_archived', ffa.is_archived
+        'assignment_is_archived', ffa.is_archived,
+        'sort_order', ffa.sort_order,
+        'assignment_settings', ffa.assignment_settings
       )
       ORDER BY f.name
     ) AS forms

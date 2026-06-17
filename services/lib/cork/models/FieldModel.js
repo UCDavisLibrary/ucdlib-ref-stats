@@ -83,6 +83,21 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  /**
+   * @description Update assignment_settings for a field-form assignment
+   * @param {string} fieldId - form_field_id
+   * @param {string} formId - form_id
+   * @param {Object} settings - assignment_settings object
+   * @returns {Promise}
+   */
+  async patchAssignmentSettings(fieldId, formId, settings){
+    const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'settings', assignment_settings: settings });
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
   
 
 }
