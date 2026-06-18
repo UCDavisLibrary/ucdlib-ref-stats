@@ -7,6 +7,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import { ModalFormController } from '#controllers';
 import { IdGenerator } from '#client-utils';
 import definitions from '#lib/definitions.js';
+import { forms } from '#templates';
 
 export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
@@ -20,7 +21,8 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
       formName: { type: String },
       assignmentSettings: { type: Object },
       payload: { type: Object },
-      customValidation: { state: true }
+      customValidation: { state: true },
+      hasCustomTemplate: { state: true }
     }
   }
 
@@ -40,6 +42,7 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
     this.assignmentSettings = {};
     this.payload = {};
     this.customValidation = false;
+    this.hasCustomTemplate = false;
 
     this.ctl = {
       modal: new ModalFormController(this, { submitCallback: '_onSubmitClick' }),
@@ -55,6 +58,10 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
       this.customValidation = definitions.hasCustomValidation(this.formName, this.fieldName);
       this.ctl.modal.setModalTitle('Field Settings');
       this.ctl.modal.setModalSubmitButton('Save Settings');
+    }
+
+    if ( props.has('formName') ){
+      this.hasCustomTemplate = forms.some( f => f.name === this.formName );
     }
   }
 

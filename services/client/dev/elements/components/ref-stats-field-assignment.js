@@ -5,6 +5,7 @@ import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 import {AppComponentController} from '#controllers';
+import { forms } from '#templates';
 
 import '#components/ref-stats-field-typeahead.js';
 import '#components/forms/ref-stats-field-settings-form.js';
@@ -21,7 +22,9 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       fieldToAdd: { state: true },
       formToAdd: { state: true },
       fieldType: { state: true },
-      fieldObj: { state: true }
+      fieldObj: { state: true },
+      hasCustomTemplate: { state: true },
+      reordering: { state: true }
     }
   }
 
@@ -39,6 +42,8 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     this.forms = [];
     this.fieldType = null;
     this.fieldObj = null;
+    this.hasCustomTemplate = false;
+    this.reordering = false;
 
     this.ctl = {
       appComponent : new AppComponentController(this),
@@ -73,8 +78,12 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
         out.assignment_is_archived = !!form?.assignment_is_archived;
         out.assignment_settings = form?.assignment_settings || {};
         out.formName = form?.name || this.formNameOrId;
+        out.sort_order = form?.sort_order ?? 0;
         return out;
       });
+      this.fields.sort((a, b) => a.sort_order - b.sort_order);
+      const resolvedFormName = this.fields[0]?.formName;
+      this.hasCustomTemplate = resolvedFormName ? forms.some(f => f.name === resolvedFormName) : false;
       if ( r.payload.max_page > 1 ) {
         console.warn('RefStatsFieldAssignment: more than 500 fields assigned to form, only first 500 loaded');
       }
@@ -164,6 +173,30 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       ]
     })
     
+  }
+
+  /**
+   * @description Move a field up or down in the form's sort order
+   * @param {'up'|'down'} direction
+   * @param {Object} fieldItem - item from this.fields
+   */
+  async _onReorderClick(direction, fieldItem) {
+    const idx = this.fields.indexOf(fieldItem);
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= this.fields.length) return;
+
+    this.reordering = true;
+
+    const orders = this.fields.map((_, i) => i);
+    [orders[idx], orders[targetIdx]] = [orders[targetIdx], orders[idx]];
+
+    await Promise.all([
+      this.FieldModel.reorderAssignment(this.fields[idx].field.form_field_id, this.formNameOrId, orders[idx]),
+      this.FieldModel.reorderAssignment(this.fields[targetIdx].field.form_field_id, this.formNameOrId, orders[targetIdx])
+    ]);
+
+    this.reordering = false;
+    this._loadData();
   }
 
   /**

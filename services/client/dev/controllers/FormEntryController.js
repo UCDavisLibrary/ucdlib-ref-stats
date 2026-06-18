@@ -209,16 +209,6 @@ export default class FormEntryController {
           const s = f.forms?.find(form => form.form_id === formId)?.assignment_settings || {};
           return html`<ref-stats-form-entry-field
             field="${f.name}"
-            ?multiple=${!!s.multiple}
-            ?required=${!!s.required}
-            ?no-field-container=${!!s.noFieldContainer}
-            min=${ifDefined(s.min)}
-            max=${ifDefined(s.max)}
-            step=${ifDefined(s.step)}
-            placeholder=${ifDefined(s.placeholder)}
-            rows=${ifDefined(s.rows)}
-            description=${ifDefined(s.description)}
-            label=${ifDefined(s.label)}
           ></ref-stats-form-entry-field>`;
         })}
         ${this.renderActionButtons()}
@@ -245,7 +235,8 @@ export default class FormEntryController {
 
     if ( this.hostIsField ) {
       const f = this.fields.find( f => f.name === this.host.field );
-      if ( !f || f.is_archived ) return html``;
+      const assignmentArchived = f?.forms?.find(form => form.form_id === this.form?.form_id)?.assignment_is_archived;
+      if ( !f || f.is_archived || assignmentArchived ) return html``;
       const template = fields[f.field_type];
       if ( !template ) return html``;
       return template.call(this.host, this);

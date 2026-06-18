@@ -24,7 +24,14 @@ class Assignment {
     try {
       await client.query('BEGIN');
 
-      const sql = `INSERT INTO ${config.db.tables.assignment} (form_field_id, form_id) VALUES (get_form_field_id($1), get_form_id($2)) RETURNING form_field_id, form_id, form_field_assignment_id;`;
+      const sql = `
+        INSERT INTO ${config.db.tables.assignment} (form_field_id, form_id, sort_order)
+        VALUES (
+          get_form_field_id($1),
+          get_form_id($2),
+          (SELECT COALESCE(MAX(sort_order), -1) + 1 FROM ${config.db.tables.assignment} WHERE form_id = get_form_id($2))
+        )
+        RETURNING form_field_id, form_id, form_field_assignment_id;`;
       let result = await client.query(sql, [fieldId, formId]);
 
       await client.query('COMMIT');

@@ -5,6 +5,9 @@ export function styles() {
     ref-stats-form-entry-field {
       display: block;
     }
+    ref-stats-form-entry-field .required-marker {
+      color: var(--double-decker, #c10230);
+    }
   `;
 
   return [elementStyles];

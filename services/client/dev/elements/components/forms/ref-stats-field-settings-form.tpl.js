@@ -18,6 +18,7 @@ export function render() {
   const isNumber = t === 'number';
   const isTextOrNumber = isText || isNumber;
   const isSelectOrTypeahead = t === 'select' || t === 'typeahead';
+  const isPicklist = ['select', 'typeahead', 'radio', 'checkbox-multiple'].includes(t);
 
   return html`
     <fieldset>
@@ -75,6 +76,9 @@ export function render() {
 
     <fieldset>
       <legend>Display Settings</legend>
+      <div class='alert' ?hidden=${!this.hasCustomTemplate}>
+        This form has a custom template. The settings below may not override all display behavior.
+      </div>
 
       <cork-field-container class='field-container' ?hidden=${!isText}>
         <label for=${this.ctl.idGen.get('placeholder')}>Placeholder</label>
@@ -120,6 +124,15 @@ export function render() {
           .checked=${!!this.payload?.noFieldContainer}
           @input=${() => this._onPayloadInput('noFieldContainer', !this.payload?.noFieldContainer)}>
         <label for=${this.ctl.idGen.get('noFieldContainer')}>Hide field container wrapper</label>
+      </cork-field-container>
+
+      <cork-field-container class='field-container checkbox' ?hidden=${!isPicklist}>
+        <input
+          type="checkbox"
+          id=${this.ctl.idGen.get('allowQuickAdd')}
+          .checked=${!!this.payload?.allowQuickAdd}
+          @input=${() => this._onPayloadInput('allowQuickAdd', !this.payload?.allowQuickAdd)}>
+        <label for=${this.ctl.idGen.get('allowQuickAdd')}>Allow picklist item creation</label>
       </cork-field-container>
     </fieldset>
   `;

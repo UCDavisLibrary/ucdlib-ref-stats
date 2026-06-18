@@ -84,6 +84,21 @@ class FieldModel extends BaseModel {
   }
 
   /**
+   * @description Update sort_order for a field-form assignment
+   * @param {string} fieldId - form_field_id
+   * @param {string} formId - form_id
+   * @param {number} sortOrder - new sort_order value
+   * @returns {Promise}
+   */
+  async reorderAssignment(fieldId, formId, sortOrder){
+    const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'reorder', sort_order: sortOrder });
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
+  /**
    * @description Update assignment_settings for a field-form assignment
    * @param {string} fieldId - form_field_id
    * @param {string} formId - form_id

@@ -14,6 +14,14 @@ export function styles() {
       --cork-icon-size: .9rem;
       color: var(--ucd-blue-70, #73abdd);
     }
+    ref-stats-field-assignment .field-header {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    ref-stats-field-assignment .field-header cork-icon-button {
+      --cork-icon-button-size: 1.1rem;
+    }
   `;
 
   return [elementStyles];
@@ -83,12 +91,26 @@ function _renderFields(){
       No fields assigned to this form.
     </div>
     <div>
-      ${this.fields.map( f => html`
+      ${this.fields.map( (f, idx) => html`
         <div class='u-space-mb--small'>
-          <div>
+          <div class='field-header'>
             <a href="/field/${f.field.name}" class='ucd-link-list-item--title'>${f.field.label}</a>
             <div class='ucd-link-list-item--badge' ?hidden=${!f.assignment_is_archived}>Archived</div>
             <div class='ucd-link-list-item--badge' ?hidden=${!f.field.is_archived}>Field Archived</div>
+            <div ?hidden=${this.hasCustomTemplate || f.field.is_archived || f.assignment_is_archived}>
+              <cork-icon-button 
+                icon='fas.arrow-up' 
+                ?disabled=${this.reordering || idx === 0} 
+                title='Move field up'
+                @click=${() => this._onReorderClick('up', f)}>
+              </cork-icon-button>
+              <cork-icon-button 
+                icon='fas.arrow-down' 
+                ?disabled=${this.reordering || idx === this.fields.length - 1} 
+                title='Move field down'
+                @click=${() => this._onReorderClick('down', f)}>
+              </cork-icon-button>
+            </div>
           </div>
           <div class='ucd-link-list-item--excerpt'>${f.field.name}</div>
           <ul class='list--pipe actions text--smaller'>

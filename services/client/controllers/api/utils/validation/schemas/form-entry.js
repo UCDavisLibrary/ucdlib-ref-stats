@@ -118,6 +118,9 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
   const extraShape = {};
 
   for (const field of fields) {
+    if ( field.is_archived ) continue;
+    const form = formId ? field.forms?.find(f => f.form_id === formId) : null;
+    if ( form?.assignment_is_archived ) continue;
     if (coveredKeys.includes(field.name)) continue;
 
     const settings = formId

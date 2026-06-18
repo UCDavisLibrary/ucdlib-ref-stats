@@ -20,6 +20,8 @@ router.post('/', json(), validate(schema.assignment, {reqParts: ['body']}), asyn
       r = await models.assignment.patch(req.payload.form_field_id, req.payload.form_id, { is_archived: false });
     } else if ( req.payload.action === 'settings' ) {
       r = await models.assignment.patch(req.payload.form_field_id, req.payload.form_id, { assignment_settings: req.payload.assignment_settings ?? {} });
+    } else if ( req.payload.action === 'reorder' ) {
+      r = await models.assignment.patch(req.payload.form_field_id, req.payload.form_id, { sort_order: req.payload.sort_order });
     }
     if (r.error) {
       throw r.error;
