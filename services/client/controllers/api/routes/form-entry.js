@@ -74,4 +74,19 @@ router.get('/:idOrName/:entryId', async (req, res) => {
   }
 });
 
+router.delete('/:entryId', async (req, res) => {
+  try {
+    const entry = await models.formEntry.get(req.params.entryId);
+    if ( !entry.res ) return res.status(404).json({ message: 'Form entry not found' });
+    if ( !entry.res.is_latest_version ) return res.status(409).json({ message: 'Only the latest version of a submission can be deleted' });
+    const deleteAll = req.query.all === 'true';
+    const r = await models.formEntry.deleteLatest(req.params.entryId, { deleteAll });
+    if ( r.error ) throw r.error;
+    logger.info('Form entry deleted', req.context.logSignal, { formEntryId: req.params.entryId, deleteAll });
+    res.status(200).json(r.res);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
 export default router;

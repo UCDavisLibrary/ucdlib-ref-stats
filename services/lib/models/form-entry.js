@@ -168,6 +168,56 @@ class FormEntry {
     }
     return { res: missing ? null : r.res?.rows?.[0] || null };
   }
+
+  /**
+   * @description Delete the latest version of a form entry. If opts.deleteAll is true, all versions
+   * in the version chain are removed. Otherwise only the specified entry is deleted and the
+   * previous version is promoted to is_latest_version = TRUE.
+   * @param {String} entryId - The form_entry_id to delete (must be the latest version)
+   * @param {Object} opts - Options object
+   * @param {Boolean} opts.deleteAll - If true, delete all versions in the chain
+   * @returns {Object} Object with form_entry_id and new_latest_id (null when deleteAll), or an error object
+   */
+  async deleteLatest(entryId, opts={}) {
+    const client = await pgClient.pool.connect();
+    try {
+      await client.query('BEGIN');
+      let newLatestId = null;
+      if ( opts.deleteAll ) {
+        const sql = `
+          DELETE FROM ${config.db.tables.formEntry}
+          WHERE COALESCE(original_form_entry_id, form_entry_id) = (
+            SELECT COALESCE(original_form_entry_id, form_entry_id)
+            FROM ${config.db.tables.formEntry} WHERE form_entry_id = $1
+          )`;
+        await client.query(sql, [entryId]);
+      } else {
+        const sql = `
+          WITH deleted AS (
+            DELETE FROM ${config.db.tables.formEntry}
+            WHERE form_entry_id = $1 RETURNING COALESCE(original_form_entry_id, form_entry_id) AS root_id
+          ),
+          prev AS (
+            SELECT fe.form_entry_id FROM ${config.db.tables.formEntry} fe, deleted
+            WHERE COALESCE(fe.original_form_entry_id, fe.form_entry_id) = deleted.root_id
+              AND fe.form_entry_id != $1
+            ORDER BY fe.created_at DESC LIMIT 1
+          )
+          UPDATE ${config.db.tables.formEntry} SET is_latest_version = TRUE
+          FROM prev WHERE ${config.db.tables.formEntry}.form_entry_id = prev.form_entry_id
+          RETURNING ${config.db.tables.formEntry}.form_entry_id AS new_latest_id`;
+        const r = await client.query(sql, [entryId]);
+        newLatestId = r.rows?.[0]?.new_latest_id || null;
+      }
+      await client.query('COMMIT');
+      return { res: { form_entry_id: entryId, new_latest_id: newLatestId } };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      return { error };
+    } finally {
+      client.release();
+    }
+  }
 }
 
 export default new FormEntry();

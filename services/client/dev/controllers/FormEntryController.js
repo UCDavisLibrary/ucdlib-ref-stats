@@ -339,7 +339,8 @@ export default class FormEntryController {
   }
 
   /**
-   * @description Render the submit, reset, and new-submission action buttons
+   * @description Render the submit, reset, new-submission, and delete action buttons.
+   * The delete button is only shown when viewing the latest version of an existing entry.
    * @returns {import('lit').TemplateResult}
    */
   renderActionButtons(){
@@ -349,8 +350,24 @@ export default class FormEntryController {
         <button type="submit" class="btn btn--primary">${this.formEntry ? 'Update' : 'Submit'}</button>
         <button type="button" class="btn btn--invert" @click=${this._onReset.bind(this)}>Reset</button>
         <a href="/form/${this.formNameOrId}" class="btn btn--invert" ?hidden=${!this.formEntry}>New Submission</a>
+        <button type="button" class="btn btn--invert" ?hidden=${!this.formEntry?.is_latest_version} @click=${this._onDeleteClick.bind(this)}>Delete</button>
       </div>
     `;
+  }
+
+  /**
+   * @description Open a confirmation modal for deleting the current form entry.
+   * Only reachable when viewing the latest version of an entry.
+   */
+  _onDeleteClick(){
+    this.models.AppStateModel.showDialogModal({
+      actions: [{ text: 'Cancel', value: 'dismiss', invert: true, color: 'secondary' }],
+      content: () => html`
+        <ref-stats-entry-delete-confirm-form
+          form-name-or-id="${this.formNameOrId}"
+          entry-id="${this.formEntry.form_entry_id}">
+        </ref-stats-entry-delete-confirm-form>`
+    });
   }
 
   /**

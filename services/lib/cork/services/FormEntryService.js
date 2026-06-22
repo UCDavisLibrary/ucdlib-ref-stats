@@ -116,6 +116,30 @@ class FormEntryService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Deletes the latest version of a form entry, optionally removing all versions in the chain.
+   * @param {String} entryId - The form_entry_id to delete (must be the latest version)
+   * @param {Object} opts - Options object
+   * @param {Boolean} opts.deleteAll - If true, all versions in the chain are deleted
+   * @returns {Promise<Object>} Store state object for the request
+   */
+  async deleteLatest(entryId, opts={}) {
+    const ido = { entryId, deleteAll: opts.deleteAll || false };
+    const id = payload.getKey(ido);
+    const store = this.store.data.delete;
+    const appStateOptions = { errorSettings: { message: 'Unable to delete submission' } };
+    const url = opts.deleteAll ? `${this.baseUrl}/${entryId}?all=true` : `${this.baseUrl}/${entryId}`;
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url,
+        fetchOptions: { method: 'DELETE' },
+        onUpdate: resp => this.store.set(payload.generate(ido, resp), store, null, appStateOptions)
+      })
+    );
+    return store.get(id);
+  }
+
 }
 
 const service = new FormEntryService();

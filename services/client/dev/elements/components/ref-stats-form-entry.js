@@ -5,6 +5,7 @@ import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 import { FormEntryController } from '#controllers';
+import './forms/ref-stats-entry-delete-confirm-form.js';
 
 /**
  * @description Page-level element that renders the form entry view, allowing users

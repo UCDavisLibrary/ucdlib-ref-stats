@@ -53,6 +53,21 @@ class FormEntryModel extends BaseModel {
     return this.service.query(query, appStateOptions);
   }
 
+  /**
+   * @description Delete the latest version of a form entry, clearing the cache on success
+   * @param {String} entryId - The form_entry_id to delete (must be the latest version)
+   * @param {Object} opts - Options object
+   * @param {Boolean} opts.deleteAll - If true, all versions in the chain are deleted
+   * @returns {Promise}
+   */
+  async deleteLatest(entryId, opts={}) {
+    const res = await this.service.deleteLatest(entryId, opts);
+    if ( res.state === 'loaded' ) {
+      clearCache();
+    }
+    return res;
+  }
+
 }
 
 const model = new FormEntryModel();
