@@ -7,6 +7,12 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import {AppComponentController, QueryStringController} from '#controllers';
 import { IdGenerator } from '#client-utils';
 
+/**
+ * @description Page-level element for browsing and filtering form fields.
+ * Reads query-string parameters to drive a paginated, searchable list of fields.
+ * @property {Array} fields - Paginated list of field objects returned by the current query
+ * @property {Number} maxPage - Total number of pages available for the current query
+ */
 export default class RefStatsFields extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -37,12 +43,20 @@ export default class RefStatsFields extends Mixin(LitElement)
     this._injectModel('FieldModel', 'AppStateModel');
   }
 
+  /**
+   * @description Responds to app-state changes. Triggers a query when this element is on the active page.
+   * @param {Object} e - App state update event
+   */
   async _onAppStateUpdate(e) {
     if ( !this.ctl.appComponent.isOnActivePage ) return;
     await this.ctl.qs.updateComplete;
     await this.query();
   }
 
+  /**
+   * @description Fetches fields from the FieldModel using the current query-string parameters
+   * and updates the fields and maxPage reactive properties.
+   */
   async query(){
     const res = await this.FieldModel.query(this.ctl.qs.query);
     if ( res.state !== 'loaded' ) {
@@ -54,11 +68,19 @@ export default class RefStatsFields extends Mixin(LitElement)
     this.maxPage = res.payload.max_page;
   }
 
+  /**
+   * @description Handles pagination change events by updating the page query-string parameter.
+   * @param {CustomEvent} e - Event with detail.page containing the new page number
+   */
   _onPageChange(e){
     this.ctl.qs.setParam('page', e.detail.page);
     this.ctl.qs.setLocation();
   }
 
+  /**
+   * @description Handles form typeahead selection by updating the form query-string filter.
+   * @param {CustomEvent} e - Event with detail.form containing the selected form object
+   */
   _onFormTypeaheadSelected(e) {
     const form = e.detail?.form?.name;
     if ( form ) {
@@ -70,6 +92,11 @@ export default class RefStatsFields extends Mixin(LitElement)
     this.ctl.qs.setLocation();
   }
 
+  /**
+   * @description Handles text input in the search box with a 300 ms debounce,
+   * updating the q query-string parameter and resetting the page to 1.
+   * @param {InputEvent} e - Native input event from the search field
+   */
   _onSearchInput(e) {
     const value = e.target.value;
     if ( this.searchTimeout ) clearTimeout(this.searchTimeout);

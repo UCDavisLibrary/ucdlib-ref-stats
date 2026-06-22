@@ -25,6 +25,12 @@ function renderQuickAdd(field, ctl) {
   `;
 }
 
+/**
+ * @description Renders a group of checkboxes for a multi-select picklist field.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function checkboxMulti(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -53,6 +59,12 @@ function checkboxMulti(ctl) {
   `;
 }
 
+/**
+ * @description Renders a group of radio buttons for a single-select picklist field.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function radio(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -81,6 +93,13 @@ function radio(ctl) {
   `;
 }
 
+/**
+ * @description Renders a slim-select dropdown for a picklist field. Supports both
+ * single and multi-select modes via the host element's `_multiple` property.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function select(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   const onChange = (e) => {
@@ -112,6 +131,12 @@ function select(ctl) {
   `;
 }
 
+/**
+ * @description Renders a single boolean checkbox field.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function checkbox(ctl){
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -132,6 +157,13 @@ function checkbox(ctl){
   `;
 }
 
+/**
+ * @description Renders a numeric input field. Respects min, max, step, and placeholder
+ * properties on the host element.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function number(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -152,6 +184,12 @@ function number(ctl) {
   `;
 }
 
+/**
+ * @description Renders a plain text input field.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function text(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -169,6 +207,12 @@ function text(ctl) {
   `;
 }
 
+/**
+ * @description Renders a multi-line textarea field. Respects the rows property on the host element.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function textarea(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -187,6 +231,13 @@ function textarea(ctl) {
   `;
 }
 
+/**
+ * @description Renders a date input field (type="date"). Respects min, max, and placeholder
+ * properties on the host element.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function date(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -206,6 +257,13 @@ function date(ctl) {
   `;
 }
 
+/**
+ * @description Renders a date-and-time input field (type="datetime-local"). Respects min, max,
+ * and placeholder properties on the host element.
+ * Called with `this` bound to the host element (ref-stats-form-entry-field).
+ * @param {Object} ctl - FormEntryController instance
+ * @returns {import('lit').TemplateResult}
+ */
 function datetime(ctl) {
   const field = ctl.fields.find( f => this.field === f.name );
   return html`
@@ -225,6 +283,11 @@ function datetime(ctl) {
   `;
 }
 
+/**
+ * @description Renders a small required-field asterisk marker, hidden when the field
+ * is not required. Called with `this` bound to the host element.
+ * @returns {import('lit').TemplateResult}
+ */
 function reqMarker(){
   return html`<span class='required-marker' aria-hidden="true" ?hidden=${!this._required}>*</span>`;
 }

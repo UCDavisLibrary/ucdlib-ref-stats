@@ -17,15 +17,26 @@ export default class AppComponentController {
     this.parentPage = null;
   }
 
+  /**
+   * @description Whether the host element's parent page is the currently active page in the application
+   * @returns {Boolean}
+   */
   get isOnActivePage(){
     if ( !this.parentPageId || !this.AppStateModel?.store?.data?.page ) return false;
     return this.AppStateModel.store.data.page === this.parentPageId;
   }
 
+  /**
+   * @description Walk up the DOM to set the parent page on connect
+   */
   hostConnected(){
     this._setParentPage();
   }
 
+  /**
+   * @description Walk up the DOM (including across shadow roots) to find and store the nearest ancestor with a page-id attribute
+   * @returns {HTMLElement|Boolean} The parent page element, or false if not found
+   */
   _setParentPage(){
     let el = this.host;
     while( el ) {

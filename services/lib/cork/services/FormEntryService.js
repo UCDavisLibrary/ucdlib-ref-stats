@@ -11,10 +11,20 @@ class FormEntryService extends BaseService {
     this.store = FormEntryStore;
   }
 
+  /**
+   * @description Base URL for form entry API endpoints.
+   * @returns {string}
+   */
   get baseUrl(){
     return `/api/form-entry`;
   }
 
+  /**
+   * @description Submits a new entry for the specified form.
+   * @param {string|number} formId - ID of the form to submit an entry for.
+   * @param {object} data - Entry field values.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async create(formId, data){
     let id = await digest({formId, data});
     const store = this.store.data.create;
@@ -43,6 +53,13 @@ class FormEntryService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Retrieves a single form entry by ID.
+   * @param {string|number} entryId - ID of the form entry.
+   * @param {string|number} form - ID or name of the form.
+   * @param {object} opts - Additional query parameters.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async get(entryId, form, opts={}){
     const ido = { ...opts, entryId, form };
     const id = payload.getKey(ido);
@@ -70,6 +87,12 @@ class FormEntryService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Queries form entries with the given filters.
+   * @param {object} query - Query parameters.
+   * @param {object} appStateOptions - Options passed to the app state error handler.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async query(query={}, appStateOptions={}){
     if ( !query.page ) query.page = 1;
     let id = await digest(query);

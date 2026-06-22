@@ -3,11 +3,23 @@ import config from '../config.js';
 
 class Field {
 
+  /**
+   * @description Query form fields with optional filtering and pagination
+   * @param {Object} params - Query parameters
+   * @param {Number} params.page - Page number
+   * @param {Number} params.per_page - Number of results per page
+   * @param {String} params.q - Search string to filter fields by label
+   * @param {Boolean} params.active_only - If true, exclude archived fields
+   * @param {Boolean} params.archived_only - If true, return only archived fields
+   * @param {String} params.form - Filter to fields assigned to this form ID or name
+   * @param {String} params['-form'] - Filter to fields NOT assigned to this form ID or name
+   * @returns {Object} Paginated results object or an error object
+   */
   async query(params={}){
     const page = params.page || 1;
     const perPage = params.per_page || 15;
     const offset = (page - 1) * perPage;
-    
+
     const where = [];
     const values = [];
 
@@ -83,6 +95,11 @@ class Field {
     return { res: missing ? null : r.res?.rows?.[0] || null };
   }
 
+  /**
+   * @description Create a new form field
+   * @param {Object} data - Field data to insert
+   * @returns {Object} The new field's form_field_id and name, or an error object
+   */
   async create(data){
     let client = await pgClient.pool.connect();
     try {
@@ -102,6 +119,12 @@ class Field {
     }
   }
 
+  /**
+   * @description Update fields on an existing form field
+   * @param {String} idOrName - The field ID or name; may be omitted if present in data
+   * @param {Object} data - Fields to update (form_field_id and name are stripped before update)
+   * @returns {Object} The updated field's form_field_id and name, or an error object
+   */
   async patch(idOrName, data){
     if ( !idOrName ) {
       if ( data.form_field_id || data.name ) {
@@ -130,6 +153,11 @@ class Field {
     }
   }
 
+  /**
+   * @description Delete a form field by ID or name
+   * @param {String} idOrName - The field ID or name
+   * @returns {Object} The deleted field's form_field_id and name, or an error object
+   */
   async delete(idOrName){
     const sql = `DELETE FROM ${config.db.tables.field} WHERE form_field_id = get_form_field_id($1) RETURNING form_field_id, name;`;
     const r = await pgClient.query(sql, [idOrName]);
@@ -139,7 +167,13 @@ class Field {
     return { res: r.res.rows[0] || null };
   }
 
-async picklistItemsExist(fieldIdOrName, picklistItemValues = []) {
+  /**
+   * @description Check whether all given picklist values exist for a field's associated picklist
+   * @param {String} fieldIdOrName - The field ID or name
+   * @param {String|String[]} picklistItemValues - One or more picklist item values to check
+   * @returns {Object} {res: true} if all values exist, {res: false} if any are missing, or an error object
+   */
+  async picklistItemsExist(fieldIdOrName, picklistItemValues = []) {
   if (typeof picklistItemValues === 'string') {
     picklistItemValues = [picklistItemValues];
   }

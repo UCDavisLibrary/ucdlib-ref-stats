@@ -17,6 +17,11 @@ class BundleLoader {
     });
   }
 
+  /**
+   * @description Loads the JS bundle associated with the given page name, if one exists.
+   * @param {String} page - The page name to look up
+   * @returns {Promise}
+   */
   loadForPage(page){
     const bundle = this.bundles.find( b => b.pages?.includes(page) );
     if ( bundle ) {
@@ -28,6 +33,13 @@ class BundleLoader {
     return Promise.resolve(false);
   }
 
+  /**
+   * @description Dynamically imports a bundle by name. Marks the bundle as loaded to prevent duplicate imports.
+   * @param {Object} bundle - The bundle descriptor object
+   * @param {String} bundle.name - The bundle file name (without extension)
+   * @param {Boolean} bundle.loaded - Whether the bundle has already been loaded
+   * @returns {Promise}
+   */
   _loadBundle(bundle){
     if ( bundle.loaded ) {
       return Promise.resolve(false);

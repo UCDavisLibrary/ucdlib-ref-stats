@@ -7,6 +7,12 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import {AppComponentController, QueryStringController} from '#controllers';
 
 
+/**
+ * @description Page-level element for browsing the paginated list of picklists.
+ * Reads query-string parameters for pagination and fetches picklist data on app-state changes.
+ * @property {Array} picklists - Paginated list of picklist objects returned by the current query
+ * @property {Number} maxPage - Total number of pages available for the current query
+ */
 export default class RefStatsPicklists extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -36,12 +42,20 @@ export default class RefStatsPicklists extends Mixin(LitElement)
     this._injectModel('PicklistModel', 'AppStateModel');
   }
 
+  /**
+   * @description Responds to app-state changes. Triggers a query when this element is on the active page.
+   * @param {Object} e - App state update event
+   */
   async _onAppStateUpdate(e) {
     if ( !this.ctl.appComponent.isOnActivePage ) return;
     await this.ctl.qs.updateComplete;
     await this.query();
   }
 
+  /**
+   * @description Fetches picklists from the PicklistModel using pagination parameters from
+   * the query string, and updates the picklists and maxPage reactive properties.
+   */
   async query(){
     const query = {};
     if ( this.ctl.qs.query.page ){
@@ -61,6 +75,10 @@ export default class RefStatsPicklists extends Mixin(LitElement)
     this.maxPage = res.payload.max_page;
   }
 
+  /**
+   * @description Handles pagination change events by updating the page query-string parameter.
+   * @param {CustomEvent} e - Event with detail.page containing the new page number
+   */
   _onPageChange(e){
     this.ctl.qs.setParam('page', e.detail.page);
     this.ctl.qs.setLocation();

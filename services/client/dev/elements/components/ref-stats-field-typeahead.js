@@ -6,6 +6,21 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { DropdownController } from '#controllers';
 
+/**
+ * @description Typeahead input element for searching and selecting a reference statistics
+ * field. Queries FieldModel as the user types and displays matching suggestions in a
+ * dropdown. Supports filtering by form or excluding a specific form. Dispatches a
+ * `field-typeahead-selected` event when a suggestion is chosen.
+ * @property {String} value - Current text value of the input
+ * @property {String} inputId - Id attribute applied to the underlying input element
+ * @property {String} form - Form name or id used to filter field suggestions to a specific form
+ * @property {String} excludeForm - Form name or id whose fields should be excluded from suggestions
+ * @property {Array} suggestions - Array of field suggestion objects returned by the last query
+ * @property {String} nameOrId - Field name or id used to pre-populate the input value
+ * @property {Number} suggestionLimit - Maximum number of suggestions to fetch
+ * @property {Object} selectedSuggestion - The currently selected field suggestion object
+ * @property {Boolean} relativeDropdown - When true, positions the dropdown relatively instead of absolutely
+ */
 export default class RefStatsFieldTypeahead extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -47,6 +62,11 @@ export default class RefStatsFieldTypeahead extends Mixin(LitElement)
     this._injectModel('FieldModel');
   }
 
+  /**
+   * @description Lit lifecycle callback. Resolves the display value when nameOrId changes
+   * and updates the dropdown positioning style when relativeDropdown changes.
+   * @param {Map} props - Map of changed property names to their previous values
+   */
   willUpdate(props){
     if ( props.has('nameOrId') ) {
       this.getByNameOrId();
@@ -56,6 +76,11 @@ export default class RefStatsFieldTypeahead extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Looks up a field by the current nameOrId value and sets the input text
+   * to the matching field's label. If nameOrId is empty or the lookup fails, clears the
+   * input value.
+   */
   async getByNameOrId(){
     if ( !this.nameOrId ) {
       this.value = '';
@@ -74,6 +99,11 @@ export default class RefStatsFieldTypeahead extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Handles input events on the text field. Clears the selected suggestion,
+   * updates the value, and debounces a suggestion fetch followed by opening the dropdown.
+   * @param {Event} e - The native input event from the text field
+   */
   async _onValueInput(e){
     this.selectedSuggestion = null;
     this.value = e.target.value;
@@ -88,6 +118,11 @@ export default class RefStatsFieldTypeahead extends Mixin(LitElement)
 
   }
 
+  /**
+   * @description Handles a click on a suggestion item. Sets the selected suggestion,
+   * closes the dropdown, and dispatches a `field-typeahead-selected` custom event.
+   * @param {Object} suggestion - The field suggestion object that was clicked
+   */
   _onSuggestionClick(suggestion){
     this.selectedSuggestion = suggestion;
     this.nameOrId = suggestion.form_field_id;
@@ -99,6 +134,11 @@ export default class RefStatsFieldTypeahead extends Mixin(LitElement)
     }));
   }
 
+  /**
+   * @description Fetches field suggestions from FieldModel based on the current input value,
+   * form filter, excludeForm filter, and suggestion limit. Updates the suggestions list and
+   * totalSuggestions count, or sets fetchError if the request fails with a non-404 error.
+   */
   async getSuggestions(){
     this.fetchError = false;
     const query = {

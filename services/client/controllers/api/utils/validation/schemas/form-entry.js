@@ -4,6 +4,11 @@ import models from '#models';
 import logger from '#lib/logger.js';
 import definitions from '#lib/definitions.js';
 
+/**
+ * @description Returns a Zod superRefine callback that validates submitted values exist in the given picklist.
+ * @param {String} field - The field name whose picklist items should be checked
+ * @returns {Function} Async superRefine callback
+ */
 function srPicklistItemsExist(field){
   return async (value, ctx) => {
     if ( !value || value?.length === 0 ) return;
@@ -26,6 +31,11 @@ function srPicklistItemsExist(field){
   }
 } 
 
+/**
+ * @description Zod superRefine callback — validates that original_form_entry_id exists and belongs to the form.
+ * @param {Object} data - Validated form entry data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srOriginalFormEntryExists = async (data, ctx) => {
   if ( !data.original_form_entry_id ) return;
   const existing = await models.formEntry.get(data.original_form_entry_id, data._formId);
@@ -47,6 +57,12 @@ const srOriginalFormEntryExists = async (data, ctx) => {
   }
 }
 
+/**
+ * @description Zod superRefine callback — validates that an orderByField value references an existing field.
+ * Strips a leading +/- sort direction prefix before the lookup.
+ * @param {String} value - The orderByField query parameter value
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srOrderByFieldExists = async (value, ctx) => {
   if ( !value ) return;
   console.log('Validating orderByField:', value);

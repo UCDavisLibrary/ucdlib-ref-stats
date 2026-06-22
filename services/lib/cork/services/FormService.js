@@ -11,10 +11,19 @@ class FormService extends BaseService {
     this.store = FormStore;
   }
 
+  /**
+   * @description Base URL for form API endpoints.
+   * @returns {string}
+   */
   get baseUrl(){
     return `/api/form`;
   }
 
+  /**
+   * @description Creates a new form.
+   * @param {object} data - Form data to submit.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async create(data){
     let id = await digest(data);
     const store = this.store.data.create;
@@ -43,6 +52,11 @@ class FormService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Updates an existing form.
+   * @param {object} data - Partial form data to patch.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async patch(data){
     let id = await digest(data);
     const store = this.store.data.patch;
@@ -71,6 +85,12 @@ class FormService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Queries forms with the given filters.
+   * @param {object} query - Query parameters.
+   * @param {object} appStateOptions - Options passed to the app state error handler.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async query(query={}, appStateOptions={}){
     if ( !query.page ) query.page = 1;
     let id = payload.getKey(query);
@@ -94,6 +114,12 @@ class FormService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Retrieves a single form by ID or name.
+   * @param {string|number} idOrName - Form ID or name.
+   * @param {object} opts - Additional query parameters.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async get(idOrName, opts={}){
     const ido = { ...opts, idOrName };
     const id = payload.getKey(ido);
@@ -121,6 +147,11 @@ class FormService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Deletes a form by ID.
+   * @param {string|number} id - Form ID.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async delete(id){
     const store = this.store.data.delete;
 

@@ -272,6 +272,10 @@ export default class QueryStringController {
     return query;
   }
 
+  /**
+   * @description Handle app-state-update events — sync query state from location when on the active page
+   * @param {Object} e - Application state event data
+   */
   async _onAppStateUpdate(e) {
 
     // create a promise that resolves when query is set
@@ -292,10 +296,16 @@ export default class QueryStringController {
     }
   }
 
+  /**
+   * @description Register event listeners when the host is connected to the DOM
+   */
   hostConnected() {
     this.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate.bind(this));
   }
 
+  /**
+   * @description Remove event listeners when the host is disconnected from the DOM
+   */
   hostDisconnected() {
     this.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate.bind(this));
   }

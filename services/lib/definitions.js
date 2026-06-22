@@ -44,6 +44,11 @@ class Definitions {
     return !!(this.customValidationRegistry[formName]?.includes(fieldName));
   }
 
+  /**
+   * @description Returns true if the given field type requires a pick list
+   * @param {string} fieldType - A field type value (e.g. 'select', 'radio')
+   * @returns {boolean}
+   */
   fieldTypeUsesPickList(fieldType) {
     const ft = this.fieldTypes.find(ft => ft.value === fieldType);
     return ft ? !!ft.usesPickList : false;

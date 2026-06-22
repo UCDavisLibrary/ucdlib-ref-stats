@@ -4,6 +4,10 @@ import {render, styles} from "./ref-stats-page-field.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
+/**
+ * @description Admin page element that lists all reference-stats fields.
+ * @property {String} pageId - The page identifier used to match app-state route events
+ */
 export default class RefStatsPageField extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 

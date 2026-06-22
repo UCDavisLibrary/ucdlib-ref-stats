@@ -61,6 +61,11 @@ function validate(schema, opts={}) {
   };
 }
 
+/**
+ * @description Formats a Zod error into a consistent API response shape.
+ * @param {import('zod').ZodError} zodError - The Zod error to format
+ * @returns {Object} Object with validationError flag and issues array
+ */
 function formatErrorResponse(zodError) {
   const issues = [];
   for (let issue of zodError.issues) {

@@ -17,10 +17,21 @@ class FieldModel extends BaseModel {
     this.inject('ValidationModel');
   }
 
+  /**
+   * @description Query form fields
+   * @param {Object} query - Query parameters
+   * @param {Object} appStateOptions - Options passed to the app state model (loader/error settings)
+   * @returns {Promise}
+   */
   async query(query, appStateOptions={}) {
     return this.service.query(query, appStateOptions);
   }
 
+  /**
+   * @description Create a new form field
+   * @param {Object} data - Field data
+   * @returns {Promise}
+   */
   async create(data) {
     const res = await this.service.create(data);
     this.ValidationModel.notify('field', res);
@@ -30,6 +41,11 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  /**
+   * @description Patch an existing form field
+   * @param {Object} data - Partial field data including the field id
+   * @returns {Promise}
+   */
   async patch(data) {
     const res = await this.service.patch(data);
     this.ValidationModel.notify('field', res);
@@ -39,10 +55,21 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  /**
+   * @description Get a form field by id
+   * @param {String} id - Field id
+   * @param {Object} opts - Options passed to the service
+   * @returns {Promise}
+   */
   async get(id, opts={}) {
     return this.service.get(id, opts);
   }
-  
+
+  /**
+   * @description Delete a form field by id
+   * @param {String} id - Field id
+   * @returns {Promise}
+   */
   async delete(id) {
     const res = await this.service.delete(id);
     if ( res.state === 'loaded' ) {
@@ -51,6 +78,12 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  /**
+   * @description Assign a field to a form
+   * @param {String} fieldId - form_field_id
+   * @param {String} formId - form_id
+   * @returns {Promise}
+   */
   async assign(fieldId, formId){
     const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'assign' });
     if ( res.state === 'loaded' ) {
@@ -59,6 +92,12 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  /**
+   * @description Unassign a field from a form
+   * @param {String} fieldId - form_field_id
+   * @param {String} formId - form_id
+   * @returns {Promise}
+   */
   async unassign(fieldId, formId){
     const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'unassign' });
     if ( res.state === 'loaded' ) {
@@ -67,6 +106,12 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  /**
+   * @description Archive a field-form assignment
+   * @param {String} fieldId - form_field_id
+   * @param {String} formId - form_id
+   * @returns {Promise}
+   */
   async archiveAssignment(fieldId, formId){
     const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'archive' });
     if ( res.state === 'loaded' ) {
@@ -75,6 +120,12 @@ class FieldModel extends BaseModel {
     return res;
   }
 
+  /**
+   * @description Unarchive a field-form assignment
+   * @param {String} fieldId - form_field_id
+   * @param {String} formId - form_id
+   * @returns {Promise}
+   */
   async unarchiveAssignment(fieldId, formId){
     const res = await this.service.assign({ form_field_id: fieldId, form_id: formId, action: 'unarchive' });
     if ( res.state === 'loaded' ) {

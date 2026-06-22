@@ -5,6 +5,11 @@ import models from '#models';
 import { requiredString } from "./utils.js";
 import logger from '#lib/logger.js';
 
+/**
+ * @description Zod superRefine callback — validates that a field-form assignment exists for non-assign actions.
+ * @param {Object} data - Validated assignment data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srValidateAssignmentExists = async (data, ctx) => {
   if ( data.action && data.action !== 'assign' ) {
     const existing = await models.assignment.get(data.form_field_id, data.form_id);

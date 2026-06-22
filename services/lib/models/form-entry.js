@@ -5,6 +5,16 @@ import models from '#models';
 
 class FormEntry {
 
+  /**
+   * @description Query form entries with optional filtering and pagination
+   * @param {Object} params - Query parameters
+   * @param {Number} params.page - Page number
+   * @param {Number} params.per_page - Number of results per page
+   * @param {Boolean} params.is_latest_version - If true, only return the latest version of each entry
+   * @param {String|String[]} params.form - Filter by form ID or name
+   * @param {String} params.orderByField - Field name to order by; prefix with '-' for DESC or '+' for ASC
+   * @returns {Object} Paginated results object or an error object
+   */
   async query(params={}){
     const page = params.page || 1;
     const perPage = params.per_page || 15;
@@ -63,6 +73,13 @@ class FormEntry {
     }};
   }
 
+  /**
+   * @description Create a new form entry and its associated field values
+   * @param {String} formNameOrId - The form ID or name the entry belongs to
+   * @param {Object} data - Key/value pairs of field names to field values
+   * @param {String} [data.original_form_entry_id] - ID of the original entry if this is a revision
+   * @returns {Object} The new entry's form_entry_id, or an error object
+   */
   async create(formNameOrId, data){
     let fields = await models.field.query({form: formNameOrId , perPage: 1000});
     if ( fields.error ) {
@@ -123,6 +140,14 @@ class FormEntry {
     }
   }
 
+  /**
+   * @description Get a form entry by ID, optionally scoped to a specific form
+   * @param {String} formEntryId - The form entry UUID
+   * @param {String} [formNameOrId] - Optional form ID or name to scope the lookup
+   * @param {Object} opts - Options object
+   * @param {Boolean} opts.errorOnMissing - If true, return an error if the entry is not found. Otherwise {res} will be null.
+   * @returns {Object} The form entry row or null, or an error object
+   */
   async get(formEntryId, formNameOrId = null, opts={}){
     const params = [formEntryId];
     const sql = `

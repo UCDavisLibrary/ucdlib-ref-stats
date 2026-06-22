@@ -13,6 +13,11 @@ import { styles as formTypeaheadStyles } from '#components/ref-stats-form-typeah
 import { styles as picklistItemQuickAddStyles } from '#components/ref-stats-picklist-item-quick-add.tpl.js';
 import { styles as formEntryQueryStyles } from '#components/ref-stats-form-entry-query.tpl.js';
 
+/**
+ * @description Extracts CSS text from a Lit styles function and joins it into a single string.
+ * @param {Function} styles - A Lit styles function that returns an array of CSSResult objects
+ * @returns {String} Concatenated CSS text
+ */
 function getLitStyles(styles){
   return styles().map(s => s.cssText).join('\n');
 }

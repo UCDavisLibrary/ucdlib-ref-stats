@@ -3,6 +3,14 @@ import config from '../config.js';
 
 class Assignment {
 
+  /**
+   * @description Get a field-to-form assignment
+   * @param {String} fieldId - The form field ID or name
+   * @param {String} formId - The form ID or name
+   * @param {Object} opts - Options object
+   * @param {Boolean} opts.errorOnMissing - If true, return an error if the assignment is not found. Otherwise {res} will be null.
+   * @returns {Object} The assignment row or null, or an error object
+   */
   async get(fieldId, formId, opts = {}) {
     const sql = `SELECT * FROM ${config.db.tables.assignment}
       WHERE form_field_id = get_form_field_id($1)
@@ -19,6 +27,12 @@ class Assignment {
     return { res: missing ? null : r.res?.rows?.[0] || null };
   }
 
+  /**
+   * @description Assign a field to a form, appending it at the end of the sort order
+   * @param {String} fieldId - The form field ID or name
+   * @param {String} formId - The form ID or name
+   * @returns {Object} The new assignment's form_field_id, form_id, and form_field_assignment_id, or an error object
+   */
   async create(fieldId, formId){
     let client = await pgClient.pool.connect();
     try {
@@ -44,6 +58,13 @@ class Assignment {
     }
   }
 
+  /**
+   * @description Update an existing field-to-form assignment
+   * @param {String} fieldId - The form field ID or name
+   * @param {String} formId - The form ID or name
+   * @param {Object} data - Fields to update on the assignment (e.g. sort_order)
+   * @returns {Object} The updated assignment's form_field_id, form_id, and form_field_assignment_id, or an error object
+   */
   async patch(fieldId, formId, data){
     const client = await pgClient.pool.connect();
     try {
@@ -63,6 +84,12 @@ class Assignment {
     }
   }
 
+  /**
+   * @description Remove a field from a form
+   * @param {String} fieldId - The form field ID or name
+   * @param {String} formId - The form ID or name
+   * @returns {Object} The deleted assignment's form_field_id, form_id, and form_field_assignment_id, or an error object
+   */
   async delete(fieldId, formId){
     const sql = `DELETE FROM ${config.db.tables.assignment}
       WHERE form_field_id = get_form_field_id($1)

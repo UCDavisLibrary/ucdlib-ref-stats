@@ -3,6 +3,12 @@ import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanPara
 import models from '#models';
 import logger from '#lib/logger.js';
 
+/**
+ * @description Zod superRefine callback — validates that a form name is unique in the database.
+ * Allows the existing name when updating the same record.
+ * @param {Object} data - Validated form data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srNameUnique = async (data, ctx) => {
   if ( !data.name ) return;
   const existing = await models.form.get(data.name);
@@ -27,6 +33,11 @@ const srNameUnique = async (data, ctx) => {
   }
 }
 
+/**
+ * @description Zod superRefine callback — validates that form_id exists in the database.
+ * @param {Object} data - Validated form data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srValidateFormId = async (data, ctx) => {
   if ( data.form_id ) {
     const existing = await models.form.get(data.form_id);

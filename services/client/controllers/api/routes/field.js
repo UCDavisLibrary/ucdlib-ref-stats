@@ -37,6 +37,12 @@ router.get('/:idOrName', async (req, res) => {
   }
 });
 
+/**
+ * @description Middleware that sets picklist_id to null on the request body when the field type does not use a picklist.
+ * @param {import('express').Request} req - The Express request object
+ * @param {import('express').Response} res - The Express response object
+ * @param {import('express').NextFunction} next - The Express next function
+ */
 const transformPayload = (req, res, next) => {
   if ( req.body?.field_type && !definitions.fieldTypeUsesPickList(req.body.field_type) ) {
     req.body.picklist_id = null;

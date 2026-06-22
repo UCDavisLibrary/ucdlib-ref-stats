@@ -79,6 +79,12 @@ class PgClient {
     return this._toEqualsClause(queryObject, ', ', indexStart, kwargs?.preserveArrays);
   }
 
+  /**
+   * @description Alias for toUpdateClause. Converts an object to parameters of an UPDATE clause.
+   * @param {Object} obj - key value pairs for clause
+   * @param {Object} kwargs - Optional arguments passed to toUpdateClause
+   * @returns {Object} {sql: 'foo = $1, bar = $2', values: ['fooValue', 'barValue']}
+   */
   prepareObjectForUpdate(obj, kwargs){
     return this.toUpdateClause(obj, kwargs);
   }
@@ -127,6 +133,14 @@ class PgClient {
     return out;
   }
 
+  /**
+   * @description Converts an object to a SQL equals clause with a configurable separator
+   * @param {Object} queryObject - key value pairs for clause
+   * @param {String} sep - Separator between clauses (e.g. ' AND ', ' OR ', ', ')
+   * @param {Number} indexStart - The starting index for the $ placeholders. Default 0.
+   * @param {Boolean} preserveArrays - If true, treat array values as scalars rather than IN clauses
+   * @returns {Object} {sql, values}
+   */
   _toEqualsClause(queryObject, sep=' AND ', indexStart=0, preserveArrays=false){
     let sql = '';
     const values = [];

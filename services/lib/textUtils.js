@@ -1,5 +1,13 @@
+/**
+ * @description Utility class for common text transformations
+ */
 class TextUtils {
 
+  /**
+   * @description Converts a string to a URL-friendly slug
+   * @param {String} text - Input text
+   * @returns {String} Lowercased, hyphen-separated string with non-word characters removed
+   */
   toUrlFriendly(text) {
     return (text || '').toString().toLowerCase()
       .replace(/\s+/g, '-')           // Replace spaces with -

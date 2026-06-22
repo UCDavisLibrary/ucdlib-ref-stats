@@ -45,6 +45,12 @@ import '#lib/cork/models/PicklistModel.js';
 Registry.ready();
 
 
+/**
+ * @description Root application element. Bootstraps the SPA, loads page bundles on demand,
+ * and handles top-level app-state updates including page routing and nav management.
+ * @property {String} page - The current page identifier driven by AppStateModel
+ * @property {Boolean} _firstAppStateUpdate - Tracks whether the first app-state update has been processed
+ */
 export default class RefStatsApp extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -69,10 +75,20 @@ export default class RefStatsApp extends Mixin(LitElement)
     this._injectModel('AppStateModel');
   }
 
+  /**
+   * @description Called after the element's first render. Triggers an AppStateModel refresh
+   * to load the initial page state.
+   */
   firstUpdated(){
     this.AppStateModel.refresh();
   }
 
+  /**
+   * @description Handles app-state updates. Hides the full-site loader on first call,
+   * closes the nav, loads any required JS bundle for the new page, and updates the
+   * active page property.
+   * @param {Object} e - App-state event object containing page and location
+   */
   async _onAppStateUpdate(e) {
     this.logger.info('appStateUpdate', e);
     if ( !this._firstAppStateUpdate ) {

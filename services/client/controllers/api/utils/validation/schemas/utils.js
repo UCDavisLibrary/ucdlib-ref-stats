@@ -11,6 +11,9 @@ export const requiredString = (msg = 'Required') =>
     z.string().trim().min(1, msg)
   );
 
+/**
+ * @description Coerces a value to a string, converting null/undefined to an empty string.
+ */
 export const toString = z.preprocess(
   v => {
     if (v == null ) return '';
@@ -18,6 +21,11 @@ export const toString = z.preprocess(
   }, z.string()
 );
 
+/**
+ * @description Validates a required ISO date string (YYYY-MM-DD).
+ * @param {String} msg - Required validation message. Default: 'Required'
+ * @returns {import('zod').ZodType}
+ */
 export const requiredIsoDate = (msg = 'Required') =>
   z.preprocess(
     v => (v == null ? '' : v),
@@ -59,6 +67,12 @@ export const isoDatetime = z.preprocess(
   )
 );
 
+/**
+ * @description Validates a required array with at least one item.
+ * @param {String} msg - Required validation message. Default: 'Required'
+ * @param {import('zod').ZodType} [itemSchema] - Schema for array items. Defaults to z.string()
+ * @returns {import('zod').ZodType}
+ */
 export const requiredArray = (msg = 'Required', itemSchema) => {
   itemSchema = itemSchema || z.string();
   return z.preprocess(
@@ -96,10 +110,16 @@ export const requiredNumber = (
       .transform(v => Number(v.replace(/,/g, '')))
   );
 
+/**
+ * @description Validates a URL-friendly string: lowercase letters, numbers, hyphens, and underscores only.
+ */
 export const urlFriendlyString = z.string().regex(/^[a-z0-9_-]+$/, {
   message: "Must be URL-friendly: lowercase letters, numbers, hyphens, and underscores only."
 });
 
+/**
+ * @description Validates a page query parameter. Coerces empty/null to 1.
+ */
 export const pageParam = z.preprocess(
   v => {
     if (v == null || v === '') return 1;
@@ -109,6 +129,12 @@ export const pageParam = z.preprocess(
   z.number().int().positive("Page must be a positive integer")
 );
 
+/**
+ * @description Validates a per_page query parameter with configurable default and maximum.
+ * @param {Number} defaultValue - Default value when empty/null. Default: 15
+ * @param {Number} maxValue - Maximum allowed value. Default: 100
+ * @returns {import('zod').ZodType}
+ */
 export const perPageParam = (defaultValue = 15, maxValue = 100) =>
   z.preprocess(
     v => {
@@ -122,6 +148,9 @@ export const perPageParam = (defaultValue = 15, maxValue = 100) =>
       .max(maxValue, `per_page must be ≤ ${maxValue}`)
   );
 
+/**
+ * @description Coerces 'true'/'false' string query params to booleans. Optional — passes through undefined.
+ */
 export const booleanParam = z.preprocess(
   v => {
     if (v === 'true') return true;

@@ -95,10 +95,17 @@ export default class ModalFormController {
     ];
   }
 
+  /**
+   * @description Close the parent modal if it exists
+   */
   closeModal(){
     if ( this.modal ) this.modal.close();
   }
 
+  /**
+   * @description Programmatically trigger the modal submit action
+   * @returns {Promise}
+   */
   async submit(){
     return this._onAppDialogAction({action: {value: this.submitActionId}});
   }
@@ -153,12 +160,18 @@ export default class ModalFormController {
     this.host.requestUpdate();
   }
 
+  /**
+   * @description Register event listeners and initialise modal defaults when the host is connected to the DOM
+   */
   hostConnected() {
     this.AppStateModel.EventBus.on('app-dialog-action', this._onAppDialogAction.bind(this));
     this.AppStateModel.EventBus.on('app-dialog-open', this._onAppDialogOpen.bind(this));
     this.setDefaultModalValues();
   }
 
+  /**
+   * @description Remove event listeners and clear the cached modal reference when the host is disconnected from the DOM
+   */
   hostDisconnected() {
     this.AppStateModel.EventBus.off('app-dialog-action', this._onAppDialogAction.bind(this));
     this.AppStateModel.EventBus.off('app-dialog-open', this._onAppDialogOpen.bind(this));

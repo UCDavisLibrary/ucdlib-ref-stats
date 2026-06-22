@@ -6,6 +6,19 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { DropdownController } from '#controllers';
 
+/**
+ * @description Typeahead input element for searching and selecting a reference statistics
+ * picklist. Queries PicklistModel as the user types and displays matching suggestions in a
+ * dropdown. Supports filtering to active picklists only. Dispatches a
+ * `picklist-typeahead-selected` event when a suggestion is chosen.
+ * @property {String} value - Current text value of the input
+ * @property {String} inputId - Id attribute applied to the underlying input element
+ * @property {Array} suggestions - Array of picklist suggestion objects returned by the last query
+ * @property {String} nameOrId - Picklist name or id used to pre-populate the input value
+ * @property {Boolean} activeOnly - When true, restricts suggestions to active picklists only
+ * @property {Number} suggestionLimit - Maximum number of suggestions to fetch
+ * @property {Object} selectedSuggestion - The currently selected picklist suggestion object
+ */
 export default class RefStatsPicklistTypeahead extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -42,12 +55,21 @@ export default class RefStatsPicklistTypeahead extends Mixin(LitElement)
     this._injectModel('PicklistModel');
   }
 
+  /**
+   * @description Lit lifecycle callback. Resolves the display value when nameOrId changes.
+   * @param {Map} props - Map of changed property names to their previous values
+   */
   willUpdate(props){
     if ( props.has('nameOrId') ) {
       this.getByNameOrId();
     }
   }
 
+  /**
+   * @description Looks up a picklist by the current nameOrId value and sets the input text
+   * to the matching picklist's label. If nameOrId is empty or the lookup fails, clears the
+   * input value.
+   */
   async getByNameOrId(){
     if ( !this.nameOrId ) {
       this.value = '';
@@ -66,6 +88,11 @@ export default class RefStatsPicklistTypeahead extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Handles input events on the text field. Clears the selected suggestion,
+   * updates the value, and debounces a suggestion fetch followed by opening the dropdown.
+   * @param {Event} e - The native input event from the text field
+   */
   async _onValueInput(e){
     this.selectedSuggestion = null;
     this.value = e.target.value;
@@ -80,6 +107,11 @@ export default class RefStatsPicklistTypeahead extends Mixin(LitElement)
 
   }
 
+  /**
+   * @description Handles a click on a suggestion item. Sets the selected suggestion,
+   * closes the dropdown, and dispatches a `picklist-typeahead-selected` custom event.
+   * @param {Object} suggestion - The picklist suggestion object that was clicked
+   */
   _onSuggestionClick(suggestion){
     this.selectedSuggestion = suggestion;
     this.nameOrId = suggestion.picklist_id;
@@ -91,6 +123,11 @@ export default class RefStatsPicklistTypeahead extends Mixin(LitElement)
     }));
   }
 
+  /**
+   * @description Fetches picklist suggestions from PicklistModel based on the current input
+   * value, activeOnly filter, and suggestion limit. Updates the suggestions list and
+   * totalSuggestions count, or sets fetchError if the request fails with a non-404 error.
+   */
   async getSuggestions(){
     this.fetchError = false;
     const query = {

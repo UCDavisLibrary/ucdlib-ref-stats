@@ -24,6 +24,11 @@ class AppStateModelImpl extends AppStateModel {
     this.inject('ValidationModel');
   }
 
+  /**
+   * @description Update app state. Derives the current page slug from the location path and dismisses validation messages.
+   * @param {Object} update - App state update object, typically containing a location property
+   * @returns {*} Result of the parent set call
+   */
   set(update) {
     if( update.location ) {
       update.lastPage = this.store.data.page;
@@ -125,17 +130,26 @@ class AppStateModelImpl extends AppStateModel {
 
   }
 
+  /**
+   * @description Re-emit the current app state, triggering any listeners to re-render
+   */
   refresh(){
     const state = this.store.data;
     this.set(state);
     this.store.emit(this.store.events.APP_STATE_UPDATE, state);
   }
 
+  /**
+   * @description Emit an event to show the loading indicator
+   */
   showLoading(){
     this._loaderVisible = true;
     this.store.emit(this.store.events.APP_LOADING_UPDATE, {show: true});
   }
 
+  /**
+   * @description Emit an event to hide the loading indicator. Also shows any queued page-load toast.
+   */
   hideLoading(){
     this._loaderVisible = false;
     this.store.emit(this.store.events.APP_LOADING_UPDATE, {show: false});
@@ -157,6 +171,9 @@ class AppStateModelImpl extends AppStateModel {
     this.closeDialogModal();
   }
 
+  /**
+   * @description Emit an event to hide the error dialog
+   */
   hideError(){
     this._errorVisible = false;
     this.store.emit(this.store.events.APP_ERROR_UPDATE, {show: false});
@@ -199,10 +216,17 @@ class AppStateModelImpl extends AppStateModel {
     this.store.emit('app-dialog-open', options);
   }
 
+  /**
+   * @description Close the active modal dialog
+   * @param {Object} opts - Options passed to the close event
+   */
   closeDialogModal(opts={}){
     this.store.emit('app-dialog-close', opts);
   }
 
+  /**
+   * @description Request the active modal dialog to re-render its content
+   */
   requestDialogUpdate(){
     this.store.emit('app-dialog-update-request');
   }

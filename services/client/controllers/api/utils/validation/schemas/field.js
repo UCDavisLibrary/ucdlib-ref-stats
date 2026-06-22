@@ -7,6 +7,12 @@ import logger from '#lib/logger.js';
 const fieldTypeEnum = z.enum(definitions.fieldTypes.map(ft => ft.value));
 
 
+/**
+ * @description Zod superRefine callback — validates that a field name is unique in the database.
+ * Allows the existing name when updating the same record.
+ * @param {Object} data - Validated field data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srNameUnique = async (data, ctx) => {
   if ( !data.name ) return;
   const existing = await models.field.get(data.name);
@@ -31,6 +37,12 @@ const srNameUnique = async (data, ctx) => {
   }
 }
 
+/**
+ * @description Zod superRefine callback — validates that a picklist_id is provided and exists when the field type requires a picklist.
+ * For patch operations without a field_type, looks up the existing field to determine the type.
+ * @param {Object} data - Validated field data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srValidatePicklistId = async (data, ctx) => {
   let fieldType = data.field_type;
 
@@ -81,6 +93,11 @@ const srValidatePicklistId = async (data, ctx) => {
   }
 }
 
+/**
+ * @description Zod superRefine callback — validates that form_field_id exists in the database.
+ * @param {Object} data - Validated field data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
 const srValidateFieldId = async (data, ctx) => {
   if ( data.form_field_id ) {
     const existing = await models.field.get(data.form_field_id);

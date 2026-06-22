@@ -11,10 +11,20 @@ class PicklistService extends BaseService {
     this.store = PicklistStore;
   }
 
+  /**
+   * @description Base URL for picklist API endpoints.
+   * @returns {string}
+   */
   get baseUrl(){
     return `/api/picklist`;
   }
 
+  /**
+   * @description Queries picklists with the given filters.
+   * @param {object} query - Query parameters.
+   * @param {object} appStateOptions - Options passed to the app state error handler.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async query(query={}, appStateOptions={}){
     if ( !query.page ) query.page = 1;
     let id = payload.getKey(query);
@@ -38,6 +48,12 @@ class PicklistService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Retrieves a single picklist by ID.
+   * @param {string|number} picklistId - Picklist ID.
+   * @param {object} opts - Additional query parameters.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async get(picklistId, opts={}){
     const ido = { ...opts, picklistId };
     const id = payload.getKey(ido);
@@ -65,6 +81,11 @@ class PicklistService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Creates a new picklist.
+   * @param {object} data - Picklist data to submit.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async create(data){
     let id = await digest(data);
     const store = this.store.data.create;
@@ -93,6 +114,12 @@ class PicklistService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Updates an existing picklist.
+   * @param {string|number} id - Picklist ID.
+   * @param {object} data - Partial picklist data to patch.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async patch(id, data){
     let storeId = await digest({id, data});
     const store = this.store.data.patch;
@@ -121,6 +148,11 @@ class PicklistService extends BaseService {
     return store.get(storeId);
   }
 
+  /**
+   * @description Deletes a picklist by ID.
+   * @param {string|number} id - Picklist ID.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async delete(id){
     const store = this.store.data.delete;
 
@@ -147,6 +179,12 @@ class PicklistService extends BaseService {
     return store.get(id);
   }
 
+  /**
+   * @description Retrieves items for one or more picklists, optionally scoped to a form.
+   * @param {Array<string|number>} picklistIds - Array of picklist IDs.
+   * @param {string|number} [formId] - Optional form ID to scope segment filtering.
+   * @returns {Promise<object>} Store state object for the request.
+   */
   async items(picklistIds, formId){
     let id = await digest({formId, picklistIds});
     const store = this.store.data.items;

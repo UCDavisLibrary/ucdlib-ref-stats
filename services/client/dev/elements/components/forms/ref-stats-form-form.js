@@ -8,6 +8,12 @@ import { AppComponentController } from '#controllers';
 import { IdGenerator } from '#client-utils';
 
 
+/**
+ * @description Form element for creating and editing a reference statistics form definition.
+ * Handles form creation, updates, and deletion.
+ * @property {String} nameOrId - The name or ID of the form being edited, or null for a new form.
+ * @property {Object} payload - The current form data payload bound to the form inputs.
+ */
 export default class RefStatsFormForm extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -37,12 +43,21 @@ export default class RefStatsFormForm extends Mixin(LitElement)
     this._injectModel('AppStateModel', 'FormModel');
   }
 
+  /**
+   * @description Responds to app state changes. Sets nameOrId from the URL path
+   * and fetches data when the component's page is active.
+   * @param {Object} e - App state update event containing location information.
+   */
   _onAppStateUpdate(e) {
     if ( !this.ctl.appComponent.isOnActivePage ) return;
     this.nameOrId = e.location.path[1] === 'new' ? null : e.location.path[1];
     this.getData();
   }
 
+  /**
+   * @description Fetches the form definition data from the FormModel using the current nameOrId.
+   * Resets the payload before fetching. Does nothing if nameOrId is not set.
+   */
   async getData(){
     this.payload = {};
     if ( !this.nameOrId ) return;
@@ -53,6 +68,12 @@ export default class RefStatsFormForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Handles form submission. Creates or patches the form definition depending
+   * on whether nameOrId is set. Fires a `ref-stats-form-updated` custom event on success.
+   * @param {Event} e - The form submit event.
+   * @returns {Object|undefined} The model response if there is a 422 validation error, otherwise undefined.
+   */
   async _onSubmit(e) {
     e.preventDefault();
 
@@ -76,11 +97,19 @@ export default class RefStatsFormForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Updates a single property on the payload and requests a re-render.
+   * @param {String} prop - The payload property name to update.
+   * @param {*} value - The new value for the property.
+   */
   _onPayloadInput(prop, value){
     this.payload[prop] = value;
     this.requestUpdate();
   }
 
+  /**
+   * @description Opens a confirmation dialog prompting the user to confirm form deletion.
+   */
   _onDeleteRequest(){
     this.AppStateModel.showDialogModal({
       title: 'Delete Form',
@@ -92,6 +121,11 @@ export default class RefStatsFormForm extends Mixin(LitElement)
     })
   }
 
+  /**
+   * @description Handles dialog action events. Deletes the form definition when the user
+   * confirms the 'form-delete' action, then fires a `ref-stats-form-updated` custom event.
+   * @param {Object} e - Dialog action event with an `action` property containing the action value.
+   */
   async _onAppDialogAction(e){
     if ( e.action.value !== 'form-delete' ) return;
     const r = await this.FormModel.delete(this.nameOrId);

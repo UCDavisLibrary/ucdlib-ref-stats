@@ -6,6 +6,10 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { FormEntryController } from '#controllers';
 
+/**
+ * @description Page-level element that renders the form entry view, allowing users
+ * to select and submit a reference statistics form.
+ */
 export default class RefStatsFormEntry extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 

@@ -10,6 +10,10 @@ import preloadedIcons from './icons.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * @description Registers the SPA middleware and static asset serving for the client app.
+ * @param {import('express').Application} app - The Express application instance
+ */
 export default (app) => {
   let assetsDir = path.join(__dirname, '../public');
   logger.info(`Serving static assets from ${assetsDir}`);

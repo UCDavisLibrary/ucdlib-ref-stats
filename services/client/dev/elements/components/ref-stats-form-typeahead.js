@@ -6,6 +6,18 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { DropdownController } from '#controllers';
 
+/**
+ * @description Typeahead input element for searching and selecting a reference statistics
+ * form. Queries FormModel as the user types and displays matching suggestions in a
+ * dropdown. Dispatches a `form-typeahead-selected` event when a suggestion is chosen.
+ * @property {String} value - Current text value of the input
+ * @property {String} inputId - Id attribute applied to the underlying input element
+ * @property {Array} suggestions - Array of form suggestion objects returned by the last query
+ * @property {String} nameOrId - Form name or id used to pre-populate the input value
+ * @property {Number} suggestionLimit - Maximum number of suggestions to fetch
+ * @property {Object} selectedSuggestion - The currently selected form suggestion object
+ * @property {Boolean} relativeDropdown - When true, positions the dropdown relatively instead of absolutely
+ */
 export default class RefStatsFormTypeahead extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -41,6 +53,11 @@ export default class RefStatsFormTypeahead extends Mixin(LitElement)
     this._injectModel('FormModel');
   }
 
+  /**
+   * @description Lit lifecycle callback. Resolves the display value when nameOrId changes
+   * and updates the dropdown positioning style when relativeDropdown changes.
+   * @param {Map} props - Map of changed property names to their previous values
+   */
   willUpdate(props){
     if ( props.has('nameOrId') ) {
       this.getByNameOrId();
@@ -51,6 +68,11 @@ export default class RefStatsFormTypeahead extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Looks up a form by the current nameOrId value and sets the input text
+   * to the matching form's label. If nameOrId is empty or the lookup fails, clears the
+   * input value.
+   */
   async getByNameOrId(){
     if ( !this.nameOrId ) {
       this.value = '';
@@ -69,6 +91,11 @@ export default class RefStatsFormTypeahead extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Handles input events on the text field. Clears the selected suggestion,
+   * updates the value, and debounces a suggestion fetch followed by opening the dropdown.
+   * @param {Event} e - The native input event from the text field
+   */
   async _onValueInput(e){
     this.selectedSuggestion = null;
     this.value = e.target.value;
@@ -83,6 +110,11 @@ export default class RefStatsFormTypeahead extends Mixin(LitElement)
 
   }
 
+  /**
+   * @description Handles a click on a suggestion item. Sets the selected suggestion,
+   * closes the dropdown, and dispatches a `form-typeahead-selected` custom event.
+   * @param {Object} suggestion - The form suggestion object that was clicked
+   */
   _onSuggestionClick(suggestion){
     this.selectedSuggestion = suggestion;
     this.nameOrId = suggestion.form_id;
@@ -94,6 +126,11 @@ export default class RefStatsFormTypeahead extends Mixin(LitElement)
     }));
   }
 
+  /**
+   * @description Fetches form suggestions from FormModel based on the current input value
+   * and suggestion limit. Updates the suggestions list and totalSuggestions count, or sets
+   * fetchError if the request fails with a non-404 error.
+   */
   async getSuggestions(){
     this.fetchError = false;
     const query = {

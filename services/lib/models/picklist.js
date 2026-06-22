@@ -3,11 +3,21 @@ import config from '../config.js';
 
 class Picklist {
 
+  /**
+   * @description Query picklists with optional filtering and pagination
+   * @param {Object} params - Query parameters
+   * @param {Number} params.page - Page number
+   * @param {Number} params.per_page - Number of results per page
+   * @param {Boolean} params.active_only - If true, exclude archived picklists
+   * @param {Boolean} params.archived_only - If true, return only archived picklists
+   * @param {String} params.q - Search string to filter picklists by label
+   * @returns {Object} Paginated results object or an error object
+   */
   async query(params={}){
     const page = params.page || 1;
     const perPage = params.per_page || 15;
     const offset = (page - 1) * perPage;
-    
+
     const where = [];
     const values = [];
 
@@ -73,6 +83,12 @@ class Picklist {
     return { res: missing ? null : r.res?.rows?.[0] || null };
   }
 
+  /**
+   * @description Create a new picklist, optionally with initial items
+   * @param {Object} data - Picklist data to insert
+   * @param {Array} [data.items] - Optional array of picklist item objects to insert alongside the picklist
+   * @returns {Object} The new picklist's picklist_id and name, or an error object
+   */
   async create(data){
     const client = await pgClient.pool.connect();
     try {
@@ -109,6 +125,13 @@ class Picklist {
     }
   }
 
+  /**
+   * @description Update a picklist and/or its items
+   * @param {String} idOrName - The picklist ID or name
+   * @param {Object} data - Fields to update; items with a picklist_item_id are updated, those without are inserted
+   * @param {Array} [data.items] - Array of picklist item objects to upsert
+   * @returns {Object} The updated picklist's picklist_id and name, or an error object
+   */
   async patch(idOrName, data){
     const client = await pgClient.pool.connect();
     try {
@@ -158,6 +181,11 @@ class Picklist {
     }
   }
 
+  /**
+   * @description Delete a picklist by ID or name
+   * @param {String} idOrName - The picklist ID or name
+   * @returns {Object} The deleted picklist's picklist_id and name, or an error object
+   */
   async delete(idOrName){
     const sql = `DELETE FROM ${config.db.tables.picklist} WHERE picklist_id = get_picklist_id($1) RETURNING picklist_id, name;`;
     const r = await pgClient.query(sql, [idOrName]);
@@ -167,6 +195,12 @@ class Picklist {
     return { res: r.res.rows[0] || null };
   }
 
+  /**
+   * @description Get picklist items for a given picklist, optionally filtered by segment
+   * @param {String} picklistNameOrId - The picklist ID or name
+   * @param {String[]} segments - Optional array of segment values to filter items by
+   * @returns {Object} Array of picklist item rows, or an error object
+   */
   async getPicklistItems(picklistNameOrId, segments=[]){
     const sql = `SELECT * FROM get_picklist_items( $1, $2);`;
     const r = await pgClient.query(sql, [picklistNameOrId, segments]);

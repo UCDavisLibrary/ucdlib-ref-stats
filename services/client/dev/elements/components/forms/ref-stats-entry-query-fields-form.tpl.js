@@ -72,6 +72,12 @@ export function render() {
   `;
 }
 
+/**
+ * @description Render a single display field row with move, remove, and input controls.
+ * @param {Object} f - The RefStatsDisplayField configuration object
+ * @param {Number} idx - Index of this field in the queryElementFields array
+ * @returns {TemplateResult}
+ */
 function _renderFieldRow(f, idx) {
   const isFirst = idx === 0;
   const isLast = idx === this.queryElementFields.length - 1;

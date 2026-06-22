@@ -10,6 +10,16 @@ import { forms } from '#templates';
 import '#components/ref-stats-field-typeahead.js';
 import '#components/forms/ref-stats-field-settings-form.js';
 
+/**
+ * @description Element for managing field-to-form assignments. Can operate in two modes:
+ * form-centric (shows all fields assigned to a given form) or field-centric (shows all forms
+ * a given field is assigned to). Supports adding, removing, archiving, reordering, and
+ * configuring field assignments.
+ * @property {String} formNameOrId - Name or ID of the form to manage assignments for (reflected via attribute form-name-or-id)
+ * @property {String} fieldNameOrId - Name or ID of the field to manage assignments for (reflected via attribute field-name-or-id)
+ * @property {Array} fields - List of field-assignment objects when operating in form-centric mode
+ * @property {Array} forms - List of form objects the field is assigned to when in field-centric mode
+ */
 export default class RefStatsFieldAssignment extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -52,12 +62,21 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     this._injectModel('AppStateModel', 'FormModel', 'FieldModel');
   }
 
+  /**
+   * @description Triggers a data load whenever formNameOrId or fieldNameOrId changes.
+   * @param {Map} props - Map of changed property names to their previous values
+   */
   willUpdate(props) {
     if ( props.has('formNameOrId') || props.has('fieldNameOrId') ) {
       this._loadData();
     }
   }
 
+  /**
+   * @description Responds to app-state changes. Reloads data when the active page path
+   * matches the currently managed form or field identifier.
+   * @param {Object} e - App state update event containing the current location
+   */
   _onAppStateUpdate(e) {
     if ( !this.ctl.appComponent.isOnActivePage ) return;
     const nameOrId = e.location.path?.[1];
@@ -68,6 +87,11 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Loads assignment data from the API based on the current mode.
+   * In form-centric mode fetches all fields assigned to the form and enriches them with
+   * assignment metadata. In field-centric mode fetches the field and its form assignments.
+   */
   async _loadData() {
     if ( this.formNameOrId ) {
       const r = await this.FieldModel.query({ form: this.formNameOrId, page: 1, per_page: 500 });
@@ -97,6 +121,10 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Archives a field-form assignment and reloads data on success.
+   * @param {String|Number} id - Form ID when in field-centric mode, or field ID when in form-centric mode
+   */
   async _onArchiveClick(id) {
     const fieldId = this.fieldNameOrId || id;
     const formId = this.formNameOrId || id;
@@ -107,6 +135,10 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Unarchives a field-form assignment and reloads data on success.
+   * @param {String|Number} id - Form ID when in field-centric mode, or field ID when in form-centric mode
+   */
   async _onUnarchiveClick(id) {
     const fieldId = this.fieldNameOrId || id;
     const formId = this.formNameOrId || id;
@@ -117,6 +149,10 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Opens a dialog modal for adding a field-to-form assignment.
+   * In form-centric mode presents a field typeahead; in field-centric mode presents a form typeahead.
+   */
   _onAddFieldClick(){
     if ( this.formNameOrId ) {
       this.fieldToAdd = null;
@@ -158,6 +194,10 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Opens a confirmation dialog for removing a field-form assignment.
+   * @param {String|Number} id - Form ID when in field-centric mode, or field ID when in form-centric mode
+   */
   _onRemoveFieldClick(id){
     const fieldId = this.fieldNameOrId || id;
     const formId = this.formNameOrId || id;
@@ -221,6 +261,11 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     });
   }
 
+  /**
+   * @description Handles dialog modal action events. Processes add-field-to-form and
+   * remove-field-from-form actions, calling the appropriate FieldModel methods and reloading data on success.
+   * @param {CustomEvent} e - Dialog action event with action.value and optional data payload
+   */
   async _onAppDialogAction(e){
     if ( !this.ctl.appComponent.isOnActivePage ) return;
     if ( e.action.value === 'add-field-to-form' ) {

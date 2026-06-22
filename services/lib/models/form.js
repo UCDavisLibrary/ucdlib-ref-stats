@@ -3,6 +3,14 @@ import config from '../config.js';
 
 class Form {
 
+  /**
+   * @description Query forms with optional filtering and pagination
+   * @param {Object} params - Query parameters
+   * @param {Number} params.page - Page number
+   * @param {Number} params.per_page - Number of results per page
+   * @param {String} params.q - Search string to filter forms by label
+   * @returns {Object} Paginated results object or an error object
+   */
   async query(params={}){
     const page = params.page || 1;
     const perPage = params.per_page || 15;
@@ -65,6 +73,11 @@ class Form {
     return { res: missing ? null : r.res?.rows?.[0] || null };
   }
 
+  /**
+   * @description Create a new form
+   * @param {Object} data - Form data to insert
+   * @returns {Object} The new form's form_id and name, or an error object
+   */
   async create(data){
     let client = await pgClient.pool.connect();
     try {
@@ -84,6 +97,12 @@ class Form {
     }
   }
 
+  /**
+   * @description Update fields on an existing form
+   * @param {String} idOrName - The form ID or name; may be omitted if present in data
+   * @param {Object} data - Fields to update (form_id and name are stripped before update)
+   * @returns {Object} The updated form's form_id and name, or an error object
+   */
   async patch(idOrName, data){
     if ( !idOrName ) {
       if ( data.form_id || data.name ) {
@@ -112,6 +131,11 @@ class Form {
     }
   }
 
+  /**
+   * @description Delete a form by ID or name
+   * @param {String} idOrName - The form ID or name
+   * @returns {Object} The deleted form's form_id and name, or an error object
+   */
   async delete(idOrName){
     const sql = `DELETE FROM ${config.db.tables.form} WHERE form_id = get_form_id($1) RETURNING form_id, name;`;
     const r = await pgClient.query(sql, [idOrName]);

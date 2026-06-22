@@ -8,6 +8,12 @@ import { ModalFormController, AppComponentController } from '#controllers';
 import { IdGenerator } from '#client-utils';
 import textUtils from '#lib/textUtils.js';
 
+/**
+ * @description Form element for creating and editing a picklist and its items.
+ * Can operate as a standalone page form or inside a dialog modal.
+ * @property {String} picklistIdOrName - The ID or name of the picklist being edited, or null for a new picklist.
+ * @property {Object} payload - The current picklist data payload bound to the form inputs.
+ */
 export default class RefStatsPicklistForm extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -36,6 +42,12 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     this._injectModel('PicklistModel', 'AppStateModel');
   }
 
+  /**
+   * @description Responds to app state changes. Re-fetches data when the component's
+   * page is active and the resolved nameOrId matches the current picklistIdOrName,
+   * ensuring the form resets even when the property value has not changed.
+   * @param {Object} e - App state update event containing location information.
+   */
   _onAppStateUpdate(e) {
     if ( !this.ctl.appComponent.isOnActivePage ) return;
 
@@ -47,12 +59,21 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Responds to dialog open events. Fetches fresh data when the component
+   * is rendered inside a dialog modal.
+   */
   _onAppDialogOpen() {
     if ( this.ctl.modal.modal ) {
       this.getData();
     }
   }
 
+  /**
+   * @description Reacts to property changes. Updates the modal title and submit button text
+   * and fetches fresh data when picklistIdOrName changes.
+   * @param {Map} props - Map of changed property names to their previous values.
+   */
   willUpdate(props){
     if ( props.has('picklistIdOrName') ) {
       this.ctl.modal.setModalTitle(this.picklistIdOrName ? 'Edit Picklist' : 'New Picklist');
@@ -62,6 +83,10 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Fetches the picklist data (including items) from the PicklistModel.
+   * Resets the payload before fetching. Does nothing if picklistIdOrName is not set.
+   */
   async getData(){
     this.payload = {};
     if ( !this.picklistIdOrName ) return;
@@ -72,6 +97,11 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Handles the form's native submit event. Delegates to the modal controller
+   * submit flow when inside a modal, or calls _onSubmitClick directly otherwise.
+   * @param {Event} e - The form submit event.
+   */
   _onSubmit(e){
     e.preventDefault();
     if ( this.ctl.modal.modal ){
@@ -81,6 +111,9 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Opens a confirmation dialog prompting the user to confirm picklist deletion.
+   */
   _onDeleteRequest(){
     this.AppStateModel.showDialogModal({
       title: 'Delete Picklist',
@@ -92,6 +125,11 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     })
   }
 
+  /**
+   * @description Handles dialog action events. Deletes the picklist when the user confirms
+   * the 'picklist-delete' action, then fires a `ref-stats-picklist-updated` custom event.
+   * @param {Object} e - Dialog action event with an `action` property containing the action value.
+   */
   async _onAppDialogAction(e){
     if ( e.action.value !== 'picklist-delete' ) return;
     const res = await this.PicklistModel.delete(this.picklistIdOrName);
@@ -105,6 +143,12 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Gathers form data including picklist items from the child
+   * `ref-stats-picklist-items-form` element, then creates or patches the picklist.
+   * Fires a `ref-stats-picklist-updated` custom event on success.
+   * @returns {Object} The model response object.
+   */
   async _onSubmitClick(){
     let r;
     let payload = {...this.payload};
@@ -143,6 +187,13 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
     return r;
   }
 
+  /**
+   * @description Updates a single property on the payload and requests a re-render.
+   * Auto-generates the name from the label (with a debounce) when the label changes
+   * and a name has not yet been set.
+   * @param {String} prop - The payload property name to update.
+   * @param {*} value - The new value for the property.
+   */
   _onPayloadInput(prop, value){
     this.payload[prop] = value;
     if ( prop === 'label' && !this.payload.name ){

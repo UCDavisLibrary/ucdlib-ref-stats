@@ -1,5 +1,14 @@
 import { html } from 'lit';
 
+/**
+ * @description Renders a UC Davis branded focal-link element containing an icon and label text.
+ * @param {Object} opts - Options object
+ * @param {String} opts.text - Display text shown in the link body
+ * @param {String} opts.icon - Cork-icon identifier for the focal link figure
+ * @param {String} opts.href - URL the link points to (defaults to '#')
+ * @param {String} opts.brandColor - Optional brand color suffix appended to the category-brand class
+ * @returns {import('lit').TemplateResult}
+ */
 export default (opts={}) => {
   const text = opts.text || '';
   const icon = opts.icon || '';

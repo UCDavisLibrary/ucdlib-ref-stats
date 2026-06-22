@@ -42,6 +42,10 @@ export default class DropdownController {
     this._onKeyDown = this._onKeyDown.bind(this);
   }
 
+  /**
+   * @description Set the open state of the dropdown and request a host update
+   * @param {Boolean} value - Whether the dropdown should be open
+   */
   set open(value) {
     if ( !value ) value = false;
     if ( value ) value = true;
@@ -50,10 +54,18 @@ export default class DropdownController {
     this.host.requestUpdate();
   }
 
+  /**
+   * @description Whether the dropdown is currently open
+   * @returns {Boolean}
+   */
   get open() {
     return this._open;
   }
 
+  /**
+   * @description Compute inline styles for the dropdown based on open state and available viewport space
+   * @returns {Object} Style properties object
+   */
   get styles() {
     if ( !this.open ) return { display: 'none' };
     const hostRect = this.host.getBoundingClientRect();
@@ -81,14 +93,25 @@ export default class DropdownController {
     return styles;
   }
 
+  /**
+   * @description Lit styleMap directive result computed from the current styles
+   * @returns {import('lit/directives/style-map.js').StyleMapDirective}
+   */
   get styleMap() {
     return styleMap( this.styles );
   }
 
+  /**
+   * @description Close the dropdown when the window is resized
+   */
   _onWindowResize(){
     this.open = false;
   }
 
+  /**
+   * @description Handle keydown events — step focus on arrow keys and close on Escape
+   * @param {KeyboardEvent} e - The keyboard event
+   */
   _onKeyDown(e) {
     this.focusOnArrowKey(e);
     if ( e.key === 'Escape' && this.open ) {
@@ -120,6 +143,9 @@ export default class DropdownController {
     suggestionButtons[focusedIndex].focus();
   }
 
+  /**
+   * @description Close the dropdown after a short delay when focus leaves the host element
+   */
   _onHostFocusOut(){
     setTimeout(() => {
       if ( !this.open ) return;
@@ -139,6 +165,9 @@ export default class DropdownController {
     }, this.hostFocusOutTime);
   }
 
+  /**
+   * @description Register event listeners and set host positioning when the host is connected to the DOM
+   */
   hostConnected() {
     window.addEventListener('resize', this._onWindowResize);
     document.addEventListener('keydown', this._onKeyDown);
@@ -146,6 +175,9 @@ export default class DropdownController {
     this.host.style.position = 'relative';
   }
 
+  /**
+   * @description Remove event listeners when the host is disconnected from the DOM
+   */
   hostDisconnected() {
     window.removeEventListener('resize', this._onWindowResize);
     document.removeEventListener('keydown', this._onKeyDown);

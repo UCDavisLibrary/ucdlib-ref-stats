@@ -4,6 +4,10 @@ import {render, styles} from "./ref-stats-page-picklist.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
+/**
+ * @description Admin page element that lists all reference-stats picklists.
+ * @property {String} pageId - The page identifier used to match app-state route events
+ */
 export default class RefStatsPagePicklist extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
