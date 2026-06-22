@@ -21,6 +21,7 @@ return html`
     selected=${this.page}
     attr-for-selected='page-id'>
     <ref-stats-page-form-single page-id='form-single'></ref-stats-page-form-single>
+    <ref-stats-page-form-entries page-id='form-entries'></ref-stats-page-form-entries>
     <ref-stats-page-home page-id='home'></ref-stats-page-home>
 
     <!-- Admin Pages -->

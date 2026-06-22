@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS form (
   name VARCHAR(255) NOT NULL UNIQUE,
   label TEXT,
   description TEXT,
+  form_display_settings JSONB NOT NULL DEFAULT '{}'::JSONB,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now(),
   is_archived BOOLEAN DEFAULT FALSE NOT NULL

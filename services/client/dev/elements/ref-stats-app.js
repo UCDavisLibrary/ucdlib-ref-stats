@@ -19,6 +19,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 // pages loaded upfront
 import './pages/ref-stats-page-home.js';
 import './pages/ref-stats-page-form-single.js';
+import './pages/ref-stats-page-form-entries.js';
 
 // app global components
 import './components/cork-app-dialog-modal.js';

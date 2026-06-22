@@ -166,9 +166,15 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     if ( displayField?.label ) {
       return displayField.label;
     }
+
+    // entry metadata fields with hardcoded labels
     if ( fieldName === '_created_at' ) return 'Submitted At';
+    if ( fieldName === '_id' ) return 'Entry ID';
+
     const field = this.formFields[fieldName];
-    return field ? field.label : fieldName;
+    if ( !field ) return fieldName;
+    const form = field.forms.find( f => this.formNameOrId.includes(f.name) || this.formNameOrId.includes(f.form_id) );
+    return form?.assignment_settings?.label || field.label || field.name;
   }
 
   /**
@@ -180,6 +186,9 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
   getFieldValue(formEntry, fieldName){
     if ( fieldName === '_created_at' ) {
       return html`<cork-date-display iso=${formEntry.created_at}></cork-date-display>`;
+    }
+    if ( fieldName === '_id' ){
+      return formEntry.form_entry_id;
     }
     const fieldValue = formEntry.fields[fieldName];
     const fieldValueArray = Array.isArray(fieldValue) ? fieldValue : [fieldValue];

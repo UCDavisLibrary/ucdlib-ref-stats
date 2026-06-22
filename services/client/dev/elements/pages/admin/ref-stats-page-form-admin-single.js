@@ -44,7 +44,12 @@ export default class RefStatsPageFormAdminSingle extends Mixin(LitElement)
   }
 
   _onFormUpdated(e) {
-    this.AppStateModel.setLocation('/form-admin');
+    if ( e.detail?.newForm ){
+      this.AppStateModel.setLocation(`/form-admin/${e.detail.form.name}`);
+    } else {
+      this.AppStateModel.refresh();
+    }
+    
   }
 
 }

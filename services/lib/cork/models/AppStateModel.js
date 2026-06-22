@@ -30,7 +30,9 @@ class AppStateModelImpl extends AppStateModel {
       update.lastLocation = JSON.parse(JSON.stringify(this.store.data.location));
       let page = update.location.path?.[0] ? update.location.path[0] : 'home';
 
-      if ( ['picklist', 'field', 'form-admin', 'form'].includes(page) && update.location.path?.length > 1 ) {
+      if ( page === 'form' && update.location.path?.[2] === 'entries' ) {
+        page = 'form-entries';
+      } else if ( ['picklist', 'field', 'form-admin', 'form'].includes(page) && update.location.path?.length > 1 ) {
         page += '-single';
       }
 

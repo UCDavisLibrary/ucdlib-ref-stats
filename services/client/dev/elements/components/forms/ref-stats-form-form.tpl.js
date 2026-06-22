@@ -1,4 +1,5 @@
 import { html, css } from 'lit';
+import './ref-stats-entry-query-fields-form.js';
 
 export function styles() {
   const elementStyles = css`
@@ -57,6 +58,12 @@ export function render() {
           @input=${() => this._onPayloadInput('is_archived', !this.payload?.is_archived)}>
         <label for=${this.ctl.idGen.get('is_archived')}>Archived</label>
       </cork-field-container>
+      <div ?hidden=${isNew}>
+        <ref-stats-entry-query-fields-form
+          class='u-space-mb--large'
+          @ref-stats-entry-query-fields-updated=${e => this._onPayloadInput('form_display_settings', { queryElementFields: e.detail.fields })}>
+        </ref-stats-entry-query-fields-form>
+      </div>
       <div>
         <button type="submit" class='btn btn--primary'>${isEdit ? 'Save Changes' : 'Create Form'}</button>
         <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest}>Delete</button>

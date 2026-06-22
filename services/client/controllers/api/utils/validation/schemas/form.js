@@ -67,7 +67,15 @@ const formCreateSchema = formBaseSchema.extend({
   .superRefine(srNameUnique);
 
 const formUpdateSchema = formBaseSchema.partial().extend({
-  form_id: z.string().uuid()
+  form_id: z.string().uuid(),
+  form_display_settings: z.object({
+    queryElementFields: z.array(z.object({
+      field: z.string(),
+      label: z.string().optional(),
+      desktopFr: z.number().optional(),
+      mobileFr: z.number().optional(),
+    })).optional()
+  }).optional()
 })
 .superRefine(srValidateFormId);
 
