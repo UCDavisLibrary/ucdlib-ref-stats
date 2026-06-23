@@ -78,6 +78,9 @@ export default class RefStatsFormForm extends Mixin(LitElement)
     e.preventDefault();
 
     let r;
+    if ( !this.payload.edit_interval_amount ) {
+      this.payload.edit_interval_amount = 0;
+    }
 
     if ( this.nameOrId ) {
       r = await this.FormModel.patch(this.payload);
@@ -103,6 +106,9 @@ export default class RefStatsFormForm extends Mixin(LitElement)
    * @param {*} value - The new value for the property.
    */
   _onPayloadInput(prop, value){
+    if ( prop === 'edit_interval_amount' && value !== '' ) {
+      value = Number(value);
+    }
     this.payload[prop] = value;
     this.requestUpdate();
   }

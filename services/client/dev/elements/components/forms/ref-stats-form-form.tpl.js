@@ -1,6 +1,10 @@
 import { html, css } from 'lit';
 import './ref-stats-entry-query-fields-form.js';
 
+import definitions from '#lib/definitions.js';
+
+const hiddenIntervalUnits = definitions.formEditIntervalUnits.filter(unit => unit.hideAmount).map(unit => unit.value);
+
 export function styles() {
   const elementStyles = css`
     ref-stats-form-form {
@@ -58,6 +62,30 @@ export function render() {
           @input=${() => this._onPayloadInput('is_archived', !this.payload?.is_archived)}>
         <label for=${this.ctl.idGen.get('is_archived')}>Archived</label>
       </cork-field-container>
+      <fieldset>
+        <legend>Edit Interval</legend>
+        <p>How long after submission should users be able to edit the form?</p>
+        <cork-field-container schema='form' path='edit_interval_amount' class='field-container' ?hidden=${hiddenIntervalUnits.includes(this.payload?.edit_interval_unit)}>
+          <label for=${this.ctl.idGen.get('edit_interval_amount')}>Interval Amount</label>
+          <input 
+            type="number" 
+            id=${this.ctl.idGen.get('edit_interval_amount')} 
+            .value=${this.payload?.edit_interval_amount || ''}
+            @input=${e => this._onPayloadInput('edit_interval_amount', e.target.value)}>
+        </cork-field-container>
+        <cork-field-container schema='form' path='edit_interval_unit' class='field-container'>
+          <label for=${this.ctl.idGen.get('edit_interval_unit')}>Interval Unit</label>
+          <select 
+            id=${this.ctl.idGen.get('edit_interval_unit')} 
+            .value=${this.payload?.edit_interval_unit || ''}
+            @input=${e => this._onPayloadInput('edit_interval_unit', e.target.value)}>
+            <option value="">Select Unit</option>
+            ${definitions.formEditIntervalUnits.map(unit => html`
+              <option value=${unit.value}>${unit.label}</option>
+            `)}
+          </select>
+        </cork-field-container>
+      </fieldset>
       <div ?hidden=${isNew}>
         <ref-stats-entry-query-fields-form
           class='u-space-mb--large'

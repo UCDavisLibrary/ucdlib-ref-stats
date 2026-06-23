@@ -38,9 +38,9 @@ export function render() {
             brandColor: 'gunrock'
           })}
           ${focalLink({
-            text: 'View Entries',
+            text: 'View Submissions',
             icon: 'fas.table-list',
-            href: `/form/${this.nameOrId}/entries`,
+            href: `/form/${this.nameOrId}/submissions`,
             brandColor: 'cabernet'
           })}
           <ref-stats-field-assignment form-name-or-id=${this.nameOrId} class='u-space-mt--large'></ref-stats-field-assignment>

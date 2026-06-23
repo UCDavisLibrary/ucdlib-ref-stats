@@ -101,6 +101,12 @@ const styles = `
       font-size: 1.428rem;
     }
   }
+  button.focal-link {
+    border: none;
+    width: 100%;
+    text-align: start;
+    background: none;
+  }
   ${getLitStyles(corkFieldContainerStyles)}
   ${getLitStyles(picklistTypeaheadStyles)}
   ${getLitStyles(formTypeaheadStyles)}

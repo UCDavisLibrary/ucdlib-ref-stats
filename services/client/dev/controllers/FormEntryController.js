@@ -347,10 +347,21 @@ export default class FormEntryController {
     if ( this.form?.is_archived ) return html``;
     return html`
       <div class="form-entry-action-buttons">
-        <button type="submit" class="btn btn--primary">${this.formEntry ? 'Update' : 'Submit'}</button>
-        <button type="button" class="btn btn--invert" @click=${this._onReset.bind(this)}>Reset</button>
-        <a href="/form/${this.formNameOrId}" class="btn btn--invert" ?hidden=${!this.formEntry}>New Submission</a>
-        <button type="button" class="btn btn--invert" ?hidden=${!this.formEntry?.is_latest_version} @click=${this._onDeleteClick.bind(this)}>Delete</button>
+        <button 
+          type="submit" 
+          ?disabled=${this.formEntry?.past_edit_window}
+          class="btn btn--primary">${this.formEntry ? 'Update' : 'Submit'}
+        </button>
+        <button 
+          type="button" 
+          class="btn btn--invert" 
+          ?hidden=${!this.formEntry?.is_latest_version} 
+          ?disabled=${this.formEntry?.past_edit_window}
+          @click=${this._onDeleteClick.bind(this)}>Delete
+        </button>
+      </div>
+      <div class='field-description u-space-mt' ?hidden=${!this.formEntry?.past_edit_window}>
+        The edit window for this submission has passed. It cannot be updated.
       </div>
     `;
   }

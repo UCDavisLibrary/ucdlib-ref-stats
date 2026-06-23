@@ -1,7 +1,8 @@
 import * as z from "zod";
-import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString } from "./utils.js";
+import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString, requiredEnum, requiredNumber } from "./utils.js";
 import models from '#models';
 import logger from '#lib/logger.js';
+import definitions from '#lib/definitions.js';
 
 /**
  * @description Zod superRefine callback — validates that a form name is unique in the database.
@@ -69,7 +70,9 @@ const srValidateFormId = async (data, ctx) => {
 const formBaseSchema = z.object({
   description: toString.pipe(z.string().max(300)).optional(),
   label: requiredString().pipe(z.string().max(250)),
-  is_archived: z.boolean().optional()
+  is_archived: z.boolean().optional(),
+  edit_interval_amount: requiredNumber().pipe(z.number().int().min(0)),
+  edit_interval_unit: requiredEnum(definitions.formEditIntervalUnits.map(u => u.value))
 });
 
 const formCreateSchema = formBaseSchema.extend({

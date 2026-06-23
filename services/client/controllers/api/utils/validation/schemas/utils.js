@@ -111,6 +111,21 @@ export const requiredNumber = (
   );
 
 /**
+ * @description Returns "Required" validation message if value is null/undefined/empty,
+ * or a standard enum error if the value is not one of the allowed values.
+ * @param {String[]} values - The allowed enum values
+ * @param {String} msg - The required validation message. Default: 'Required'
+ * @returns {import('zod').ZodType}
+ */
+export const requiredEnum = (values, msg = 'Required') =>
+  z.preprocess(
+    v => (v == null ? '' : v),
+    z.string().trim().min(1, msg)
+  ).pipe(
+    z.enum(values)
+  );
+
+/**
  * @description Validates a URL-friendly string: lowercase letters, numbers, hyphens, and underscores only.
  */
 export const urlFriendlyString = z.string().regex(/^[a-z0-9_-]+$/, {

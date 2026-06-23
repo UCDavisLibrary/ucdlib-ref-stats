@@ -16,11 +16,11 @@ export function styles() {
  */
 export function render() {
   return html`
-    <div><h1 class="page-title">${this.data?.label || ''} - Entries</h1></div>
+    <div><h1 class="page-title">${this.data?.label || ''} - Submissions</h1></div>
     <ol class="breadcrumbs">
       <li><a href="/">Home</a></li>
       <li><a href="/form/${this.nameOrId}">${this.data?.label || ''}</a></li>
-      <li>Entries</li>
+      <li>Submissions</li>
     </ol>
     <div class="l-container">
       <ref-stats-form-entry-query

@@ -1,3 +1,10 @@
+/**
+ * @description Definitions class provides a centralized place to define and manage various constants and configurations used throughout the application, such as field types, custom validation rules, and form edit interval units.
+ * It also includes methods to validate and retrieve these definitions, ensuring consistency and maintainability across the codebase.
+ * @property {Array} fieldTypes - An array of objects representing the different field types available in forms, each with a value and label, and an optional usesPickList property indicating if the field type requires a pick list.
+ * @property {Object} customValidationRegistry - An object that maps form names to arrays of field names that have custom validation rules defined in the code.
+ * @property {Array} formEditIntervalUnits - An array of objects representing the different units of time that can be used to define edit intervals for forms, each with a value and label.
+ */
 class Definitions {
 
   constructor() {
@@ -17,6 +24,17 @@ class Definitions {
     this.customValidationRegistry = {
       'instruction-statistics': ['participant-count', 'instructor-session-type', 'department', 'date']
     };
+
+    this.formEditIntervalUnits = [
+      { value: 'minutes', label: 'Minutes' },
+      { value: 'hours', label: 'Hours' },
+      { value: 'days', label: 'Days' },
+      { value: 'weeks', label: 'Weeks' },
+      { value: 'months', label: 'Months' },
+      { value: 'years', label: 'Years' },
+      { value: 'never', label: 'Never Allow Edits', hideAmount: true },
+      { value: 'always', label: 'Always Allow Edits', hideAmount: true }
+    ];
   }
 
   /**

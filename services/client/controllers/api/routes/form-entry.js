@@ -32,11 +32,21 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     form = form.res;
 
     const isUpdate = !!req.body?.original_form_entry_id;
-    const baseSchema = schema.formEntry?.[form.name]?.create || null;
+  
+    if ( isUpdate ){
+      const existingEntry = await models.formEntry.get(req.body.original_form_entry_id, req.params.idOrName);
+      if ( existingEntry.error ){
+        throw existingEntry.error;
+      }
+      if ( existingEntry.res?.past_edit_window ){
+        return res.status(403).json({ message: 'The edit window for this submission has passed. It cannot be updated.' });
+      }
+    }
 
+    // build schema for field based on form definition and any hard-coded definitions
+    const baseSchema = schema.formEntry?.[form.name]?.create || null;
     const fieldsResult = await models.field.query({ form: form.form_id, perPage: 1000 });
     if ( fieldsResult.error ) throw fieldsResult.error;
-
     const entrySchema = buildDynamicFormEntrySchema(fieldsResult.res.results, { isUpdate, baseSchema, formId: form.form_id });
 
     const validated = await entrySchema.safeParseAsync({...req.body, _formId: form.form_id});
@@ -79,6 +89,10 @@ router.delete('/:entryId', async (req, res) => {
     const entry = await models.formEntry.get(req.params.entryId);
     if ( !entry.res ) return res.status(404).json({ message: 'Form entry not found' });
     if ( !entry.res.is_latest_version ) return res.status(409).json({ message: 'Only the latest version of a submission can be deleted' });
+
+    if ( entry.res.past_edit_window ) {
+      return res.status(403).json({ message: 'The edit window for this submission has passed. It cannot be deleted.' });
+    }
     const deleteAll = req.query.all === 'true';
     const r = await models.formEntry.deleteLatest(req.params.entryId, { deleteAll });
     if ( r.error ) throw r.error;

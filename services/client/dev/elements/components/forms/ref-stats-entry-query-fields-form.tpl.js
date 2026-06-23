@@ -50,25 +50,24 @@ export function styles() {
  */
 export function render() {
   return html`
-    <div class='icon-header u-space-mt--large'>
-      <cork-icon icon='fas.table-columns' class='redbud'></cork-icon>
-      <h2 class='icon-header--title'>Entry Display Fields</h2>
-    </div>
-    <p class='text--smaller'>Configure which fields appear as columns (desktop/mobile) or in the expandable details section on the entries page.</p>
-    <div ?hidden=${this.queryElementFields.length > 0}>
-      No display fields configured. Entries page will show ID and submission date by default.
-    </div>
-    <div>
-      ${this.queryElementFields.map((f, idx) => _renderFieldRow.call(this, f, idx))}
-    </div>
-    <div class='u-space-mt--medium' ?hidden=${this.unselectedFields.length === 0}>
-      <select @change=${this._onAddField}>
-        <option value=''>-- Add display field --</option>
-        ${this.unselectedFields.map(f => html`
-          <option value=${f.name}>${f.label} (${f.name})</option>
-        `)}
-      </select>
-    </div>
+    <fieldset>
+      <legend>Entry Display Fields</legend>
+      <p>Configure which fields appear as columns (desktop/mobile) or in the expandable details section on the entries page.</p>
+      <div ?hidden=${this.queryElementFields.length > 0}>
+        No display fields configured. Entries page will show ID and submission date by default.
+      </div>
+      <div>
+        ${this.queryElementFields.map((f, idx) => _renderFieldRow.call(this, f, idx))}
+      </div>
+      <div class='u-space-mt--medium' ?hidden=${this.unselectedFields.length === 0}>
+        <select @change=${this._onAddField}>
+          <option value=''>-- Add display field --</option>
+          ${this.unselectedFields.map(f => html`
+            <option value=${f.name}>${f.label} (${f.name})</option>
+          `)}
+        </select>
+      </div>
+    </fieldset>
   `;
 }
 

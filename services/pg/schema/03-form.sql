@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS form (
   label TEXT,
   description TEXT,
   form_display_settings JSONB NOT NULL DEFAULT '{}'::JSONB,
+  edit_interval_amount INTEGER NOT NULL DEFAULT 0,
+  edit_interval_unit VARCHAR(20) NOT NULL DEFAULT 'days',
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now(),
   is_archived BOOLEAN DEFAULT FALSE NOT NULL

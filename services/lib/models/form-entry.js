@@ -2,6 +2,7 @@ import pgClient from '../pgClient.js';
 import config from '../config.js';
 
 import models from '#models';
+import logger from '#lib/logger.js';
 
 class FormEntry {
 
@@ -63,6 +64,7 @@ class FormEntry {
       delete row.total_count;
       return row;
     });
+    this.setPastEditWindow(results);
     return { res: {
       results,
       offset,
@@ -166,6 +168,7 @@ class FormEntry {
     } else if ( r.error && !missing ) {
       return r;
     }
+    this.setPastEditWindow(r.res?.rows);
     return { res: missing ? null : r.res?.rows?.[0] || null };
   }
 
@@ -216,6 +219,48 @@ class FormEntry {
       return { error };
     } finally {
       client.release();
+    }
+  }
+
+  /**
+   * @description Sets the `past_edit_window` property on each form entry result based on the form's edit interval settings and the entry's created_at timestamp.
+   * @param {Array} results - An array of form entry results or a single form entry result object.
+   * @returns {void}
+   */
+  setPastEditWindow(results){
+    if ( !results ) return;
+    if ( !Array.isArray(results) ) {
+      results = [results];
+    }
+    for ( const r of results ) {
+      if ( r.edit_interval_unit === 'never') {
+        r.past_edit_window = true;
+        continue;
+      }
+      if ( r.edit_interval_unit === 'always'){
+        r.past_edit_window = false;
+        continue;
+      }
+      
+      try {
+        const submitted = Temporal.Instant.fromEpochMilliseconds(new Date(r.created_at).getTime());
+        const cutoff = Temporal.Now.zonedDateTimeISO('UTC').subtract({
+          [r.edit_interval_unit]: r.edit_interval_amount
+        }).toInstant();
+        r.past_edit_window = Temporal.Instant.compare(submitted, cutoff) < 0;
+
+
+      } catch (e) {
+        r.past_edit_window = true;
+        logger.error('Error occurred while setting past edit window', { 
+          error: e, 
+          formEntryId: r.form_entry_id, 
+          formName: r.form_name,
+          createdAt: r.created_at,
+          edit_interval_amount: r.edit_interval_amount, 
+          edit_interval_unit: r.edit_interval_unit });
+
+      }
     }
   }
 }
