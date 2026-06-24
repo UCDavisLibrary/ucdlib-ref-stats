@@ -24,3 +24,22 @@ begin
 end;
 $$
 language plpgsql;
+
+CREATE TABLE cache (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(100),
+    query TEXT NOT NULL,
+    data JSONB NOT NULL DEFAULT '{}'::JSONB,
+    created timestamp DEFAULT NOW()
+);
+COMMENT ON TABLE cache IS 'Cache table for storing http requests and other data';
+
+CREATE TABLE users (
+    user_id VARCHAR(200) PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    email VARCHAR(200) NOT NULL,
+    last_login timestamp,
+    created timestamp DEFAULT NOW()
+);
+COMMENT ON TABLE users IS 'Table for storing user information. Set when a user logs in';

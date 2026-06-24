@@ -41,6 +41,7 @@ function renderHeader(){
       <ucdlib-branding-bar
         site-name="UC Davis Library"
         slogan="Reference Statistics">
+        <a href='/logout'>Logout</a>
       </ucdlib-branding-bar>
 
       <ucd-theme-primary-nav>
@@ -49,6 +50,7 @@ function renderHeader(){
       <ucd-theme-quick-links
         title="Admin"
         style-modifiers="highlight"
+        ?hidden=${!this.AuthModel?.token?.hasAdminAccess}
       >
         <a href="/form-admin">Form Administration</a>
         <a href="/field">Field Library</a>

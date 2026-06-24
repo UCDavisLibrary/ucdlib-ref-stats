@@ -186,6 +186,7 @@ export default class FormEntryController {
       promises.push( this.getFormEntry() );
     } else {
       this.formEntry = null;
+      this.originalFormEntry = null;
     }
     await Promise.all(promises);
     await this.getPicklistItems();
@@ -203,6 +204,13 @@ export default class FormEntryController {
       if ( r.state === 'loaded' ) {
         this.formEntry = r.payload;
       }
+      if ( this.formEntry?.original_form_entry_id ){
+        const originalEntry = await this.models.FormEntryModel.get(this.formEntry.original_form_entry_id, this.formNameOrId);
+        if ( originalEntry.state === 'loaded' ) {
+          this.originalFormEntry = originalEntry.payload;
+        }
+      }
+  
     }
     return this.formEntry;
   }
@@ -317,10 +325,12 @@ export default class FormEntryController {
    */
   _renderFormEntrySummary(){
     if ( !this.formEntry ) return html``;
+    const isEdited = this.formEntry.form_entry_id !== this.formEntry.original_form_entry_id;
     return html`
       <div class="alert">
         <div><span class="bold primary">Submitted:</span><span> ${new Date(this.formEntry.created_at).toLocaleString()}</span></div>
-        <div><span class="bold primary">Edited:</span><span> ${this.formEntry.form_entry_id !== this.formEntry.original_form_entry_id ? 'Yes' : 'No'}</span></div>
+        <div><span class="bold primary">Edited:</span><span> ${isEdited ? 'Yes' : 'No'}</span></div>
+        <div ?hidden=${!isEdited}> <span class="bold primary">Original Submitted:</span><span> ${new Date(this.originalFormEntry?.created_at).toLocaleString()}</span></div>
       </div>
     `;
   }
@@ -349,18 +359,18 @@ export default class FormEntryController {
       <div class="form-entry-action-buttons">
         <button 
           type="submit" 
-          ?disabled=${this.formEntry?.past_edit_window}
+          ?disabled=${this.originalFormEntry?.past_edit_window}
           class="btn btn--primary">${this.formEntry ? 'Update' : 'Submit'}
         </button>
         <button 
           type="button" 
           class="btn btn--invert" 
           ?hidden=${!this.formEntry?.is_latest_version} 
-          ?disabled=${this.formEntry?.past_edit_window}
+          ?disabled=${this.originalFormEntry?.past_edit_window}
           @click=${this._onDeleteClick.bind(this)}>Delete
         </button>
       </div>
-      <div class='field-description u-space-mt' ?hidden=${!this.formEntry?.past_edit_window}>
+      <div class='field-description u-space-mt' ?hidden=${!this.originalFormEntry?.past_edit_window}>
         The edit window for this submission has passed. It cannot be updated.
       </div>
     `;

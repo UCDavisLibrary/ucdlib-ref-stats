@@ -2,8 +2,8 @@
 CREATE TABLE IF NOT EXISTS form_entry (
   form_entry_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   form_id UUID NOT NULL REFERENCES form(form_id) ON DELETE CASCADE,
-  submitted_by TEXT, -- todo: link to user table when available
-  impersonated_by TEXT, -- todo: link to user table when available
+  submitted_by VARCHAR(200) REFERENCES users(user_id),
+  impersonated_by VARCHAR(200) REFERENCES users(user_id),
   original_form_entry_id UUID REFERENCES form_entry(form_entry_id) ON DELETE SET NULL,
   is_latest_version BOOLEAN NOT NULL DEFAULT TRUE,
   created_at timestamp NOT NULL DEFAULT now()
@@ -136,6 +136,22 @@ SELECT
   fe.created_at,
   fe.submitted_by,
   fe.impersonated_by,
+  CASE WHEN sub_user.user_id IS NOT NULL THEN
+    jsonb_build_object(
+      'user_id',    sub_user.user_id,
+      'first_name', sub_user.first_name,
+      'last_name',  sub_user.last_name,
+      'email',      sub_user.email
+    )
+  END AS submitted_by_user,
+  CASE WHEN imp_user.user_id IS NOT NULL THEN
+    jsonb_build_object(
+      'user_id',    imp_user.user_id,
+      'first_name', imp_user.first_name,
+      'last_name',  imp_user.last_name,
+      'email',      imp_user.email
+    )
+  END AS impersonated_by_user,
   fe.original_form_entry_id,
   fe.is_latest_version,
   cv.versions,
@@ -147,6 +163,8 @@ SELECT
 FROM form_entry fe
 JOIN form f
   ON f.form_id = fe.form_id
+LEFT JOIN users sub_user ON sub_user.user_id = fe.submitted_by
+LEFT JOIN users imp_user ON imp_user.user_id = fe.impersonated_by
 LEFT JOIN chain_versions cv
   ON cv.chain_id = COALESCE(fe.original_form_entry_id, fe.form_entry_id)
 LEFT JOIN form_entry_field_value fev
@@ -162,6 +180,8 @@ GROUP BY
   fe.created_at,
   fe.submitted_by,
   fe.impersonated_by,
+  sub_user.user_id, sub_user.first_name, sub_user.last_name, sub_user.email,
+  imp_user.user_id, imp_user.first_name, imp_user.last_name, imp_user.email,
   fe.original_form_entry_id,
   fe.is_latest_version,
   cv.versions;

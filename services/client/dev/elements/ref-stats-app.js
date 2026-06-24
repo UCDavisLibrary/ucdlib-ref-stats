@@ -1,6 +1,8 @@
 import { LitElement } from 'lit';
 import {render, styles} from "./ref-stats-app.tpl.js";
 
+import config from '#lib/app-config.js';
+
 // global css
 import '../css/index.js';
 
@@ -42,6 +44,8 @@ import '#lib/cork/models/FieldModel.js';
 import '#lib/cork/models/FormEntryModel.js';
 import '#lib/cork/models/FormModel.js';
 import '#lib/cork/models/PicklistModel.js';
+import AuthModel from '#lib/cork/models/AuthModel.js';
+
 Registry.ready();
 
 
@@ -72,7 +76,7 @@ export default class RefStatsApp extends Mixin(LitElement)
     this.page = '';
     this._firstAppStateUpdate = false;
 
-    this._injectModel('AppStateModel');
+    this._injectModel('AppStateModel', 'AuthModel');
   }
 
   /**
@@ -133,4 +137,8 @@ export default class RefStatsApp extends Mixin(LitElement)
 
 }
 
-customElements.define('ref-stats-app', RefStatsApp);
+// initialize the app after doing auth
+const init = async () => {
+  await AuthModel.init(['ref-stats-app', RefStatsApp]);
+}
+init();

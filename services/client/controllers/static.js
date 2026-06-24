@@ -34,14 +34,18 @@ export default (app) => {
     getConfig : async (req, res, next) => {
       next({
         routes,
-        title: appTitle
+        title: appTitle,
+        auth: {
+          clientInit: config.auth.keycloakJsClient,
+          oidcScope: config.auth.oidcScope
+        },
       });
     },
 
     template : (req, res, next) => {
       const bundle = config.app.isDevEnv ? 
-        `<script src='/js/dev/${config.app.bundleName}?v=${config.app.bundleVersion}'></script>` : 
-        `<script src='/js/dist/${config.app.bundleName}?v=${config.app.bundleVersion}'></script>`;
+        `<script src='/js/dev/${config.app.bundleName}?v=${config.app.bundleVersion}' defer></script>` : 
+        `<script src='/js/dist/${config.app.bundleName}?v=${config.app.bundleVersion}' defer></script>`;
       const siteIcon = `<link rel="icon" href="/img/site-icon.png">`;
       next({
         title: appTitle,

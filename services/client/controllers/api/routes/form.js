@@ -3,6 +3,7 @@ import handleError from '../utils/handleError.js';
 import { validate, schema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
+import protect from '../utils/protect.js';
 
 const router = Router();
 
@@ -37,7 +38,7 @@ router.get('/:idOrName', async (req, res) => {
 });
 
 // create form
-router.post('/', json(), validate(schema.formCreate, {reqParts: ['body']}), async (req, res) => {
+router.post('/', protect('hasAdminAccess'), json(), validate(schema.formCreate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Form validated', req.context.logSignal);
     const r = await models.form.create(req.payload);
@@ -51,7 +52,7 @@ router.post('/', json(), validate(schema.formCreate, {reqParts: ['body']}), asyn
   }
 });
 
-router.patch('/', json(), validate(schema.formUpdate, {reqParts: ['body']}), async (req, res) => {
+router.patch('/', protect('hasAdminAccess'), json(), validate(schema.formUpdate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Form update validated', req.context.logSignal, {formId: req.payload.form_id});
     const r = await models.form.patch(req.payload.form_id, req.payload);
@@ -65,7 +66,7 @@ router.patch('/', json(), validate(schema.formUpdate, {reqParts: ['body']}), asy
   }
 });
 
-router.delete('/:idOrName', validate(schema.formIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
+router.delete('/:idOrName', protect('hasAdminAccess'), validate(schema.formIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
   try {
     logger.info('Form delete validated', req.context.logSignal, {formIdOrName: req.params.idOrName});
     const r = await models.form.delete(req.params.idOrName);

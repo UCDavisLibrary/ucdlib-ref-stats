@@ -3,10 +3,11 @@ import handleError from '../utils/handleError.js';
 import { validate, schema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
+import protect from '../utils/protect.js';
 
 const router = Router();
 
-router.post('/', json(), validate(schema.assignment, {reqParts: ['body']}), async (req, res) => {
+router.post('/', protect('hasAdminAccess'), json(), validate(schema.assignment, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Assignment validated', req.context.logSignal, { assignment: req.payload });
     let r;

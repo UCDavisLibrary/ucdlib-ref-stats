@@ -19,7 +19,8 @@ class Config {
         form: 'form',
         assignment: 'form_field_assignment',
         formEntry: 'form_entry',
-        formEntryFieldValue: 'form_entry_field_value'
+        formEntryFieldValue: 'form_entry_field_value',
+        users: 'users'
       },
       views: {
         picklistWithItems: 'picklist_with_items',
@@ -27,6 +28,19 @@ class Config {
         formEntryFull: 'form_entry_full'
       }
     }
+
+    this.auth = {
+
+      // passed to the browser-side keycloak library initialization
+      keycloakJsClient: {
+        url: this.getEnv('APP_KEYCLOAK_URL', 'https://auth.library.ucdavis.edu'),
+        realm: this.getEnv('APP_KEYCLOAK_REALM', 'internal'),
+        clientId: this.getEnv('APP_KEYCLOAK_CLIENT_ID', 'ref-stats-client')
+      },
+      oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile ucd-ids'),
+      serverCacheExpiration: this.getEnv('APP_SERVER_CACHE_EXPIRATION', '12 hours'),
+      serverCacheLruSize: this.getEnv('APP_SERVER_CACHE_LRU_SIZE', 5)
+    };
   }
 
   /**

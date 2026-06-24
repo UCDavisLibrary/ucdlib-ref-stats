@@ -1,4 +1,5 @@
-import {BaseService, digest} from '@ucd-lib/cork-app-utils';
+import {digest} from '@ucd-lib/cork-app-utils';
+import BaseService from "./BaseService.js";
 import FormEntryStore from '../stores/FormEntryStore.js';
 
 import payload from '../utils/payload.js';

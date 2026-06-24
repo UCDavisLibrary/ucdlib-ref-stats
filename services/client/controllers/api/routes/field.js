@@ -4,6 +4,7 @@ import { validate, schema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
 import definitions from '#lib/definitions.js';
+import protect from '../utils/protect.js';
 
 const router = Router();
 
@@ -51,7 +52,7 @@ const transformPayload = (req, res, next) => {
 }
 
 // create field
-router.post('/', json(), transformPayload, validate(schema.fieldCreate, {reqParts: ['body']}), async (req, res) => {
+router.post('/', protect('hasAdminAccess'), json(), transformPayload, validate(schema.fieldCreate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Field validated', req.context.logSignal);
     const r = await models.field.create(req.payload);
@@ -65,7 +66,7 @@ router.post('/', json(), transformPayload, validate(schema.fieldCreate, {reqPart
   }
 });
 
-router.patch('/', json(), transformPayload, validate(schema.fieldUpdate, {reqParts: ['body']}), async (req, res) => {
+router.patch('/', protect('hasAdminAccess'), json(), transformPayload, validate(schema.fieldUpdate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Field update validated', req.context.logSignal, {fieldId: req.payload.form_field_id});
     const r = await models.field.patch(req.payload.form_field_id, req.payload);
@@ -79,7 +80,7 @@ router.patch('/', json(), transformPayload, validate(schema.fieldUpdate, {reqPar
   }
 });
 
-router.delete('/:idOrName', validate(schema.fieldIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
+router.delete('/:idOrName', protect('hasAdminAccess'), validate(schema.fieldIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
   try {
     logger.info('Field delete validated', req.context.logSignal, {fieldIdOrName: req.params.idOrName});
     const r = await models.field.delete(req.params.idOrName);

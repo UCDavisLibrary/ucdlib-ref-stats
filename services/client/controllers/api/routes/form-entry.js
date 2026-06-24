@@ -3,10 +3,12 @@ import handleError from '../utils/handleError.js';
 import { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
+import protect from '../utils/protect.js';
 
 const router = Router();
 
 router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (req, res) => {
+  // todo - filter to current user if not admin. do i make an admin role for each form, and then ensure all that matches the 'form' query param?
     try {
       logger.info('Form entry query validated', req.context.logSignal);
       if ( req.payload.form ) {
@@ -24,7 +26,9 @@ router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (
 });
 
 router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
+  // todo - verify user has access to submit form
   try {
+    const token = req.auth.token;
     let form = await models.form.get(req.params.idOrName);
     if ( form.error ){
       throw form.error;
@@ -32,14 +36,18 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     form = form.res;
 
     const isUpdate = !!req.body?.original_form_entry_id;
-  
+    let existingEntry;
     if ( isUpdate ){
-      const existingEntry = await models.formEntry.get(req.body.original_form_entry_id, req.params.idOrName);
+      existingEntry = await models.formEntry.get(req.body.original_form_entry_id, req.params.idOrName);
       if ( existingEntry.error ){
         throw existingEntry.error;
       }
-      if ( existingEntry.res?.past_edit_window ){
+      existingEntry = existingEntry.res;
+      if ( existingEntry.past_edit_window ){
         return res.status(403).json({ message: 'The edit window for this submission has passed. It cannot be updated.' });
+      }
+      if ( existingEntry.submitted_by !== token.id && !token.hasAdminAccess ){
+        return res.status(403).json({ message: 'You do not have permission to update this form entry.' });
       }
     }
 
@@ -56,8 +64,14 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     logger.info('Form entry validated', req.context.logSignal, { formId: form.form_id});
     delete validated.data._formId;
 
-    // todo: if new versioning is added, check if same user as og
-    const r = await models.formEntry.create(form.form_id, validated.data);
+    const d = { ...validated.data };
+    if ( isUpdate ){
+      existingEntry.submitted_by = existingEntry.submitted_by;
+      existingEntry.impersonated_by = existingEntry.submitted_by !== token.id ? token.id : null;
+    } else {
+      d.submitted_by = token.id;
+    }
+    const r = await models.formEntry.create(form.form_id, d);
     if ( r.error ) {
       throw r.error;
     }
@@ -70,7 +84,7 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
 
 router.get('/:idOrName/:entryId', async (req, res) => {
   try {
-    const r = await models.formEntry.get(req.params.entryId, req.params.idOrName, { errorOnMissing: true });
+    const r = await models.formEntry.get(req.params.entryId, req.params.idOrName);
     if (r.error) {
       throw r.error;
     }
@@ -78,6 +92,9 @@ router.get('/:idOrName/:entryId', async (req, res) => {
       return res.status(404).json({ message: 'Form entry not found' });
     }
     logger.info('Form entry get successful', req.context.logSignal, { formId: r.res.form_id, formEntryId: r.res.form_entry_id });
+    if ( r.res.submitted_by !== req.auth.token.id && !req.auth.token.hasAdminAccess ){
+      return res.status(403).json({ message: 'You do not have permission to view this form entry.' });
+    }
     res.status(200).json(r.res);
   } catch (e) {
     return handleError(res, req, e);
@@ -87,8 +104,13 @@ router.get('/:idOrName/:entryId', async (req, res) => {
 router.delete('/:entryId', async (req, res) => {
   try {
     const entry = await models.formEntry.get(req.params.entryId);
+    if ( entry.error ) throw entry.error;
     if ( !entry.res ) return res.status(404).json({ message: 'Form entry not found' });
     if ( !entry.res.is_latest_version ) return res.status(409).json({ message: 'Only the latest version of a submission can be deleted' });
+
+    if ( entry.res.submitted_by !== req.auth.token.id && !req.auth.token.hasAdminAccess ){
+      return res.status(403).json({ message: 'You do not have permission to delete this form entry.' });
+    }
 
     if ( entry.res.past_edit_window ) {
       return res.status(403).json({ message: 'The edit window for this submission has passed. It cannot be deleted.' });

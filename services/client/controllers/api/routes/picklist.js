@@ -3,6 +3,7 @@ import handleError from '../utils/handleError.js';
 import { validate, schema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
+import protect from '../utils/protect.js';
 
 const router = Router();
 
@@ -58,8 +59,16 @@ router.get('/:idOrName', async (req, res) => {
 });
 
 router.patch('/:idOrName', json(), validate(schema.picklistIdOrNameSchema, {reqParts: ['params']}), validate(schema.picklistUpdate, {reqParts: ['body']}), async (req, res) => {
-  // todo: when doing auth, allow normal user to add picklist items if user_can_add_items is true
   try {
+    const token = req.auth.token;
+    let picklist = await models.picklist.get(req.params.idOrName, { errorOnMissing: true });
+    if ( picklist.error ) {
+      throw picklist.error;
+    }
+    picklist = picklist.res;
+    if ( !token?.hasAdminAccess && !picklist.user_can_add_items ) {
+      return res.status(403).json({ message: 'You do not have permission to update this picklist.' });
+    }
     logger.info('Picklist update validated', req.context.logSignal, {picklistIdOrName: req.params.idOrName});
     const r = await models.picklist.patch(req.params.idOrName, req.payload);
     if (r.error) {
@@ -72,7 +81,7 @@ router.patch('/:idOrName', json(), validate(schema.picklistIdOrNameSchema, {reqP
   }
 });
 
-router.delete('/:idOrName', validate(schema.picklistIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
+router.delete('/:idOrName', protect('hasAdminAccess'), validate(schema.picklistIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
   try {
     logger.info('Picklist delete validated', req.context.logSignal, {picklistIdOrName: req.params.idOrName});
     const r = await models.picklist.delete(req.params.idOrName);
@@ -87,7 +96,7 @@ router.delete('/:idOrName', validate(schema.picklistIdOrNameSchema, {reqParts: [
 });
 
 // create picklist
-router.post('/', json(), validate(schema.picklistCreate, {reqParts: ['body']}), async (req, res) => {
+router.post('/', protect('hasAdminAccess'), json(), validate(schema.picklistCreate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Picklist validated', {corkTraceId: req.corkTraceId});
     const r = await models.picklist.create(req.payload);

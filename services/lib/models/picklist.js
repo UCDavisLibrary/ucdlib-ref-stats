@@ -64,7 +64,7 @@ class Picklist {
    * @description Get a picklist by ID or name
    * @param {String} idOrName - The picklist ID or name
    * @param {Object} opts - Options object
-   * @param {Boolean} opts.errorOnMissing - If true, return an error if the picklist is not found. Otherwise {res} will be null.
+   * @param {Boolean} opts.errorOnMissing - If true, return an {error} if the picklist is not found. Otherwise {res} will be null.
    * @returns 
    */
   async get(idOrName, opts={}){
