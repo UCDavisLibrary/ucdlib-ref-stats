@@ -4,6 +4,7 @@ import { forms, fields } from '#templates';
 import { IdGenerator } from '#client-utils';
 import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 export default class FormEntryController {
   constructor(host, opts={}){
@@ -301,6 +302,7 @@ export default class FormEntryController {
       }
 
       return [
+        this._renderFormIntro(),
         this._renderFormVersionWarning(),
         this._renderFormEntrySummary(),
         template ? template.render.call(this.host, this) : this._renderDefaultForm()
@@ -317,6 +319,15 @@ export default class FormEntryController {
     }
 
     return html``;
+  }
+
+  /**
+   * @description Render the form's intro text if set, displayed at the top of the form entry page.
+   * @returns {import('lit').TemplateResult}
+   */
+  _renderFormIntro(){
+    if ( !this.form?.intro ) return html``;
+    return html`<div>${unsafeHTML(this.form.intro)}</div>`;
   }
 
   /**
@@ -416,13 +427,36 @@ export default class FormEntryController {
   }
 
   /**
-   * @description Reset the form payload to its original state (existing entry fields or empty object)
+   * @description Build an initial payload for new submissions by applying any configured
+   * default values from field assignment settings. Resolves the special keyword 'today'
+   * on date fields to the current date in YYYY-MM-DD format.
+   * @returns {Object} Default payload object
+   */
+  _getDefaultPayload(){
+    const defaults = {};
+    const formId = this.form?.form_id;
+    if ( !formId ) return defaults;
+    for ( const field of this.fields ) {
+      const assignment = field.forms?.find(f => f.form_id === formId);
+      const defaultValue = assignment?.assignment_settings?.defaultValue;
+      if ( !defaultValue ) continue;
+      if ( field.field_type === 'date' && defaultValue === 'today' ) {
+        defaults[field.name] = new Date().toISOString().split('T')[0];
+      } else {
+        defaults[field.name] = defaultValue;
+      }
+    }
+    return defaults;
+  }
+
+  /**
+   * @description Reset the form payload to its original state (existing entry fields or default values for new submissions)
    */
   _onReset(){
     if ( this.formEntry?.fields ) {
       this.setPayload({...this.formEntry.fields});
     } else {
-      this.setPayload({});
+      this.setPayload(this._getDefaultPayload());
     }
   }
 
@@ -436,7 +470,7 @@ export default class FormEntryController {
     if ( this.formEntry?.fields ) {
       this.setPayload({...this.formEntry.fields});
     } else {
-      this.setPayload({});
+      this.setPayload(this._getDefaultPayload());
     }
   }
 

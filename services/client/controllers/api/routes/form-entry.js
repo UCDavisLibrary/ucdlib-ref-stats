@@ -71,6 +71,13 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     } else {
       d.submitted_by = token.id;
     }
+
+    const userData = await models.libraryIam.getUserById(token.id);
+    if ( userData.error ) {
+      logger.error('Unable to get user data from Library IAM', req.context.logSignal, { error: userData.error });
+    } else {
+      d.group_id = userData.res?.groups?.find(g => g.partOfOrg)?.id || null;
+    }
     const r = await models.formEntry.create(form.form_id, d);
     if ( r.error ) {
       throw r.error;

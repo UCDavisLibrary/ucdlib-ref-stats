@@ -20,7 +20,8 @@ class Config {
         assignment: 'form_field_assignment',
         formEntry: 'form_entry',
         formEntryFieldValue: 'form_entry_field_value',
-        users: 'users'
+        users: 'users',
+        groups: 'groups'
       },
       views: {
         picklistWithItems: 'picklist_with_items',
@@ -30,17 +31,22 @@ class Config {
     }
 
     this.auth = {
-
-      // passed to the browser-side keycloak library initialization
       keycloakJsClient: {
-        url: this.getEnv('APP_KEYCLOAK_URL', 'https://auth.library.ucdavis.edu'),
-        realm: this.getEnv('APP_KEYCLOAK_REALM', 'internal'),
-        clientId: this.getEnv('APP_KEYCLOAK_CLIENT_ID', 'ref-stats-client')
+        url: this.getEnv('KEYCLOAK_URL', 'https://auth.library.ucdavis.edu'),
+        realm: this.getEnv('KEYCLOAK_REALM', 'internal'),
+        clientId: this.getEnv('KEYCLOAK_CLIENT_ID', 'ref-stats-client')
       },
-      oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile ucd-ids'),
-      serverCacheExpiration: this.getEnv('APP_SERVER_CACHE_EXPIRATION', '12 hours'),
-      serverCacheLruSize: this.getEnv('APP_SERVER_CACHE_LRU_SIZE', 5)
+      oidcScope: this.getEnv('KEYCLOAK_OIDC_SCOPE', 'profile ucd-ids'),
+      serverCacheExpiration: this.getEnv('KEYCLOAK_SERVER_CACHE_EXPIRATION', '12 hours'),
+      serverCacheLruSize: this.getEnv('KEYCLOAK_SERVER_CACHE_LRU_SIZE', 5)
     };
+
+    this.libraryIam = {
+      url: this.getEnv('UCDLIB_PERSONNEL_API_USER_URL', 'https://iam.staff.library.ucdavis.edu/json'),
+      user: this.getEnv('UCDLIB_PERSONNEL_API_USER', ''),
+      key: this.getEnv('UCDLIB_PERSONNEL_API_KEY', ''),
+      serverCacheExpiration: this.getEnv('UCDLIB_PERSONNEL_API_CACHE_EXPIRATION', '12 hours')
+    }
   }
 
   /**

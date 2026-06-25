@@ -18,14 +18,14 @@ class AuthService extends BaseService {
   }
 
   async cacheToken(){
-    let ido = {action: 'cache-token'};
+    let ido = {action: 'user-data'};
     let id = payload.getKey(ido);
-    const store = this.store.data.cacheToken;
+    const store = this.store.data.user;
 
     await this.checkRequesting(
       id, store,
       () => this.request({
-        url : `${this.baseUrl}/set-cache`,
+        url : `${this.baseUrl}/user-data`,
         checkCached : () => store.get(id),
         onUpdate : resp => this.store.set(
           payload.generate(ido, resp),
@@ -34,13 +34,13 @@ class AuthService extends BaseService {
       })
     );
 
-    return this.store.data.cacheToken.get(id);
+    return store.get(id);
   }
 
   async clearTokenServerCache(){
     let ido = {action: 'clear-token-cache'};
     let id = payload.getKey(ido);
-    const store = this.store.data.cacheToken;
+    const store = this.store.data.user;
 
     await this.checkRequesting(
       id, store,
@@ -54,7 +54,7 @@ class AuthService extends BaseService {
       })
     );
 
-    return this.store.data.cacheToken.get(id);
+    return store.get(id);
   }
 
 }

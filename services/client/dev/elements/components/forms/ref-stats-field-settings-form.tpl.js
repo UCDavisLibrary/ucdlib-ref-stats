@@ -19,6 +19,7 @@ export function render() {
   const isTextOrNumber = isText || isNumber;
   const isSelectOrTypeahead = t === 'select' || t === 'typeahead';
   const isPicklist = ['select', 'typeahead', 'radio', 'checkbox-multiple'].includes(t);
+  const isDate = t === 'date';
 
   return html`
     <fieldset>
@@ -133,6 +134,26 @@ export function render() {
           .checked=${!!this.payload?.allowQuickAdd}
           @input=${() => this._onPayloadInput('allowQuickAdd', !this.payload?.allowQuickAdd)}>
         <label for=${this.ctl.idGen.get('allowQuickAdd')}>Allow picklist item creation</label>
+      </cork-field-container>
+    </fieldset>
+
+    <fieldset>
+      <legend>Default Value</legend>
+      <cork-field-container class='field-container checkbox' ?hidden=${!isDate}>
+        <input
+          type="checkbox"
+          id=${this.ctl.idGen.get('defaultValueToday')}
+          .checked=${this.payload?.defaultValue === 'today'}
+          @input=${() => this._onPayloadInput('defaultValue', this.payload?.defaultValue === 'today' ? undefined : 'today')}>
+        <label for=${this.ctl.idGen.get('defaultValueToday')}>Default to today's date</label>
+      </cork-field-container>
+      <cork-field-container class='field-container' ?hidden=${isDate}>
+        <label for=${this.ctl.idGen.get('defaultValue')}>Default Value</label>
+        <input
+          type="text"
+          id=${this.ctl.idGen.get('defaultValue')}
+          .value=${this.payload?.defaultValue || ''}
+          @input=${e => this._onPayloadInput('defaultValue', e.target.value || undefined)}>
       </cork-field-container>
     </fieldset>
   `;

@@ -2,8 +2,9 @@
 CREATE TABLE IF NOT EXISTS form_entry (
   form_entry_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   form_id UUID NOT NULL REFERENCES form(form_id) ON DELETE CASCADE,
-  submitted_by VARCHAR(200) REFERENCES users(user_id),
-  impersonated_by VARCHAR(200) REFERENCES users(user_id),
+  submitted_by VARCHAR(200) REFERENCES users(user_id) ON DELETE SET NULL,
+  impersonated_by VARCHAR(200) REFERENCES users(user_id) ON DELETE SET NULL,
+  group_id INTEGER REFERENCES groups(group_id) ON DELETE SET NULL,
   original_form_entry_id UUID REFERENCES form_entry(form_entry_id) ON DELETE SET NULL,
   is_latest_version BOOLEAN NOT NULL DEFAULT TRUE,
   created_at timestamp NOT NULL DEFAULT now()
@@ -152,6 +153,12 @@ SELECT
       'email',      imp_user.email
     )
   END AS impersonated_by_user,
+  CASE WHEN grp.group_id IS NOT NULL THEN
+    jsonb_build_object(
+      'group_id', grp.group_id,
+      'name',     grp.name
+    )
+  END AS "group",
   fe.original_form_entry_id,
   fe.is_latest_version,
   cv.versions,
@@ -165,6 +172,7 @@ JOIN form f
   ON f.form_id = fe.form_id
 LEFT JOIN users sub_user ON sub_user.user_id = fe.submitted_by
 LEFT JOIN users imp_user ON imp_user.user_id = fe.impersonated_by
+LEFT JOIN groups grp ON grp.group_id = fe.group_id
 LEFT JOIN chain_versions cv
   ON cv.chain_id = COALESCE(fe.original_form_entry_id, fe.form_entry_id)
 LEFT JOIN form_entry_field_value fev
@@ -182,6 +190,7 @@ GROUP BY
   fe.impersonated_by,
   sub_user.user_id, sub_user.first_name, sub_user.last_name, sub_user.email,
   imp_user.user_id, imp_user.first_name, imp_user.last_name, imp_user.email,
+  grp.group_id, grp.name,
   fe.original_form_entry_id,
   fe.is_latest_version,
   cv.versions;

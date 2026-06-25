@@ -2,6 +2,7 @@ import {BaseModel} from '@ucd-lib/cork-app-utils';
 import AuthStore from '../stores/AuthStore.js';
 import AuthService from '../services/AuthService.js';
 import config from '../../app-config.js';
+import payload from '../utils/payload.js';
 
 import Keycloak from 'keycloak-js';
 
@@ -33,6 +34,33 @@ class AuthModel extends BaseModel {
   }
 
   /**
+   * @description Returns current user data from library IAM API
+   */
+  get userData(){
+    const d = this.store.data.user.get(payload.getKey({action: 'user-data'}));
+    return d?.payload?.userData;
+  }
+
+  /**
+   * @description Returns the department of the current user from library IAM API
+   * @returns {Object} - group object from library IAM API
+   */
+  get userDepartment(){
+    return this.userData?.groups?.find(g => g.partOfOrg);
+  }
+
+  /**
+   * @description Checks if the current user is in a specific group
+   * @param {String|Array} groupId - Group ID or array of group IDs to check
+   * @returns {Boolean}
+   */
+  userIsInGroup(groupId){
+    if ( !Array.isArray(groupId) ) groupId = [groupId];
+    groupId = groupId.map(Number);
+    return this.userData?.groups?.some(g => groupId.includes(g.id));
+  }
+
+  /**
    * @description Initializes the keycloak client and sets up listeners for auth events.
    * @param {Array} mainAppElementDefinition - Args to pass to customElements.define for the main app element after successful auth
    * @returns
@@ -58,7 +86,11 @@ class AuthModel extends BaseModel {
         clearInterval(this.loginCheckInterval);
       }
       this.loginCheckInterval = setInterval(async () => {
-        this.client.updateToken(this.tokenRefreshRate);
+        try {
+          await this.client.updateToken(this.tokenRefreshRate);
+        } catch (e) {
+          this.logout();
+        }
       }, this.loginCheckRefreshRate );
 
       this._onAuthRefreshSuccess();

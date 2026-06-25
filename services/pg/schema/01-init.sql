@@ -25,7 +25,7 @@ end;
 $$
 language plpgsql;
 
-CREATE TABLE cache (
+CREATE TABLE IF NOT EXISTS cache (
     id SERIAL PRIMARY KEY,
     type VARCHAR(100),
     query TEXT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE cache (
 );
 COMMENT ON TABLE cache IS 'Cache table for storing http requests and other data';
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS  users (
     user_id VARCHAR(200) PRIMARY KEY,
     first_name TEXT,
     last_name TEXT,
@@ -43,3 +43,11 @@ CREATE TABLE users (
     created timestamp DEFAULT NOW()
 );
 COMMENT ON TABLE users IS 'Table for storing user information. Set when a user logs in';
+
+CREATE TABLE IF NOT EXISTS groups (
+    group_id integer PRIMARY KEY,
+    name TEXT NOT NULL,
+    created timestamp DEFAULT NOW(),
+    is_archived BOOLEAN DEFAULT FALSE NOT NULL
+);
+COMMENT ON TABLE groups IS 'Table for storing group information set from ucdlib iam database';

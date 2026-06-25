@@ -2,7 +2,7 @@ import { srValidateFormId } from './form.js';
 import { srValidateFieldId } from './field.js';
 import * as z from "zod";
 import models from '#models';
-import { requiredString } from "./utils.js";
+import { requiredString, toSafeHtml } from "./utils.js";
 import logger from '#lib/logger.js';
 
 /**
@@ -45,9 +45,10 @@ const assignmentSchema = z.object({
     placeholder: z.string().optional(),
     rows: z.number().int().optional(),
     noFieldContainer: z.boolean().optional(),
-    description: z.string().optional(),
+    description: toSafeHtml.pipe(z.string().max(1000)).optional(),
     label: z.string().optional(),
-    allowQuickAdd: z.boolean().optional()
+    allowQuickAdd: z.boolean().optional(),
+    defaultValue: z.string().optional()
   }).optional()
 }).superRefine(srValidateFormId).superRefine(srValidateFieldId).superRefine(srValidateAssignmentExists);
 

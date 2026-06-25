@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString, requiredEnum, requiredNumber } from "./utils.js";
+import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString, requiredEnum, requiredNumber, toSafeHtml } from "./utils.js";
 import models from '#models';
 import logger from '#lib/logger.js';
 import definitions from '#lib/definitions.js';
@@ -69,6 +69,7 @@ const srValidateFormId = async (data, ctx) => {
 
 const formBaseSchema = z.object({
   description: toString.pipe(z.string().max(300)).optional(),
+  intro: toSafeHtml.pipe(z.string().max(1000)).optional(),
   label: requiredString().pipe(z.string().max(250)),
   is_archived: z.boolean().optional(),
   edit_interval_amount: requiredNumber().pipe(z.number().int().min(0)),

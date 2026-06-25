@@ -1,5 +1,6 @@
 import { html } from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 /**
  * @description Renders a ref-stats-picklist-item-quick-add element when allowQuickAdd is enabled.
@@ -50,7 +51,7 @@ function checkboxMulti(ctl) {
                 ${item.label}
               </label>
             </div>
-            <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+            <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
           </div>
           `)}
       </fieldset>
@@ -84,7 +85,7 @@ function radio(ctl) {
                 ${item.label}
               </label>
             </div>
-            <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+            <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
           </div>
           `)}
       </fieldset>
@@ -152,7 +153,7 @@ function checkbox(ctl){
           ${this._label}
         </label>
       </cork-field-container>
-      <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </div>
   `;
 }
@@ -179,7 +180,7 @@ function number(ctl) {
         step=${ifDefined(this._step)}
         placeholder=${ifDefined(this._placeholder)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value ? Number(e.target.value) : null)}>
-      <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
   `;
 }
@@ -202,7 +203,7 @@ function text(ctl) {
         ?required=${this._required}
         placeholder=${ifDefined(this._placeholder)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
-      <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
   `;
 }
@@ -226,7 +227,7 @@ function textarea(ctl) {
         rows=${ifDefined(this._rows)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
       </textarea>
-      <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
   `;
 }
@@ -252,7 +253,7 @@ function date(ctl) {
         min=${ifDefined(this._min)}
         max=${ifDefined(this._max)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
-      <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
   `;
 }
@@ -278,7 +279,7 @@ function datetime(ctl) {
         min=${ifDefined(this._min)}
         max=${ifDefined(this._max)}
         @input=${(e) => ctl.setPayloadField(field.name, e.target.value)}>
-      <div class='field-description' ?hidden=${!this._description}>${this._description}</div>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
   `;
 }

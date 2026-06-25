@@ -54,6 +54,14 @@ export function render() {
           rows="4"
           @input=${e => this._onPayloadInput('description', e.target.value)}></textarea>
       </cork-field-container>
+      <cork-field-container schema='form' path='intro' class='field-container'>
+        <label for=${this.ctl.idGen.get('intro')}>Intro</label>
+        <textarea
+          id=${this.ctl.idGen.get('intro')}
+          .value=${this.payload?.intro || ''}
+          rows="4"
+          @input=${e => this._onPayloadInput('intro', e.target.value)}></textarea>
+      </cork-field-container>
       <cork-field-container schema='form' path='is_archived' class='field-container checkbox'>
         <input 
           type="checkbox" 

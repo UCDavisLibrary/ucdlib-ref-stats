@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toString } from "./utils.js";
+import { requiredString, urlFriendlyString, pageParam, perPageParam, booleanParam, toSafeHtml } from "./utils.js";
 import models from '#models';
 import definitions from '#lib/definitions.js';
 import logger from '#lib/logger.js';
@@ -127,7 +127,7 @@ const srValidateFieldId = async (data, ctx) => {
 }
 
 const fieldBaseSchema = z.object({
-  description: toString.pipe(z.string().max(300)).optional(),
+  description: toSafeHtml.pipe(z.string().max(1000)).optional(),
   label: requiredString().pipe(z.string().max(250)),
   field_type: fieldTypeEnum,
   picklist_id: z.string().uuid().nullish(),

@@ -1,4 +1,10 @@
 import * as z from "zod";
+import sanitizeHtml from 'sanitize-html';
+
+const SAFE_HTML_OPTIONS = {
+  allowedTags: ['p', 'a', 'strong', 'em', 'ul', 'ol', 'li', 'br'],
+  allowedAttributes: { a: ['href', 'target'] }
+};
 
 /**
  * @description Returns "Required" validation message if value is null/undefined/empty
@@ -162,6 +168,16 @@ export const perPageParam = (defaultValue = 15, maxValue = 100) =>
       .positive("per_page must be a positive integer")
       .max(maxValue, `per_page must be ≤ ${maxValue}`)
   );
+
+/**
+ * @description Zod preprocess that sanitizes HTML to a safe subset of tags before storing.
+ * Coerces null/undefined to empty string, strips disallowed tags/attributes.
+ * Use in place of `toString` for fields that accept basic HTML.
+ */
+export const toSafeHtml = z.preprocess(
+  v => sanitizeHtml(v == null ? '' : String(v), SAFE_HTML_OPTIONS),
+  z.string()
+);
 
 /**
  * @description Coerces 'true'/'false' string query params to booleans. Optional — passes through undefined.

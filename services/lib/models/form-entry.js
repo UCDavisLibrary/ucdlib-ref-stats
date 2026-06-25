@@ -102,11 +102,13 @@ class FormEntry {
         form_id: formId, 
         original_form_entry_id: data.original_form_entry_id || null,
         submitted_by: data.submitted_by || null,
-        impersonated_by: data.impersonated_by || null
+        impersonated_by: data.impersonated_by || null,
+        group_id: data.group_id || null
       });
       delete data.original_form_entry_id;
       delete data.submitted_by;
       delete data.impersonated_by;
+      delete data.group_id;
       const sql = `INSERT INTO ${config.db.tables.formEntry} (${d.keysString}) VALUES (${d.placeholdersString}) RETURNING form_entry_id;`;
       const result = await client.query(sql, d.values);
       const formEntryId = result.rows[0].form_entry_id;

@@ -8,7 +8,7 @@ class AuthStore extends BaseStore {
     super();
 
     this.data = {
-      cacheToken: new LruStore({name: 'auth.cache-token'}),
+      user: new LruStore({name: 'auth.user'}),
     };
 
     this.token = new AccessToken();

@@ -19,7 +19,7 @@ export default (app) => {
   logger.info(`Serving static assets from ${assetsDir}`);
 
   const routes = ['picklist', 'field', 'form-admin', 'form'];
-  const appTitle = 'Reference Statistics';
+  const appTitle = 'Public Services Statistics';
 
   spaMiddleware({
     app,

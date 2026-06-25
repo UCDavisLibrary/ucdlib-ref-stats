@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS form (
   name VARCHAR(255) NOT NULL UNIQUE,
   label TEXT,
   description TEXT,
+  intro TEXT,
   form_display_settings JSONB NOT NULL DEFAULT '{}'::JSONB,
   edit_interval_amount INTEGER NOT NULL DEFAULT 0,
   edit_interval_unit VARCHAR(20) NOT NULL DEFAULT 'days',
