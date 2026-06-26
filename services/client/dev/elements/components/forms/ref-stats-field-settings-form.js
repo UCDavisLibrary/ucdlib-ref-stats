@@ -35,7 +35,8 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
       assignmentSettings: { type: Object },
       payload: { type: Object },
       customValidation: { state: true },
-      hasCustomTemplate: { state: true }
+      hasCustomTemplate: { state: true },
+      groups: { state: true }
     }
   }
 
@@ -56,6 +57,7 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
     this.payload = {};
     this.customValidation = false;
     this.hasCustomTemplate = false;
+    this.groups = [];
 
     this.ctl = {
       modal: new ModalFormController(this, { submitCallback: '_onSubmitClick' }),
@@ -63,6 +65,15 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
     };
 
     this._injectModel('FieldModel', 'AppStateModel');
+  }
+
+  /**
+   * @description Fetches the list of Library IAM groups for the group restriction selector.
+   */
+  async connectedCallback() {
+    super.connectedCallback();
+    const r = await this.FieldModel.getGroups();
+    if ( r.state === 'loaded' ) this.groups = r.payload;
   }
 
   /**

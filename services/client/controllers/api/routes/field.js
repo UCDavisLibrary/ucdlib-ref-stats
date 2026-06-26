@@ -52,7 +52,7 @@ const transformPayload = (req, res, next) => {
 }
 
 // create field
-router.post('/', protect('hasAdminAccess'), json(), transformPayload, validate(schema.fieldCreate, {reqParts: ['body']}), async (req, res) => {
+router.post('/', protect('hasManagerAccess'), json(), transformPayload, validate(schema.fieldCreate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Field validated', req.context.logSignal);
     const r = await models.field.create(req.payload);
@@ -66,7 +66,7 @@ router.post('/', protect('hasAdminAccess'), json(), transformPayload, validate(s
   }
 });
 
-router.patch('/', protect('hasAdminAccess'), json(), transformPayload, validate(schema.fieldUpdate, {reqParts: ['body']}), async (req, res) => {
+router.patch('/', protect('hasManagerAccess'), json(), transformPayload, validate(schema.fieldUpdate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Field update validated', req.context.logSignal, {fieldId: req.payload.form_field_id});
     const r = await models.field.patch(req.payload.form_field_id, req.payload);

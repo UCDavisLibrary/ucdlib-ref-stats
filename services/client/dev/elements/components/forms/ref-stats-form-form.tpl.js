@@ -102,7 +102,7 @@ export function render() {
       </div>
       <div>
         <button type="submit" class='btn btn--primary'>${isEdit ? 'Save Changes' : 'Create Form'}</button>
-        <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest}>Delete</button>
+        <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest} ?disabled=${!this.AuthModel.token?.hasAdminAccess}>Delete</button>
       </div>
     </form>
   `;}

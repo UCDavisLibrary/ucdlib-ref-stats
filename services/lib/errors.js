@@ -6,3 +6,10 @@ export class MissingResourceError extends Error {
     this.identifier = identifier;
   }
 }
+
+export class AuthorizationError extends Error {
+  constructor(message) {
+    super(message || "Not authorized to access this resource.");
+    this.name = "AuthorizationError";
+  }
+}

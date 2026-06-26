@@ -129,7 +129,7 @@ const instructionStatsUpdate = instructionStatsBase.extend({
  * @returns {import('zod').ZodType}
  */
 export function buildDynamicFormEntrySchema(fields, opts = {}) {
-  const { isUpdate = false, baseSchema = null, formId = null } = opts;
+  const { isUpdate = false, baseSchema = null, formId = null, userGroupIds = null } = opts;
   const coveredKeys = baseSchema ? Object.keys(baseSchema.shape) : [];
   const extraShape = {};
 
@@ -142,6 +142,12 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
     const settings = formId
       ? (field.forms?.find(f => f.form_id === formId)?.assignment_settings || {})
       : {};
+
+    if (settings.conditionalOnGroup?.length && userGroupIds !== null) {
+      const userGids = userGroupIds.map(Number);
+      if (!settings.conditionalOnGroup.some(gid => userGids.includes(Number(gid)))) continue;
+    }
+
     const req = settings.required === true;
     const multiple = settings.multiple === true;
 

@@ -4,6 +4,8 @@ import {render, styles} from "./ref-stats-page-form-admin-single.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
+import { AdminPageController } from '#controllers';
+
 /**
  * @description Admin page element for creating or editing a single reference-stats form.
  * Resolves the form from the URL path and handles post-save navigation.
@@ -33,6 +35,10 @@ export default class RefStatsPageFormAdminSingle extends Mixin(LitElement)
 
     this.nameOrId = null;
     this.data = {};
+
+    this.ctl = {
+      adminPage : new AdminPageController(this)
+    }
 
     this._injectModel('AppStateModel', 'FormModel');
   }

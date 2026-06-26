@@ -1,5 +1,5 @@
 import logger from '#lib/logger.js';
-// import { MissingResourceError } from '../../../../lib/errors.js';
+import { AuthorizationError } from '#lib/errors.js';
 
 /**
  * @description Sends a JSON error response. Maps known error codes to HTTP status codes.
@@ -11,12 +11,13 @@ import logger from '#lib/logger.js';
 function handleError(res, req, error, details) {
   logger.error('Error in request', req.context.logSignal, {error});
 
-  // if ( error instanceof MissingResourceError ) {
-  //   return res.status(404).json({ error: error.message });
-  // }
   let status = 500;
   if ( error.code === 'P4040' ) {
     status = 404;
+  }
+
+  if ( error instanceof AuthorizationError ) {
+    status = 403;
   }
 
   res.status(status).json({

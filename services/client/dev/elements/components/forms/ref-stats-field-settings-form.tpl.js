@@ -135,10 +135,7 @@ export function render() {
           @input=${() => this._onPayloadInput('allowQuickAdd', !this.payload?.allowQuickAdd)}>
         <label for=${this.ctl.idGen.get('allowQuickAdd')}>Allow picklist item creation</label>
       </cork-field-container>
-    </fieldset>
 
-    <fieldset>
-      <legend>Default Value</legend>
       <cork-field-container class='field-container checkbox' ?hidden=${!isDate}>
         <input
           type="checkbox"
@@ -147,6 +144,7 @@ export function render() {
           @input=${() => this._onPayloadInput('defaultValue', this.payload?.defaultValue === 'today' ? undefined : 'today')}>
         <label for=${this.ctl.idGen.get('defaultValueToday')}>Default to today's date</label>
       </cork-field-container>
+
       <cork-field-container class='field-container' ?hidden=${isDate}>
         <label for=${this.ctl.idGen.get('defaultValue')}>Default Value</label>
         <input
@@ -154,6 +152,22 @@ export function render() {
           id=${this.ctl.idGen.get('defaultValue')}
           .value=${this.payload?.defaultValue || ''}
           @input=${e => this._onPayloadInput('defaultValue', e.target.value || undefined)}>
+      </cork-field-container>
+
+      <cork-field-container class='field-container'>
+        <label>Restrict to Groups</label>
+        <p class='field-description u-space-mt--flush'>If one or more groups are selected, only members of those groups will see this field.</p>
+        <ucd-theme-slim-select
+          @change=${e => this._onPayloadInput('conditionalOnGroup', e.detail?.length ? e.detail.map(o => Number(o.value)) : undefined)}>
+          <select multiple>
+            ${(this.groups || []).map(g => html`
+              <option value=${g.id}
+                ?selected=${(this.payload?.conditionalOnGroup || []).includes(g.id)}>
+                ${g.name}
+              </option>
+            `)}
+          </select>
+        </ucd-theme-slim-select>
       </cork-field-container>
     </fieldset>
   `;

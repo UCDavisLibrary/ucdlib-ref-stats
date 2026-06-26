@@ -86,7 +86,7 @@ export function render() {
       <ref-stats-picklist-items-form .items=${items} .disableMoveButtons=${this.payload?.sort_alpha || false}></ref-stats-picklist-items-form>
       <div ?hidden=${this.ctl.modal.modal}>
         <button type="submit" class='btn btn--primary'>${isEdit ? 'Save Changes' : 'Create Picklist'}</button>
-        <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest}>Delete</button>
+        <button type="button" class='btn btn--invert' @click=${this._onDeleteRequest} ?disabled=${!this.AuthModel.token?.hasAdminAccess}>Delete</button>
       </div>
     </form>
   `;

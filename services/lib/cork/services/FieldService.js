@@ -180,6 +180,35 @@ class FieldService extends BaseService {
   }
 
   /**
+   * @description Retrieves all active groups from the Library IAM API (via server cache).
+   * @param {object} opts
+   * @param {boolean} opts.clearCache - If true, instructs the server to bust its group cache before responding. Only takes effect for admin users.
+   * @returns {Promise<object>} Store state object for the request.
+   */
+  async getGroups(opts={}) {
+    const ido = { action: 'all'};
+    const q = {};
+    if ( opts.clearCache ) {
+      ido['clearCache']= true;
+      q['clear-cache'] = true;
+    }
+    const id = payload.getKey(ido);
+    const store = this.store.data.groups;
+    await this.checkRequesting(id, store, () => this.request({
+      url: '/api/assignment/groups',
+      qs: q,
+      checkCached: opts.clearCache ? undefined : () => store.get(id),
+      onUpdate: resp => this.store.set(
+        { ...resp, id },
+        store,
+        null,
+        { errorSettings: { message: 'Unable to load groups' } }
+      )
+    }));
+    return store.get(id);
+  }
+
+  /**
    * @description Assigns, unassigns, archives, or unarchives a field on a form.
    * @param {object} data - Assignment payload including the action and target identifiers.
    * @returns {Promise<object>} Store state object for the request.

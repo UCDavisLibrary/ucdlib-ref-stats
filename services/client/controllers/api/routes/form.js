@@ -38,7 +38,7 @@ router.get('/:idOrName', async (req, res) => {
 });
 
 // create form
-router.post('/', protect('hasAdminAccess'), json(), validate(schema.formCreate, {reqParts: ['body']}), async (req, res) => {
+router.post('/', protect('hasManagerAccess'), json(), validate(schema.formCreate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Form validated', req.context.logSignal);
     const r = await models.form.create(req.payload);
@@ -52,7 +52,7 @@ router.post('/', protect('hasAdminAccess'), json(), validate(schema.formCreate, 
   }
 });
 
-router.patch('/', protect('hasAdminAccess'), json(), validate(schema.formUpdate, {reqParts: ['body']}), async (req, res) => {
+router.patch('/', protect('hasManagerAccess'), json(), validate(schema.formUpdate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Form update validated', req.context.logSignal, {formId: req.payload.form_id});
     const r = await models.form.patch(req.payload.form_id, req.payload);

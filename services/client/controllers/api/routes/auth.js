@@ -5,16 +5,30 @@ import handleError from '../utils/handleError.js';
 
 const router = Router();
 
+/**
+ * @description Clears the access token cache and user cache for the authenticated user.
+ * Called on app logout
+ */
 router.get('/clear-cache', async (req, res) => {
 
-  const response = await models.cache.delete('accessToken', req.auth.token.id);
-  const success = response.error ? false : true;
-  if ( !success ) console.error('Unable to clear access token cache: ', response.error);
+  const out = {}
+  const tokenCache = await models.cache.delete('accessToken', req.auth.token.id);
+  out.tokenCache = tokenCache.error ? false : true;
+  if ( !out.tokenCache ) logger.error('Unable to clear access token cache', req.context.logSignal, { error: tokenCache.error });
 
-  res.json({success});
+  const userCache = await models.libraryIam.clearUserCache(req.auth.token.id);
+  out.userCache = userCache.error ? false : true;
+  if ( !out.userCache ) logger.error('Unable to clear user cache', req.context.logSignal, { error: userCache.error });
+
+  res.json(out);
 
 });
 
+/**
+ * @description Gets user data from the Library IAM API for the authenticated user.
+ * And as a side effect, ensures the user and their groups are upserted into the database.
+ * This is the first API call the web app makes after a user logs in browser-side
+ */
 router.get('/user-data', async (req, res) => {
 
   try {
@@ -29,6 +43,8 @@ router.get('/user-data', async (req, res) => {
       throw r.error;
     }
     logger.info('User upsert successful', req.context.logSignal, { userId: r.res.user_id });
+
+    await models.libraryIam.getAllGroups(); // ensure all groups are in the database
 
     // ensure user department is in the database
     const userData = await models.libraryIam.getUserById(req.auth.token.id);

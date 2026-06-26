@@ -150,6 +150,16 @@ class FieldModel extends BaseModel {
   }
 
   /**
+   * @description Fetch all active Library IAM groups for use in the field settings form.
+   * @param {object} opts
+   * @param {boolean} opts.clearCache - If true, instructs the server to bust its group cache before responding. Only takes effect for admin users.
+   * @returns {Promise}
+   */
+  async getGroups(opts={}) {
+    return this.service.getGroups(opts);
+  }
+
+  /**
    * @description Update assignment_settings for a field-form assignment
    * @param {string} fieldId - form_field_id
    * @param {string} formId - form_id

@@ -51,11 +51,22 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
       }
     }
 
+    // fetch user IAM data upfront (cached) — needed for group-conditional field filtering and group_id assignment
+    let userGroupIds = [];
+    let userDepartmentGroupId = null;
+    const userData = await models.libraryIam.getUserById(token.id);
+    if ( userData.error ) {
+      logger.error('Unable to get user data from Library IAM', req.context.logSignal, { error: userData.error });
+    } else {
+      userGroupIds = (userData.res?.groups || []).map(g => g.id);
+      userDepartmentGroupId = userData.res?.groups?.find(g => g.partOfOrg)?.id || null;
+    }
+
     // build schema for field based on form definition and any hard-coded definitions
     const baseSchema = schema.formEntry?.[form.name]?.create || null;
     const fieldsResult = await models.field.query({ form: form.form_id, perPage: 1000 });
     if ( fieldsResult.error ) throw fieldsResult.error;
-    const entrySchema = buildDynamicFormEntrySchema(fieldsResult.res.results, { isUpdate, baseSchema, formId: form.form_id });
+    const entrySchema = buildDynamicFormEntrySchema(fieldsResult.res.results, { isUpdate, baseSchema, formId: form.form_id, userGroupIds });
 
     const validated = await entrySchema.safeParseAsync({...req.body, _formId: form.form_id});
     if ( !validated.success ) {
@@ -67,17 +78,13 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     const d = { ...validated.data };
     if ( isUpdate ){
       existingEntry.submitted_by = existingEntry.submitted_by;
+      existingEntry.group_id = existingEntry.group_id;
       existingEntry.impersonated_by = existingEntry.submitted_by !== token.id ? token.id : null;
     } else {
       d.submitted_by = token.id;
+      d.group_id = userDepartmentGroupId;
     }
 
-    const userData = await models.libraryIam.getUserById(token.id);
-    if ( userData.error ) {
-      logger.error('Unable to get user data from Library IAM', req.context.logSignal, { error: userData.error });
-    } else {
-      d.group_id = userData.res?.groups?.find(g => g.partOfOrg)?.id || null;
-    }
     const r = await models.formEntry.create(form.form_id, d);
     if ( r.error ) {
       throw r.error;

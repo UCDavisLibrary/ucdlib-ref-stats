@@ -85,6 +85,19 @@ class Assignment {
   }
 
   /**
+   * @description Checks that all given group IDs exist in the groups table.
+   * @param {Array} groupIds - Array of integer group IDs to validate
+   * @returns {Object} {res: true} if all exist, {res: false} if any are missing, or {error}
+   */
+  async groupsExist(groupIds) {
+    if (!groupIds?.length) return { res: true };
+    const sql = `SELECT COUNT(*)::int AS count FROM groups WHERE group_id = ANY($1::int[])`;
+    const r = await pgClient.query(sql, [groupIds]);
+    if (r.error) return r;
+    return { res: r.res.rows[0].count === groupIds.length };
+  }
+
+  /**
    * @description Remove a field from a form
    * @param {String} fieldId - The form field ID or name
    * @param {String} formId - The form ID or name

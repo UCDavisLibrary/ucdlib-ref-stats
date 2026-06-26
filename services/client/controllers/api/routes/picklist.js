@@ -66,7 +66,7 @@ router.patch('/:idOrName', json(), validate(schema.picklistIdOrNameSchema, {reqP
       throw picklist.error;
     }
     picklist = picklist.res;
-    if ( !token?.hasAdminAccess && !picklist.user_can_add_items ) {
+    if ( !token?.hasManagerAccess && !picklist.user_can_add_items ) {
       return res.status(403).json({ message: 'You do not have permission to update this picklist.' });
     }
     logger.info('Picklist update validated', req.context.logSignal, {picklistIdOrName: req.params.idOrName});
@@ -96,7 +96,7 @@ router.delete('/:idOrName', protect('hasAdminAccess'), validate(schema.picklistI
 });
 
 // create picklist
-router.post('/', protect('hasAdminAccess'), json(), validate(schema.picklistCreate, {reqParts: ['body']}), async (req, res) => {
+router.post('/', protect('hasManagerAccess'), json(), validate(schema.picklistCreate, {reqParts: ['body']}), async (req, res) => {
   try {
     logger.info('Picklist validated', {corkTraceId: req.corkTraceId});
     const r = await models.picklist.create(req.payload);

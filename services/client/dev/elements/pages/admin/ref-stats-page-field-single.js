@@ -4,7 +4,7 @@ import {render, styles} from "./ref-stats-page-field-single.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
-import { QueryStringController } from '#controllers';
+import { QueryStringController, AdminPageController } from '#controllers';
 
 
 /**
@@ -37,7 +37,8 @@ export default class RefStatsPageFieldSingle extends Mixin(LitElement)
     this.data = {};
 
     this.ctl = {
-      qs: new QueryStringController(this)
+      qs: new QueryStringController(this),
+      adminPage : new AdminPageController(this)
     }
 
     this._injectModel('AppStateModel', 'FieldModel');

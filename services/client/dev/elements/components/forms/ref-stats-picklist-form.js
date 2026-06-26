@@ -39,7 +39,7 @@ export default class RefStatsPicklistForm extends Mixin(LitElement)
       idGen : new IdGenerator()
     }
 
-    this._injectModel('PicklistModel', 'AppStateModel');
+    this._injectModel('PicklistModel', 'AppStateModel', 'AuthModel');
   }
 
   /**

@@ -35,6 +35,14 @@ export default class AccessToken {
   }
 
   /**
+   * @description Returns true if user has at least manager access to this client
+   */
+  get hasManagerAccess(){
+    if ( this.hasAdminAccess ) return true;
+    return this._inRoleList('manager', 'resource');
+  }
+
+  /**
    * @description Returns list of roles assigned to user for this client
    */
   get resourceAccessRoles(){

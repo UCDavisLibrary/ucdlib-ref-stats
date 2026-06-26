@@ -40,7 +40,7 @@ export default class RefStatsFormForm extends Mixin(LitElement)
       idGen : new IdGenerator()
     }
 
-    this._injectModel('AppStateModel', 'FormModel');
+    this._injectModel('AppStateModel', 'FormModel', 'AuthModel');
   }
 
   /**

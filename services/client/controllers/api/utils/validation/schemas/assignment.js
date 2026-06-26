@@ -6,6 +6,30 @@ import { requiredString, toSafeHtml } from "./utils.js";
 import logger from '#lib/logger.js';
 
 /**
+ * @description Zod superRefine callback — validates that all group IDs in conditionalOnGroup exist in the groups table.
+ * @param {Object} data - Validated assignment data
+ * @param {import('zod').RefinementCtx} ctx - Zod refinement context
+ */
+const srValidateGroupIds = async (data, ctx) => {
+  const ids = data.assignment_settings?.conditionalOnGroup;
+  if (!ids?.length) return;
+  const r = await models.libraryIam.getAllGroups();
+  if (r.error) {
+    logger.error('Error fetching IAM groups for validation', { error: r.error });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A server error occurred', fatal: true });
+    return;
+  }
+  const validIds = new Set((r.res || []).map(g => g.id));
+  if (!ids.every(id => validIds.has(id))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'One or more selected groups do not exist',
+      path: ['assignment_settings', 'conditionalOnGroup']
+    });
+  }
+};
+
+/**
  * @description Zod superRefine callback — validates that a field-form assignment exists for non-assign actions.
  * @param {Object} data - Validated assignment data
  * @param {import('zod').RefinementCtx} ctx - Zod refinement context
@@ -48,9 +72,10 @@ const assignmentSchema = z.object({
     description: toSafeHtml.pipe(z.string().max(1000)).optional(),
     label: z.string().optional(),
     allowQuickAdd: z.boolean().optional(),
-    defaultValue: z.string().optional()
+    defaultValue: z.string().optional(),
+    conditionalOnGroup: z.array(z.number().int()).optional()
   }).optional()
-}).superRefine(srValidateFormId).superRefine(srValidateFieldId).superRefine(srValidateAssignmentExists);
+}).superRefine(srValidateFormId).superRefine(srValidateFieldId).superRefine(srValidateAssignmentExists).superRefine(srValidateGroupIds);
 
 export {
   assignmentSchema

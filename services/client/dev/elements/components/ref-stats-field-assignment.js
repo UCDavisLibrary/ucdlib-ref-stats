@@ -59,7 +59,7 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
       appComponent : new AppComponentController(this),
     }
 
-    this._injectModel('AppStateModel', 'FormModel', 'FieldModel');
+    this._injectModel('AppStateModel', 'FormModel', 'FieldModel', 'AuthModel');
   }
 
   /**
@@ -204,7 +204,8 @@ export default class RefStatsFieldAssignment extends Mixin(LitElement)
     this.AppStateModel.showDialogModal({
       title: 'Remove Field from Form',
       content: () => html`
-        Are you sure you want to remove this field from the form? This will remove responses to this field in previous submissions.
+        <div ?hidden=${!this.AuthModel.token?.hasAdminAccess}>Are you sure you want to remove this field from the form? This will remove responses to this field in previous submissions.</div>
+        <div ?hidden=${this.AuthModel.token?.hasAdminAccess}>Since removing a field could have significant implications, only administrators can perform this action.</div>
       `,
       data: { fieldId, formId },
       actions: [

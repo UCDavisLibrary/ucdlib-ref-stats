@@ -17,7 +17,8 @@ export default class FormEntryController {
       FormEntryModel: Registry.getModel('FormEntryModel'),
       FormModel: Registry.getModel('FormModel'),
       FieldModel: Registry.getModel('FieldModel'),
-      PicklistModel: Registry.getModel('PicklistModel')
+      PicklistModel: Registry.getModel('PicklistModel'),
+      AuthModel: Registry.getModel('AuthModel')
     }
 
     this.appComponentController = new AppComponentController(host);
@@ -427,9 +428,23 @@ export default class FormEntryController {
   }
 
   /**
+   * @description Returns whether the given field should be visible to the current user,
+   * based on the conditionalOnGroup assignment setting. Returns true when no groups are
+   * configured (field is unrestricted) or when the user belongs to at least one listed group.
+   * @param {Object} field - Field object from this.fields
+   * @returns {Boolean}
+   */
+  fieldIsVisibleForUser(field) {
+    const assignment = field?.forms?.find(f => f.form_id === this.form?.form_id);
+    const conditionalOnGroup = assignment?.assignment_settings?.conditionalOnGroup;
+    if ( !conditionalOnGroup?.length ) return true;
+    return !!this.models.AuthModel.userIsInGroup(conditionalOnGroup);
+  }
+
+  /**
    * @description Build an initial payload for new submissions by applying any configured
    * default values from field assignment settings. Resolves the special keyword 'today'
-   * on date fields to the current date in YYYY-MM-DD format.
+   * on date fields to the current date in YYYY-MM-DD format. Skips fields hidden from the user.
    * @returns {Object} Default payload object
    */
   _getDefaultPayload(){
@@ -437,6 +452,7 @@ export default class FormEntryController {
     const formId = this.form?.form_id;
     if ( !formId ) return defaults;
     for ( const field of this.fields ) {
+      if ( !this.fieldIsVisibleForUser(field) ) continue;
       const assignment = field.forms?.find(f => f.form_id === formId);
       const defaultValue = assignment?.assignment_settings?.defaultValue;
       if ( !defaultValue ) continue;
