@@ -66,7 +66,7 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     const baseSchema = schema.formEntry?.[form.name]?.create || null;
     const fieldsResult = await models.field.query({ form: form.form_id, perPage: 1000 });
     if ( fieldsResult.error ) throw fieldsResult.error;
-    const entrySchema = buildDynamicFormEntrySchema(fieldsResult.res.results, { isUpdate, baseSchema, formId: form.form_id, userGroupIds });
+    const entrySchema = buildDynamicFormEntrySchema(fieldsResult.res.results, { isUpdate, baseSchema, formId: form.form_id, formName: form.name, userGroupIds });
 
     const validated = await entrySchema.safeParseAsync({...req.body, _formId: form.form_id});
     if ( !validated.success ) {

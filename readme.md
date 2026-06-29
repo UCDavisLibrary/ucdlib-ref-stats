@@ -9,5 +9,4 @@ todo:
 - health endpoint
 - manager role
 - form submitter roles, my forms, my submissions, department head view
-- custom validation for virtual session
 - reporting

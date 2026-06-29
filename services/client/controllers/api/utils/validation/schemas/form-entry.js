@@ -102,34 +102,73 @@ const querySchema = z.object({
   orderByField: z.string().optional().superRefine(srOrderByFieldExists)
 });
 
-const instructionStatsBase = z.object({
+/**
+ * @description Example of a fully custom (hardcoded) form entry schema.
+ * Use this pattern when a form's validation requirements are too complex or
+ * interdependent to express via the validation options present in the GUI.
+ *
+ * Steps to add a custom schema for a new form:
+ *   1. Register the form name and its custom-validated field names in
+ *      customValidationRegistry in services/lib/definitions.js.
+ *   2. Build a Zod schema below using definitions.customValidation(fieldName, formName)
+ *      as the key — this ensures the field is registered and prevents typos.
+ *   3. Add create/update entries to the default export at the bottom of this file.
+ *      buildDynamicFormEntrySchema will use the create schema as a baseSchema and
+ *      automatically extend it with any remaining dynamic fields.
+ */
+const exampleFormBase = z.object({
   '_formId': z.string(),
-  [definitions.customValidation('participant-count', 'instruction-statistics')]: requiredNumber(),
-  [definitions.customValidation('instructor-session-type', 'instruction-statistics')]: requiredString().superRefine(srPicklistItemsExist('instructor-session-type')),
-  [definitions.customValidation('department', 'instruction-statistics')]: requiredArray().superRefine(srPicklistItemsExist('department')),
-  [definitions.customValidation('date', 'instruction-statistics')]: requiredIsoDate()
+  [definitions.customValidation('example-field', 'example')]: requiredString()
 });
 
-
-const instructionStatsUpdate = instructionStatsBase.extend({
+const exampleFormUpdate = exampleFormBase.extend({
   'original_form_entry_id': z.uuid()
 }).superRefine(srOriginalFormEntryExists);
 
+
+/**
+ * @description Cross-field validation rules applied by buildDynamicFormEntrySchema.
+ * For when validation requirements depend on the values of multiple fields, which is not currently possible to express via the GUI.
+ * Each rule fires when all fields listed in `requires` are present in the schema.
+ * The optional `forms` array restricts the rule to specific form names; omit it to apply
+ * the rule to any form that has the required fields.
+ * @type {Array<{requires: string[], forms?: string[], refine: Function}>}
+ */
+const CROSS_FIELD_REFINEMENTS = [
+  {
+    requires: ['event-count', 'virtual-event-count'],
+    refine: (data, ctx) => {
+      const eventCount = data['event-count'];
+      const virtualCount = data['virtual-event-count'];
+      if (eventCount == null || virtualCount == null) return;
+      if (Number(virtualCount) > Number(eventCount)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Cannot exceed the total number of events/transactions (${eventCount})`,
+          path: ['virtual-event-count']
+        });
+      }
+    }
+  }
+];
 
 /**
  * @description Builds a Zod schema for form entry validation from field metadata.
  * When a baseSchema is provided (hardcoded create schema), only generates validators
  * for fields not already covered by it, then extends.
  * assignment_settings (required, multiple, min, max, step) are applied per field.
+ * Cross-field rules from CROSS_FIELD_REFINEMENTS are applied when their required fields are present.
  * @param {Array} fields - Field objects from models.field.query
  * @param {Object} opts
  * @param {boolean} opts.isUpdate - Whether this is an update operation
  * @param {import('zod').ZodObject|null} opts.baseSchema - Hardcoded create schema to extend, or null
  * @param {string|null} opts.formId - Form UUID used to look up per-form assignment_settings
+ * @param {string|null} opts.formName - Form name used to match CROSS_FIELD_REFINEMENTS form filters
+ * @param {Array|null} opts.userGroupIds - IAM group IDs for the current user, for conditional field filtering
  * @returns {import('zod').ZodType}
  */
 export function buildDynamicFormEntrySchema(fields, opts = {}) {
-  const { isUpdate = false, baseSchema = null, formId = null, userGroupIds = null } = opts;
+  const { isUpdate = false, baseSchema = null, formId = null, formName = null, userGroupIds = null } = opts;
   const coveredKeys = baseSchema ? Object.keys(baseSchema.shape) : [];
   const extraShape = {};
 
@@ -233,6 +272,17 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
     schema = z.object({ _formId: z.string(), ...extraShape });
   }
 
+  const allFieldKeys = new Set([
+    ...Object.keys(extraShape),
+    ...(baseSchema ? Object.keys(baseSchema.shape) : [])
+  ]);
+  for (const { requires, forms, refine } of CROSS_FIELD_REFINEMENTS) {
+    if (forms && formName && !forms.includes(formName)) continue;
+    if (requires.every(f => allFieldKeys.has(f))) {
+      schema = schema.superRefine(refine);
+    }
+  }
+
   if (isUpdate) {
     schema = schema.extend({ original_form_entry_id: z.uuid() }).superRefine(srOriginalFormEntryExists);
   }
@@ -243,8 +293,8 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
 export default {
   'query': querySchema,
 
-  'instruction-statistics': {
-    'create': instructionStatsBase,
-    'update': instructionStatsUpdate
+  'example': {
+    'create': exampleFormBase,
+    'update': exampleFormUpdate
   }
 };

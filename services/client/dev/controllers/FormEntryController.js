@@ -477,12 +477,15 @@ export default class FormEntryController {
   }
 
   /**
-   * @description Handle app-state-update events — refresh form data and reset payload when on the active page
+   * @description Handle app-state-update events — refresh form data on all host types when on the active page.
+   * Payload reset only runs for the form host; field hosts call update() so their this.form reference
+   * stays current when Lit reuses their DOM node across form navigations.
    * @param {Object} e - Application state event data
    */
   async _onAppStateUpdate(e) {
-    if ( !this.hostIsForm || !this.appComponentController.isOnActivePage ) return;
+    if ( !this.appComponentController.isOnActivePage ) return;
     await this.update(e);
+    if ( !this.hostIsForm ) return;
     if ( this.formEntry?.fields ) {
       this.setPayload({...this.formEntry.fields});
     } else {

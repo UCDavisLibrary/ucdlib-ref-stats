@@ -22,7 +22,10 @@ class Definitions {
     ];
 
     this.customValidationRegistry = {
-      'instruction-statistics': ['participant-count', 'instructor-session-type', 'department', 'date']
+      // Example: register field names here for any form that needs a fully custom schema.
+      // Fields listed here can then be used with definitions.customValidation(fieldName, formName)
+      // in services/client/controllers/api/utils/validation/schemas/form-entry.js.
+      'example': ['example-field']
     };
 
     this.formEditIntervalUnits = [

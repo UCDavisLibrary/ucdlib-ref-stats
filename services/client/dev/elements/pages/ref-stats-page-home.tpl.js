@@ -1,5 +1,7 @@
 import { html, css } from 'lit';
 
+import '#components/ref-stats-user-form-teasers.js';
+
 export function styles() {
   const elementStyles = css`
     ref-stats-page-home {
@@ -13,7 +15,7 @@ export function styles() {
 export function render() { 
   return html`
     <div class='l-container u-space-mt--large'>
-      <h1>Home Page</h1>
+      <ref-stats-user-form-teasers></ref-stats-user-form-teasers>
     </div>
   `;
 }

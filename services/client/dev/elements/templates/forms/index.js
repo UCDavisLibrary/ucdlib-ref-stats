@@ -1,5 +1,5 @@
-import instructionStatistics from './instruction-statistics.js';
+import example from './example.js';
 
 export default [
-  instructionStatistics
+  example
 ];

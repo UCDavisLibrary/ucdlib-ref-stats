@@ -2,6 +2,7 @@ import { html, css } from 'lit';
 import './ref-stats-entry-query-fields-form.js';
 
 import definitions from '#lib/definitions.js';
+import { categoryBrands } from '@ucd-lib/theme-sass/colors.js';
 
 const hiddenIntervalUnits = definitions.formEditIntervalUnits.filter(unit => unit.hideAmount).map(unit => unit.value);
 
@@ -70,6 +71,18 @@ export function render() {
           @input=${() => this._onPayloadInput('is_archived', !this.payload?.is_archived)}>
         <label for=${this.ctl.idGen.get('is_archived')}>Archived</label>
       </cork-field-container>
+      <cork-field-container schema='form' path='brandColor' class='field-container'>
+        <label for=${this.ctl.idGen.get('brandColor')}>Brand Color</label>
+        <select
+          id=${this.ctl.idGen.get('brandColor')}
+          .value=${this.payload?.form_display_settings?.brandColor || ''}
+          @input=${e => this._onDisplaySettingsInput('brandColor', e.target.value)}>
+          <option value="">None</option>
+          ${Object.values(categoryBrands).map(c => html`
+            <option value=${c.id}>${c.title}</option>
+          `)}
+        </select>
+      </cork-field-container>
       <fieldset>
         <legend>Edit Interval</legend>
         <p>How long after submission should users be able to edit the form?</p>
@@ -97,7 +110,7 @@ export function render() {
       <div ?hidden=${isNew}>
         <ref-stats-entry-query-fields-form
           class='u-space-mb--large'
-          @ref-stats-entry-query-fields-updated=${e => this._onPayloadInput('form_display_settings', { queryElementFields: e.detail.fields })}>
+          @ref-stats-entry-query-fields-updated=${e => this._onDisplaySettingsInput('queryElementFields', e.detail.fields)}>
         </ref-stats-entry-query-fields-form>
       </div>
       <div>

@@ -89,7 +89,8 @@ const formUpdateSchema = formBaseSchema.partial().extend({
       label: z.string().optional(),
       desktopFr: z.number().optional(),
       mobileFr: z.number().optional(),
-    })).optional()
+    })).optional(),
+    brandColor: z.string().optional()
   }).optional()
 })
 .superRefine(srValidateFormId);
@@ -118,7 +119,9 @@ const formIdOrNameSchema = z.object({
 const formQuerySchema = z.object({
   page: pageParam,
   per_page: perPageParam(15),
-  q: z.string().max(250).optional()
+  q: z.string().max(250).optional(),
+  active_only: booleanParam,
+  name: z.string().optional()
 });
 
 export {

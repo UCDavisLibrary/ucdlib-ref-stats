@@ -24,6 +24,22 @@ class Form {
       where.push(`label ILIKE $${values.length}`);
     }
 
+    if ( params.name ) {
+      let name = (Array.isArray(params.name) ? params.name : params.name.split(','))
+        .map(n => n.trim())
+        .filter(n => n.length > 0)
+        .map(n => n.toLowerCase());
+      if ( name.length ) {
+        values.push(name);
+        where.push(`LOWER(name) = ANY($${values.length})`);
+      }
+    }
+
+    if ( params.active_only ) {
+      values.push(false);
+      where.push(`is_archived = $${values.length}`);
+    }
+
     const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const sql = `
       SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.tables.form} f

@@ -1,4 +1,5 @@
 import { html, css } from 'lit';
+import config from '#lib/app-config.js';
 
 export function styles() {
   const elementStyles = css`
@@ -40,7 +41,7 @@ function renderHeader(){
     <ucd-theme-header>
       <ucdlib-branding-bar
         site-name="UC Davis Library"
-        slogan="Reference Statistics">
+        slogan=${config?.title || ''}>
         <a href='/logout'>Logout</a>
       </ucdlib-branding-bar>
 

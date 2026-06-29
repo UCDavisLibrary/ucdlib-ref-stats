@@ -43,6 +43,13 @@ export default class AccessToken {
   }
 
   /**
+   * @description Returns list of form names for which user has access to this client
+   */
+  get forms(){
+    return this.resourceAccessRoles.filter(r => r.startsWith('form--')).map(r => r.replace('form--', ''));
+  }
+
+  /**
    * @description Returns list of roles assigned to user for this client
    */
   get resourceAccessRoles(){

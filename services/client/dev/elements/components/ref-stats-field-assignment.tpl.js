@@ -17,7 +17,9 @@ export function styles() {
     ref-stats-field-assignment .field-header {
       display: flex;
       align-items: center;
-      gap: .5rem;
+      row-gap: 0;
+      column-gap: .5rem;
+      flex-wrap: wrap;
     }
     ref-stats-field-assignment .field-header cork-icon-button {
       --cork-icon-button-size: 1.1rem;

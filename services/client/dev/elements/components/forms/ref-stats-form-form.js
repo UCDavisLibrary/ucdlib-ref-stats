@@ -101,6 +101,18 @@ export default class RefStatsFormForm extends Mixin(LitElement)
   }
 
   /**
+   * @description Updates a single key within form_display_settings and requests a re-render.
+   * Creates form_display_settings as an empty object if it does not yet exist.
+   * @param {String} key - The form_display_settings key to update.
+   * @param {*} value - The new value for the key.
+   */
+  _onDisplaySettingsInput(key, value) {
+    if ( !this.payload.form_display_settings ) this.payload.form_display_settings = {};
+    this.payload.form_display_settings[key] = value;
+    this.requestUpdate();
+  }
+
+  /**
    * @description Updates a single property on the payload and requests a re-render.
    * @param {String} prop - The payload property name to update.
    * @param {*} value - The new value for the property.

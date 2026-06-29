@@ -21,7 +21,7 @@ class AppStateModelImpl extends AppStateModel {
     this._errorVisible = false;
     this._showErrorTimer = null;
 
-    this.inject('ValidationModel');
+    this.inject('ValidationModel', 'AuthModel');
   }
 
   /**
@@ -30,6 +30,11 @@ class AppStateModelImpl extends AppStateModel {
    * @returns {*} Result of the parent set call
    */
   set(update) {
+    if ( this.AuthModel?.logOutRequested ){
+      this.showLoading();
+      this.AuthModel.logout();
+      return;
+    }
     if( update.location ) {
       update.lastPage = this.store.data.page;
       update.lastLocation = JSON.parse(JSON.stringify(this.store.data.location));
