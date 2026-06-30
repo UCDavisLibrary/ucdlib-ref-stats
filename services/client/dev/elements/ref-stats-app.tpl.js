@@ -46,6 +46,19 @@ function renderHeader(){
       </ucdlib-branding-bar>
 
       <ucd-theme-primary-nav>
+        ${this.forms?.length ? html`
+          <ul link-text="Forms">
+            ${this.forms.map(form => html`
+              <ul link-text=${form.label}>
+                <li><a href='/form/${form.name}'>New Submission</a></li>
+                <li><a href='/form/${form.name}/submissions'>View Submissions</a></li>
+                ${this.AuthModel?.token?.hasManagerAccess ? html`
+                  <li><a href='/form-admin/${form.name}'>Form Settings</a></li>
+                ` : html``}
+              </ul>
+              `)}
+          </ul>
+          ` : html``}
       </ucd-theme-primary-nav>
 
       <ucd-theme-quick-links

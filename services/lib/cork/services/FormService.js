@@ -94,6 +94,9 @@ class FormService extends BaseService {
    */
   async query(query={}, appStateOptions={}){
     if ( !query.page ) query.page = 1;
+    if ( Array.isArray(query.form) ){
+      query.form = query.form.sort().join(',');
+    }
     let id = payload.getKey(query);
     const store = this.store.data.query;
 

@@ -7,6 +7,6 @@ todo:
 - init and backup scripts
 - env file with get script
 - health endpoint
-- manager role
-- form submitter roles, my forms, my submissions, department head view
-- reporting
+- submission query filters
+- reports page
+- superset

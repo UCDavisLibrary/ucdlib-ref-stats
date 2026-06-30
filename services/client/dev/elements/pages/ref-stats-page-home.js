@@ -14,6 +14,7 @@ export default class RefStatsPageHome extends Mixin(LitElement)
   static get properties() {
     return {
       pageId: {type: String, attribute: 'page-id'},
+      submissionFields: {type: Array}
     }
   }
 
@@ -24,6 +25,11 @@ export default class RefStatsPageHome extends Mixin(LitElement)
   constructor() {
     super();
     this.render = render.bind(this);
+
+    this.submissionFields = [
+      {field: '_form', desktopFr: 2, mobileFr: 2},
+      {field: '_created_at', desktopFr: 1, mobileFr: 1}
+    ];
   }
 
 }

@@ -8,25 +8,52 @@ import protect from '../utils/protect.js';
 const router = Router();
 
 router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (req, res) => {
-  // todo - filter to current user if not admin. do i make an admin role for each form, and then ensure all that matches the 'form' query param?
-    try {
-      logger.info('Form entry query validated', req.context.logSignal);
-      if ( req.payload.form ) {
-        req.payload.form = req.payload.form.split(',').map(f => f.trim());
+  
+  try {
+    logger.info('Form entry query validated', req.context.logSignal);
+
+    const token = req.auth.token;
+    const userData = await models.libraryIam.getUserById(token.id);
+    if ( userData.error ) {
+      logger.error('Unable to get user data from Library IAM. Cannot test group access.', req.context.logSignal, { error: userData.error });
+    }
+    const headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
+
+    // restrict query based on user access
+    if ( req.payload.mine ) {
+      req.payload.submitted_by = token.id;
+    } else if ( token.hasManagerAccess ) {
+      // no filter - manager access can see all entries
+    } else if ( headOfGroupIds.length > 0 ) {
+      const allGroupIds = await models.libraryIam.addChildGroupIds(headOfGroupIds);
+      if ( !req.payload.group_id ){
+        req.payload.group_id = allGroupIds;
+      } else {
+        for ( const groupId of req.payload.group_id ){
+          if ( !allGroupIds.includes(groupId) ){
+            return res.status(403).json({ message: 'You do not have permission to query this group.' });
+          }
+        }
       }
-      const r = await models.formEntry.query(req.payload);
-      if (r.error) {
-        throw r.error;
-      }
-      logger.info('Form entry query successful',  req.context.logSignal, {resultCount: r.res.total_count});
-      res.status(200).json(r.res);
+    } else {
+      req.payload.submitted_by = token.id;
+    }
+
+    if ( req.payload.form ) {
+      req.payload.form = req.payload.form.split(',').map(f => f.trim());
+    }
+    const r = await models.formEntry.query(req.payload);
+    if (r.error) {
+      throw r.error;
+    }
+    logger.info('Form entry query successful',  req.context.logSignal, {resultCount: r.res.total_count});
+    res.status(200).json(r.res);
   } catch (e) {
     return handleError(res, req, e);
   }
 });
 
 router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
-  // todo - verify user has access to submit form
   try {
     const token = req.auth.token;
     let form = await models.form.get(req.params.idOrName);
@@ -34,6 +61,14 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
       throw form.error;
     }
     form = form.res;
+
+    if ( !token.hasManagerAccess && !token.forms.includes(form.name) ){
+      return res.status(403).json({ message: 'You do not have permission to submit this form.' });
+    }
+
+    if ( form.is_archived ){
+      return res.status(403).json({ message: 'This form is archived and cannot be submitted.' });
+    }
 
     const isUpdate = !!req.body?.original_form_entry_id;
     let existingEntry;

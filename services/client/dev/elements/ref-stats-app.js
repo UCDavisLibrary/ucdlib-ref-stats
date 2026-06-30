@@ -61,6 +61,7 @@ export default class RefStatsApp extends Mixin(LitElement)
   static get properties() {
     return {
       page: {type: String},
+      forms: {type: Array},
       _firstAppStateUpdate : { state: true }
     }
   }
@@ -75,8 +76,9 @@ export default class RefStatsApp extends Mixin(LitElement)
 
     this.page = '';
     this._firstAppStateUpdate = false;
+    this.forms = [];
 
-    this._injectModel('AppStateModel', 'AuthModel');
+    this._injectModel('AppStateModel', 'AuthModel', 'FormModel');
   }
 
   /**
@@ -107,8 +109,21 @@ export default class RefStatsApp extends Mixin(LitElement)
       this.AppStateModel.refresh();
       return;
     }
-
+    await this.getForms();
     this.page = page;
+  }
+
+  async getForms(){
+    const q = {active_only: true};
+    if ( !this.AuthModel.token.hasManagerAccess ){
+      q.name = this.AuthModel.token.forms.join(',');
+    }
+    const res = await this.FormModel.query(q);
+    if ( res.state !== 'loaded' ) {
+      this.forms = [];
+      return;
+    }
+    this.forms = res.payload.results;
   }
 
   /**

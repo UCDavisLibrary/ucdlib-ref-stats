@@ -33,12 +33,14 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     return {
       formNameOrId: { type: Array },
       latestVersion: { type: Boolean, attribute: 'latest-version' },
+      mine: { type: Boolean },
       orderByField: { type: String, attribute: 'order-by-field' },
       displayedFields: { type: Array },
       mobileThreshold: { type: Number, attribute: 'mobile-threshold' },
       maxPage: {type: Number },
       formEntries: {type: Array },
       formFields: { type: Object },
+      forms: { type: Array },
       expandedEntries: { type: Array },
       picklistItems: { type: Object }
     }
@@ -50,8 +52,10 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
 
     this.formEntries = [];
     this.formNameOrId = [];
+    this.forms = [];
     this.orderByField = '';
     this.latestVersion = false;
+    this.mine = false;
     this.maxPage = 1;
     this.formFields = {};
     this.mobileThreshold = 768;
@@ -67,7 +71,7 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
 
     this.id = this.ctl.idGen.get('self');
 
-    this._injectModel('FormEntryModel', 'AppStateModel', 'FieldModel', 'PicklistModel');
+    this._injectModel('FormEntryModel', 'AppStateModel', 'FieldModel', 'PicklistModel', 'FormModel');
   }
 
   /**
@@ -90,6 +94,9 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     if ( this.formNameOrId.length ) {
       q.form = this.formNameOrId;
     }
+    if ( this.mine ) {
+      q.mine = true;
+    }
     if ( this.latestVersion ) {
       q.is_latest_version = true;
     }
@@ -110,6 +117,20 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     }
     this.formEntries = res.payload.results;
     this.maxPage = res.payload.max_page;
+
+    if ( this.displayedFields.find(f => f.field === '_form') && this.formEntries.length ) {
+      const formNames = [...(new Set(this.formEntries.map(fe => fe.form_name))).values()];
+      const q = {name: formNames};
+      if ( this.ctl.qs.query?.per_page ) {
+        q.per_page = this.ctl.qs.query.per_page;
+      }
+      const formRes = await this.FormModel.query(q);
+      if ( formRes.state === 'loaded' ) {
+        this.forms = formRes.payload.results;
+      } else {
+        this.forms = [];
+      }
+    }
 
     this.formFields = {};
     const picklists = new Set();
@@ -170,6 +191,8 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     // entry metadata fields with hardcoded labels
     if ( fieldName === '_created_at' ) return 'Submitted At';
     if ( fieldName === '_id' ) return 'Entry ID';
+    if ( fieldName === '_form' ) return 'Form';
+    if ( fieldName === '_submitter' ) return 'Submitter';
 
     const field = this.formFields[fieldName];
     if ( !field ) return fieldName;
@@ -189,6 +212,16 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
     }
     if ( fieldName === '_id' ){
       return formEntry.form_entry_id;
+    }
+    if ( fieldName === '_form' ){
+      return this.forms.find(f => f.name === formEntry.form_name)?.label || formEntry.form_name;
+    }
+    if ( fieldName === '_submitter' ){
+      let name = `${formEntry.submitted_by_user?.first_name || ''} ${formEntry.submitted_by_user?.last_name || ''}`.trim();
+      if ( !name ) {
+        name = formEntry.submitted_by_user?.user_id || '';
+      }
+      return name || '';
     }
     const fieldValue = formEntry.fields[fieldName];
     const fieldValueArray = Array.isArray(fieldValue) ? fieldValue : [fieldValue];

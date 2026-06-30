@@ -30,7 +30,7 @@ class AppStateModelImpl extends AppStateModel {
    * @returns {*} Result of the parent set call
    */
   set(update) {
-    if ( this.AuthModel?.logOutRequested ){
+    if ( this.AuthModel?.logOutRequested(update.location) ){
       this.showLoading();
       this.AuthModel.logout();
       return;

@@ -46,6 +46,16 @@ class FormEntry {
       where.push(`form_id IN (SELECT get_form_id(fid) FROM unnest($${values.length}::text[]) AS fid)`);
     }
 
+    if ( params.submitted_by ) {
+      values.push(params.submitted_by);
+      where.push(`submitted_by = $${values.length}`);
+    }
+
+    if ( params.group_id ) {
+      values.push(params.group_id.map(Number));
+      where.push(`(fe.group->>'group_id')::int = ANY($${values.length})`);
+    }
+
     const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const sql = `
       SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.views.formEntryFull} fe

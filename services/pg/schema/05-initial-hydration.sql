@@ -22,7 +22,7 @@ VALUES (
 <p><strong>Do NOT count: </strong>questions about hours directions, policies, printing, or basic equipment assistance (i.e., directional)</p>',
   7,
   'days',
-  jsonb_build_object('brandColor', 'putah-creek', 'queryElementFields', jsonb_build_array(
+  jsonb_build_object('brandColor', 'delta', 'queryElementFields', jsonb_build_array(
     jsonb_build_object('field', 'event-date',          'desktopFr', 1, 'mobileFr', 1),
     jsonb_build_object('field', 'event-count',         'desktopFr', 1, 'mobileFr', 1),
     jsonb_build_object('field', 'virtual-event-count', 'desktopFr', 1),

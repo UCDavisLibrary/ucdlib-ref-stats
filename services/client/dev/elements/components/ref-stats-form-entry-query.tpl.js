@@ -32,8 +32,8 @@ export function styles() {
       overflow-wrap: anywhere;
     }
     ref-stats-form-entry-query .details {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
       gap: .5rem;
       font-size: var(--font-size--small, .75rem);
       margin-top: .75rem;
@@ -51,13 +51,22 @@ export function styles() {
     }
     @container (min-width: 400px) {
       ref-stats-form-entry-query .details {
-        max-width: 700px;
-        flex-wrap: wrap;
-        flex-direction: row;
-        justify-content: space-between;
+        max-width: 1000px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 1rem;
       }
-
     }
+    @container (min-width: 600px) {
+      ref-stats-form-entry-query .details {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+    @container (min-width: 800px) {
+      ref-stats-form-entry-query .details {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+
   `;
 
   return [elementStyles];

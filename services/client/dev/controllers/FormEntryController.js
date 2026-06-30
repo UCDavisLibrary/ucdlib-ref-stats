@@ -28,6 +28,7 @@ export default class FormEntryController {
     this.formNameOrId = null;
     this.fields = [];
     this.picklistItems = {};
+    this.errorResponse = null;
   }
 
   /**
@@ -303,6 +304,7 @@ export default class FormEntryController {
       }
 
       return [
+        this._renderErrorResponse(),
         this._renderFormIntro(),
         this._renderFormVersionWarning(),
         this._renderFormEntrySummary(),
@@ -356,6 +358,19 @@ export default class FormEntryController {
     return html`
       <div class="alert">
         There is a <a href="/form/${this.formNameOrId}/${this.formEntry.versions[this.formEntry.versions.length - 1]}">newer version</a> of this submission available.
+      </div>
+    `
+  }
+
+  /**
+   * @description Render an error message when the last submission attempt failed validation
+   * @returns {import('lit').TemplateResult}
+   */
+  _renderErrorResponse(){
+    if ( this.errorResponse?.error?.response?.status !== 422 ) return html``;
+    return html`
+      <div class="alert alert--error">
+        There was a problem with your submission. Please review the highlighted fields and try again.
       </div>
     `
   }
@@ -416,7 +431,15 @@ export default class FormEntryController {
    * @description Submit the form payload. Shows a success toast and navigates on success.
    */
   async submit(){
+    this.errorResponse = null;
     const r = await this.models.FormEntryModel.create(this.form.name, {...this.payload, ...(this.formEntry ? { original_form_entry_id: this.formEntry?.original_form_entry_id } : {})});
+    if ( r?.state === 'error' ) {
+      this.errorResponse = r;
+      this.host.requestUpdate();
+      const rect = this.host.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      window.scrollTo(0, rect.top + scrollTop - 65);
+    }
     if ( r.state !== 'loaded' ) return;
     if ( this.formEntry ){
       this.models.AppStateModel.showToast({text: 'Update successful', type: 'success'});
@@ -469,6 +492,7 @@ export default class FormEntryController {
    * @description Reset the form payload to its original state (existing entry fields or default values for new submissions)
    */
   _onReset(){
+    this.errorResponse = null;
     if ( this.formEntry?.fields ) {
       this.setPayload({...this.formEntry.fields});
     } else {
@@ -484,6 +508,7 @@ export default class FormEntryController {
    */
   async _onAppStateUpdate(e) {
     if ( !this.appComponentController.isOnActivePage ) return;
+    this.errorResponse = null;
     await this.update(e);
     if ( !this.hostIsForm ) return;
     if ( this.formEntry?.fields ) {

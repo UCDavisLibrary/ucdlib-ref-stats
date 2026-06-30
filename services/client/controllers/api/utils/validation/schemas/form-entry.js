@@ -99,7 +99,8 @@ const querySchema = z.object({
   per_page: perPageParam(15),
   form: z.string().optional(),
   is_latest_version: booleanParam,
-  orderByField: z.string().optional().superRefine(srOrderByFieldExists)
+  orderByField: z.string().optional().superRefine(srOrderByFieldExists),
+  mine: booleanParam
 });
 
 /**

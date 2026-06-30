@@ -61,6 +61,14 @@ class AuthModel extends BaseModel {
   }
 
   /**
+   * @description Checks if the current user is a group head for any group
+   * @returns {Boolean}
+   */
+  get userIsAGroupHead(){
+    return this.userData?.groups?.some(g => g.isHead);
+  }
+
+  /**
    * @description Initializes the keycloak client and sets up listeners for auth events.
    * @param {Array} mainAppElementDefinition - Args to pass to customElements.define for the main app element after successful auth
    * @returns
