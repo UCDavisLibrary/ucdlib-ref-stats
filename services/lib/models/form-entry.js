@@ -13,7 +13,10 @@ class FormEntry {
    * @param {Number} params.per_page - Number of results per page
    * @param {Boolean} params.is_latest_version - If true, only return the latest version of each entry
    * @param {String|String[]} params.form - Filter by form ID or name
+   * @param {String|String[]} params.submitted_by - Filter by submitter user ID(s); string or array of strings
+   * @param {Number[]} params.group_id - Filter by group ID(s)
    * @param {String} params.orderByField - Field name to order by; prefix with '-' for DESC or '+' for ASC
+   * @param {Array} [params.field_filters] - Normalized field filter specs from the route; each: {field_name, field_type, after?, before?, values?}
    * @returns {Object} Paginated results object or an error object
    */
   async query(params={}){
@@ -47,13 +50,45 @@ class FormEntry {
     }
 
     if ( params.submitted_by ) {
-      values.push(params.submitted_by);
-      where.push(`submitted_by = $${values.length}`);
+      const submittedBy = Array.isArray(params.submitted_by) ? params.submitted_by : [params.submitted_by];
+      values.push(submittedBy);
+      where.push(`submitted_by = ANY($${values.length})`);
     }
 
-    if ( params.group_id ) {
+    if ( params.group_id?.length ) {
       values.push(params.group_id.map(Number));
       where.push(`(fe.group->>'group_id')::int = ANY($${values.length})`);
+    }
+
+    if ( params.submitted_after ) {
+      values.push(params.submitted_after);
+      where.push(`created_at >= $${values.length}`);
+    }
+
+    if ( params.submitted_before ) {
+      values.push(params.submitted_before);
+      where.push(`created_at <= $${values.length}`);
+    }
+
+    // field_filters are validated/normalized in the route layer; field_name is safe to interpolate
+    for ( const ff of (params.field_filters || []) ) {
+      if ( ['date','datetime'].includes(ff.field_type) ) {
+        if ( ff.after ) {
+          values.push(ff.after);
+          where.push(`(fe.fields->>'${ff.field_name}')::date >= $${values.length}::date`);
+        }
+        if ( ff.before ) {
+          values.push(ff.before);
+          where.push(`(fe.fields->>'${ff.field_name}')::date <= $${values.length}::date`);
+        }
+      } else if ( ff.field_type === 'checkbox-multiple' ) {
+        values.push(ff.values);
+        where.push(`EXISTS (SELECT 1 FROM jsonb_array_elements_text(fe.fields->'${ff.field_name}') v WHERE v = ANY($${values.length}))`);
+      } else {
+        // select, radio, typeahead — single text value stored
+        values.push(ff.values);
+        where.push(`fe.fields->>'${ff.field_name}' = ANY($${values.length})`);
+      }
     }
 
     const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';

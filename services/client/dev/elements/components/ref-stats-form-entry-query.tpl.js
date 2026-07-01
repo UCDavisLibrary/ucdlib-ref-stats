@@ -52,18 +52,18 @@ export function styles() {
     @container (min-width: 400px) {
       ref-stats-form-entry-query .details {
         max-width: 1000px;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
       }
     }
     @container (min-width: 600px) {
       ref-stats-form-entry-query .details {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
     @container (min-width: 800px) {
       ref-stats-form-entry-query .details {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: repeat(6, minmax(0, 1fr));
       }
     }
 

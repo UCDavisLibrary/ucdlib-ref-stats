@@ -202,6 +202,57 @@ class Field {
 }
 
 
+  /**
+   * @description Returns form fields that have filterOrder set (>= 1) in their assignment settings,
+   * optionally scoped to specific forms. Each result includes a filter_forms array listing which
+   * forms the field is filterable for and at what order. Used to power the /filters API endpoint
+   * and to enrich field filter query params on GET /.
+   * @param {String|String[]|null} forms - Form name(s) or ID(s) to scope results. Null/empty = all forms.
+   * @returns {Object} {res: Array<{form_field_id, name, label, field_type, picklist_id, filter_forms}>} or {error}
+   */
+  async getFilters(forms) {
+    const values = [];
+    let formFilter = '';
+    if ( forms != null ) {
+      const arr = (Array.isArray(forms) ? forms : [forms]).filter(Boolean);
+      if ( arr.length ) {
+        values.push(arr);
+        formFilter = `AND ffa.form_id IN (SELECT get_form_id(fid) FROM unnest($${values.length}::text[]) AS fid)`;
+      }
+    }
+
+    const sql = `
+      SELECT
+        ff.form_field_id,
+        ff.name,
+        ff.label,
+        ff.field_type,
+        ff.picklist_id,
+        jsonb_agg(
+          jsonb_build_object(
+            'form_id',      ffa.form_id,
+            'form_name',    f.name,
+            'filterOrder', (ffa.assignment_settings->>'filterOrder')::int
+          )
+          ORDER BY (ffa.assignment_settings->>'filterOrder')::int
+        ) AS filter_forms
+      FROM ${config.db.tables.field} ff
+      JOIN ${config.db.tables.assignment} ffa ON ffa.form_field_id = ff.form_field_id
+      JOIN ${config.db.tables.form} f ON f.form_id = ffa.form_id
+      WHERE (ffa.assignment_settings->>'filterOrder')::int >= 1
+        AND NOT ffa.is_archived
+        AND NOT ff.is_archived
+        AND NOT f.is_archived
+        ${formFilter}
+      GROUP BY ff.form_field_id, ff.name, ff.label, ff.field_type, ff.picklist_id
+      ORDER BY min((ffa.assignment_settings->>'filterOrder')::int), ff.label
+    `;
+
+    const r = await pgClient.query(sql, values);
+    if ( r.error ) return r;
+    return { res: r.res.rows };
+  }
+
 }
 
 export default new Field();

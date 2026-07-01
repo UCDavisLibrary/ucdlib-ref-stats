@@ -73,7 +73,8 @@ const assignmentSchema = z.object({
     label: z.string().optional(),
     allowQuickAdd: z.boolean().optional(),
     defaultValue: z.string().optional(),
-    conditionalOnGroup: z.array(z.number().int()).optional()
+    conditionalOnGroup: z.array(z.number().int()).optional(),
+    filterOrder: z.number().int().min(1).optional()
   }).optional()
 }).superRefine(srValidateFormId).superRefine(srValidateFieldId).superRefine(srValidateAssignmentExists).superRefine(srValidateGroupIds);
 

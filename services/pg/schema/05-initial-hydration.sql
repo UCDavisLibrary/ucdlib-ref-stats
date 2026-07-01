@@ -160,7 +160,7 @@ VALUES
 INSERT INTO form_field_assignment (form_field_assignment_id, form_id, form_field_id, sort_order, assignment_settings)
 VALUES
   (gen_random_uuid(), get_form_id('reference'), get_form_field_id('event-date'), 0,
-    jsonb_build_object('required', true, 'label', 'Date of interaction(s)', 'defaultValue', 'today')),
+    jsonb_build_object('required', true, 'label', 'Date of interaction(s)', 'defaultValue', 'today', 'filterOrder', 1)),
   (gen_random_uuid(), get_form_id('reference'), get_form_field_id('event-count'), 1,
     jsonb_build_object('required', true, 'label', 'Number of reference transactions', 'defaultValue', '1',
       'description', 'Enter the number of reference transactions represented by this submission. For retrospective entry, multiple transactions may be reported together.')),
@@ -182,7 +182,7 @@ VALUES
 INSERT INTO form_field_assignment (form_field_assignment_id, form_id, form_field_id, sort_order, assignment_settings)
 VALUES
   (gen_random_uuid(), get_form_id('instruction'), get_form_field_id('event-date'), 0,
-    jsonb_build_object('required', true, 'label', 'Date of session', 'defaultValue', 'today')),
+    jsonb_build_object('required', true, 'label', 'Date of session', 'defaultValue', 'today', 'filterOrder', 1)),
   (gen_random_uuid(), get_form_id('instruction'), get_form_field_id('event-count'), 1,
     jsonb_build_object('required', true, 'label', 'Number of presentations', 'defaultValue', '1',
       'description', 'Enter the number of instructional sessions represented by this submission. Multi-session courses should be reported as one presentation per meeting/session.')),
@@ -207,7 +207,7 @@ VALUES
 INSERT INTO form_field_assignment (form_field_assignment_id, form_id, form_field_id, sort_order, assignment_settings)
 VALUES
   (gen_random_uuid(), get_form_id('outreach'), get_form_field_id('event-date'), 0,
-    jsonb_build_object('required', true, 'label', 'Date of activity', 'defaultValue', 'today')),
+    jsonb_build_object('required', true, 'label', 'Date of activity', 'defaultValue', 'today', 'filterOrder', 1)),
   (gen_random_uuid(), get_form_id('outreach'), get_form_field_id('event-count'), 1,
     jsonb_build_object('required', true, 'label', 'Number of outreach activities', 'defaultValue', '1',
       'description', 'Enter the number of outreach activities represented by this submission. Multiple activities may be entered retrospectively if needed.')),

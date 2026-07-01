@@ -118,6 +118,35 @@ class FormEntryService extends BaseService {
   }
 
   /**
+   * @description Queries form entries with the given filters.
+   * @param {object} opts - Query parameters.
+   * @param {object} appStateOptions - Options passed to the app state error handler.
+   * @returns {Promise<object>} Store state object for the request.
+   */
+  async filters(opts={}, appStateOptions={}){
+    const ido = { ...opts, 'action': 'filters' };
+    const id = payload.getKey(ido);
+    const store = this.store.data.filters;
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url : `${this.baseUrl}/filters`,
+        qs: opts,
+        checkCached : () => store.get(id),
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          store,
+          null,
+          serviceUtils.getAppStateOptions('Unable to retrieve submission filters', appStateOptions)
+        )
+      })
+    );
+
+    return store.get(id);
+  }
+
+  /**
    * @description Deletes the latest version of a form entry, optionally removing all versions in the chain.
    * @param {String} entryId - The form_entry_id to delete (must be the latest version)
    * @param {Object} opts - Options object

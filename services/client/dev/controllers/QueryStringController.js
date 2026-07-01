@@ -32,6 +32,9 @@ export default class QueryStringController {
    * @param {String} key - the query string parameter key
    * @param {*} value - the query string parameter value
    * @param {Object} opts - options for setting the parameter
+   * @param {Boolean} opts.reflect - whether to reflect the change in the URL and fire an app-state-update event
+   * @param {Boolean} opts.resetPage - whether to reset the page parameter to 1 when changing this parameter
+   * @param {Boolean} opts.removeFalsey - whether to remove the parameter if the value is falsey
    * @param {Number} opts.position - position to insert value at (for array types)
    * @param {Boolean} opts.append - whether to append value to array (for array types)
    * @param {Boolean} opts.increasePosition - whether to move value up one position in array (for array types)
@@ -68,17 +71,29 @@ export default class QueryStringController {
       }
     
     // string param
+    } else if ( opts.removeFalsey && (!value || Array.isArray(value) && value.length === 0) ) {
+      delete this.query[key];
     } else {
       this.query[key] = value;
     }
 
+    if ( opts.resetPage ) {
+      delete this.query.page;
+    }
+
     
     this.host.requestUpdate();
+    if ( opts.reflect ) {
+      this.setLocation();
+    }
   }
 
   /**
    * @description Delete a query string parameter
    * @param {String} key - the query string parameter key
+   * @param {Object} opts - options for setting the parameter
+   * @param {Boolean} opts.reflect - whether to reflect the change in the URL and fire an app-state-update event
+   * @param {Boolean} opts.resetPage - whether to reset the page parameter to 1 when changing this parameter
    */
   deleteParam(key, opts={}){
     if ( this.types[key] === 'array' ) {
@@ -90,7 +105,16 @@ export default class QueryStringController {
     } else {
       delete this.query[key];
     }
+
+    if ( opts.resetPage ) {
+      delete this.query.page;
+    }
+
     this.host.requestUpdate();
+    if ( opts.reflect ) {
+      this.setLocation();
+    }
+
   }
 
   /**

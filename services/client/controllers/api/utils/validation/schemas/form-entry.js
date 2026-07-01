@@ -100,7 +100,15 @@ const querySchema = z.object({
   form: z.string().optional(),
   is_latest_version: booleanParam,
   orderByField: z.string().optional().superRefine(srOrderByFieldExists),
-  mine: booleanParam
+  mine: booleanParam,
+  group_id: z.string().optional(),
+  submitted_by: z.string().optional(),
+  submitted_after: isoDate.optional(),
+  submitted_before: isoDate.optional()
+}).passthrough();
+
+const filterSchema = z.object({
+  form: z.string().optional()
 });
 
 /**
@@ -293,6 +301,7 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
 
 export default {
   'query': querySchema,
+  'filter': filterSchema,
 
   'example': {
     'create': exampleFormBase,

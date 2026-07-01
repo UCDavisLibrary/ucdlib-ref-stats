@@ -1,5 +1,6 @@
 import { html, css } from 'lit';
 import '#components/ref-stats-form-entry-query.js';
+import '#components/ref-stats-form-entry-query-filters.js';
 
 export function styles() {
   const elementStyles = css`
@@ -23,6 +24,11 @@ export function render() {
       <li>Submissions</li>
     </ol>
     <div class="l-container">
+      <ref-stats-form-entry-query-filters
+        .formNameOrId=${[this.nameOrId]}
+      >
+
+      </ref-stats-form-entry-query-filters>
       <ref-stats-form-entry-query
         .formNameOrId=${[this.nameOrId]}
         .displayedFields=${this.displayedFields}

@@ -11,7 +11,8 @@ class FormEntryStore extends BaseStore {
       payload: new LruStore({name: 'formentry.payload'}),
       get: new LruStore({name: 'formentry.get'}),
       query: new LruStore({name: 'formentry.query'}),
-      delete: new LruStore({name: 'formentry.delete'})
+      delete: new LruStore({name: 'formentry.delete'}),
+      filters: new LruStore({name: 'formentry.filters'})
     };
     this.events = {};
   }

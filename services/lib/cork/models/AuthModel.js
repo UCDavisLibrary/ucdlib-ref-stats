@@ -50,6 +50,14 @@ class AuthModel extends BaseModel {
   }
 
   /**
+   * @description User is not manager/admin or a department head
+   */
+  get isBasicUser(){
+    if ( this.token.hasManagerAccess ) return false;
+    return !this.userIsAGroupHead;
+  }
+
+  /**
    * @description Checks if the current user is in a specific group
    * @param {String|Array} groupId - Group ID or array of group IDs to check
    * @returns {Boolean}

@@ -19,6 +19,13 @@ router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (
     }
     const headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
 
+    if ( req.payload.submitted_by ){
+      req.payload.submitted_by = req.payload.submitted_by.split(',').map(s => s.trim()).filter(s => s);
+    }
+    if ( req.payload.group_id ){
+      req.payload.group_id = req.payload.group_id.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+    }
+
     // restrict query based on user access
     if ( req.payload.mine ) {
       req.payload.submitted_by = token.id;
@@ -42,6 +49,34 @@ router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (
     if ( req.payload.form ) {
       req.payload.form = req.payload.form.split(',').map(f => f.trim());
     }
+
+    // extract field filters from passthrough query params
+    if ( req.payload.form?.length ) {
+      const filterableFields = await models.field.getFilters(req.payload.form);
+      if ( filterableFields.error ) throw filterableFields.error;
+
+      const fieldFilters = [];
+      for ( const f of filterableFields.res ) {
+        const entry = { field_name: f.name, field_type: f.field_type };
+
+        if ( ['date','datetime'].includes(f.field_type) ) {
+          entry.after  = req.payload[`${f.name}_after`]  || null;
+          entry.before = req.payload[`${f.name}_before`] || null;
+          delete req.payload[`${f.name}_after`];
+          delete req.payload[`${f.name}_before`];
+          if ( entry.after || entry.before ) fieldFilters.push(entry);
+        } else if ( ['select','radio','typeahead','checkbox-multiple'].includes(f.field_type) ) {
+          const raw = req.payload[f.name];
+          delete req.payload[f.name];
+          if ( raw ) {
+            entry.values = String(raw).split(',').map(v => v.trim()).filter(Boolean);
+            if ( entry.values.length ) fieldFilters.push(entry);
+          }
+        }
+      }
+      if ( fieldFilters.length ) req.payload.field_filters = fieldFilters;
+    }
+
     const r = await models.formEntry.query(req.payload);
     if (r.error) {
       throw r.error;
@@ -52,6 +87,77 @@ router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (
     return handleError(res, req, e);
   }
 });
+
+router.get('/filters', validate(schema.formEntry.filter, {reqParts: ['query']}), async (req, res) => {
+
+  try {
+    logger.info('Form entry filter validated', req.context.logSignal);
+
+    const token = req.auth.token;
+    const userData = await models.libraryIam.getUserById(token.id);
+    if ( userData.error ) {
+      logger.error('Unable to get user data from Library IAM. Cannot test group access.', req.context.logSignal, { error: userData.error });
+    }
+    const headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
+    const allGroupIds = await models.libraryIam.addChildGroupIds(headOfGroupIds);
+
+
+    if ( req.payload.form ) {
+      req.payload.form = req.payload.form.split(',').map(f => f.trim()).filter(f => f);
+    }
+
+    const out = {
+      submitted_by: { label: 'Submitted By', options: [], multiple: true, type: 'select' },
+      group_id: { label: 'Group', options: [], multiple: true, type: 'select' },
+      submitted_after: { label: 'Submitted After', type: 'date' },
+      submitted_before: { label: 'Submitted Before', type: 'date' }
+    };
+
+    if ( allGroupIds.length || token.hasManagerAccess ) {
+      const submitters = await models.user.getFormSubmitters(req.payload.form, allGroupIds);
+      if ( submitters.error ) throw submitters.error;
+      out.submitted_by.options = submitters.res.map(u => ({ value: u.user_id, label: `${u.first_name} ${u.last_name}`.trim() || u.user_id }));
+
+      const groups = await models.group.getFormGroups(req.payload.form, allGroupIds);
+      if ( groups.error ) throw groups.error;
+      out.group_id.options = groups.res.map(g => ({ value: g.group_id, label: g.name }));
+    }
+
+    const filterableFields = await models.field.getFilters(req.payload.form);
+    if ( filterableFields.error ) throw filterableFields.error;
+
+    for ( const f of filterableFields.res ) {
+      const minOrder = Math.min(...f.filter_forms.map(ff => ff.filterOrder));
+      const base = {
+        isField: true,
+        field_name: f.name,
+        label: f.label,
+        sort_order: minOrder,
+        sort_order_secondary: 0,
+        filter_forms: f.filter_forms
+      };
+
+      if ( ['date','datetime'].includes(f.field_type) ) {
+        out[`${f.name}_after`]  = { ...base, type: 'date', label: `${f.label} After`  };
+        out[`${f.name}_before`] = { ...base, type: 'date', label: `${f.label} Before`, sort_order_secondary: 1 };
+      } else {
+        const items = await models.picklist.getPicklistItems(f.picklist_id);
+        if ( items.error ) throw items.error;
+        out[f.name] = {
+          ...base,
+          type: 'select',
+          multiple: true,
+          options: items.res.map(i => ({ value: i.value, label: i.label || i.value }))
+        };
+      }
+    }
+
+    res.status(200).json(out);
+
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+})
 
 router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
   try {

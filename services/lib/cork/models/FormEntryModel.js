@@ -54,6 +54,16 @@ class FormEntryModel extends BaseModel {
   }
 
   /**
+   * @description Get form entry query filters available for the current user
+   * @param {Object} opts - Query parameters
+   * @param {Object} appStateOptions - Options passed to the app state model (loader/error settings)
+   * @returns {Promise}
+   */
+  filters(opts, appStateOptions={}) {
+    return this.service.filters(opts, appStateOptions);
+  }
+
+  /**
    * @description Delete the latest version of a form entry, clearing the cache on success
    * @param {String} entryId - The form_entry_id to delete (must be the latest version)
    * @param {Object} opts - Options object

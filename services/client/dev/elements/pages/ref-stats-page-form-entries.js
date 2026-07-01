@@ -53,7 +53,7 @@ export default class RefStatsPageFormEntries extends Mixin(LitElement)
       this.data = {...res.payload};
     }
 
-    const configured = this.data?.form_display_settings?.queryElementFields;
+    const configured = [...(this.data?.form_display_settings?.queryElementFields || [])];
     let displayedFields = configured?.length
       ? configured
       : [{field: '_id', desktopFr: 1, mobileFr: 1}, {field: '_created_at', desktopFr: 1, mobileFr: 1}];

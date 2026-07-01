@@ -20,6 +20,7 @@ export function render() {
   const isSelectOrTypeahead = t === 'select' || t === 'typeahead';
   const isPicklist = ['select', 'typeahead', 'radio', 'checkbox-multiple'].includes(t);
   const isDate = t === 'date';
+  const isFilterable = ['date','datetime','select','radio','typeahead','checkbox-multiple'].includes(t);
 
   return html`
     <fieldset>
@@ -168,6 +169,17 @@ export function render() {
             `)}
           </select>
         </ucd-theme-slim-select>
+      </cork-field-container>
+
+      <cork-field-container class='field-container' ?hidden=${!isFilterable}>
+        <label for=${this.ctl.idGen.get('filterOrder')}>Filter Order</label>
+        <p class='field-description u-space-mt--flush'>Set a positive integer to expose this field as a filter on the entry query page. Lower numbers appear first.</p>
+        <input
+          type="number"
+          min="1"
+          id=${this.ctl.idGen.get('filterOrder')}
+          .value=${this.payload?.filterOrder ?? ''}
+          @input=${e => this._onPayloadInput('filterOrder', e.target.value === '' ? undefined : Number(e.target.value))}>
       </cork-field-container>
     </fieldset>
   `;
