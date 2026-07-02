@@ -91,7 +91,7 @@ export default class RefStatsFormEntryQuery extends Mixin(LitElement)
    */
   async query(){
     const q = {...this.ctl.qs.query};
-    if ( this.formNameOrId.length ) {
+    if ( this.formNameOrId.length && !q.form ) {
       q.form = this.formNameOrId;
     }
     if ( this.mine ) {

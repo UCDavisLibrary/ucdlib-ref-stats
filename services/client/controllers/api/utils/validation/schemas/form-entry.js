@@ -108,7 +108,8 @@ const querySchema = z.object({
 }).passthrough();
 
 const filterSchema = z.object({
-  form: z.string().optional()
+  form: z.string().optional(),
+  form_filter: booleanParam
 });
 
 /**

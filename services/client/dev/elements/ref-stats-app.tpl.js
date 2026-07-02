@@ -24,6 +24,7 @@ return html`
     <ref-stats-page-form-single page-id='form-single'></ref-stats-page-form-single>
     <ref-stats-page-form-entries page-id='form-entries'></ref-stats-page-form-entries>
     <ref-stats-page-home page-id='home'></ref-stats-page-home>
+    <ref-stats-page-reports page-id='reports'></ref-stats-page-reports>
 
     <!-- Admin Pages -->
     <ref-stats-page-picklist page-id='picklist'></ref-stats-page-picklist>
@@ -59,6 +60,7 @@ function renderHeader(){
               `)}
           </ul>
           ` : html``}
+          <a href='/reports'>Reports and Dashboards</a>
       </ucd-theme-primary-nav>
 
       <ucd-theme-quick-links

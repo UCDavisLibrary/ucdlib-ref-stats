@@ -51,31 +51,29 @@ router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (
     }
 
     // extract field filters from passthrough query params
-    if ( req.payload.form?.length ) {
-      const filterableFields = await models.field.getFilters(req.payload.form);
-      if ( filterableFields.error ) throw filterableFields.error;
+    const filterableFields = await models.field.getFilters(req.payload.form || null);
+    if ( filterableFields.error ) throw filterableFields.error;
 
-      const fieldFilters = [];
-      for ( const f of filterableFields.res ) {
-        const entry = { field_name: f.name, field_type: f.field_type };
+    const fieldFilters = [];
+    for ( const f of filterableFields.res ) {
+      const entry = { field_name: f.name, field_type: f.field_type };
 
-        if ( ['date','datetime'].includes(f.field_type) ) {
-          entry.after  = req.payload[`${f.name}_after`]  || null;
-          entry.before = req.payload[`${f.name}_before`] || null;
-          delete req.payload[`${f.name}_after`];
-          delete req.payload[`${f.name}_before`];
-          if ( entry.after || entry.before ) fieldFilters.push(entry);
-        } else if ( ['select','radio','typeahead','checkbox-multiple'].includes(f.field_type) ) {
-          const raw = req.payload[f.name];
-          delete req.payload[f.name];
-          if ( raw ) {
-            entry.values = String(raw).split(',').map(v => v.trim()).filter(Boolean);
-            if ( entry.values.length ) fieldFilters.push(entry);
-          }
+      if ( ['date','datetime'].includes(f.field_type) ) {
+        entry.after  = req.payload[`${f.name}_after`]  || null;
+        entry.before = req.payload[`${f.name}_before`] || null;
+        delete req.payload[`${f.name}_after`];
+        delete req.payload[`${f.name}_before`];
+        if ( entry.after || entry.before ) fieldFilters.push(entry);
+      } else if ( ['select','radio','typeahead','checkbox-multiple'].includes(f.field_type) ) {
+        const raw = req.payload[f.name];
+        delete req.payload[f.name];
+        if ( raw ) {
+          entry.values = String(raw).split(',').map(v => v.trim()).filter(Boolean);
+          if ( entry.values.length ) fieldFilters.push(entry);
         }
       }
-      if ( fieldFilters.length ) req.payload.field_filters = fieldFilters;
     }
+    if ( fieldFilters.length ) req.payload.field_filters = fieldFilters;
 
     const r = await models.formEntry.query(req.payload);
     if (r.error) {
@@ -109,10 +107,12 @@ router.get('/filters', validate(schema.formEntry.filter, {reqParts: ['query']}),
     const out = {
       submitted_by: { label: 'Submitted By', options: [], multiple: true, type: 'select' },
       group_id: { label: 'Group', options: [], multiple: true, type: 'select' },
+      form: { label: 'Form', options: [], multiple: true, type: 'select' },
       submitted_after: { label: 'Submitted After', type: 'date' },
       submitted_before: { label: 'Submitted Before', type: 'date' }
     };
 
+    // advanced access filters
     if ( allGroupIds.length || token.hasManagerAccess ) {
       const submitters = await models.user.getFormSubmitters(req.payload.form, allGroupIds);
       if ( submitters.error ) throw submitters.error;
@@ -123,9 +123,16 @@ router.get('/filters', validate(schema.formEntry.filter, {reqParts: ['query']}),
       out.group_id.options = groups.res.map(g => ({ value: g.group_id, label: g.name }));
     }
 
+    // populate form filter options if requested
+    if ( req.payload.form_filter ){
+      const formOptions = await models.form.getAllForms();
+      if ( formOptions.error ) throw formOptions.error;
+      out.form.options = formOptions.res.map(f => ({ value: f.name, label: f.label, id: f.form_id }));
+    }
+
+    // populate form field filters for the requested form(s)
     const filterableFields = await models.field.getFilters(req.payload.form);
     if ( filterableFields.error ) throw filterableFields.error;
-
     for ( const f of filterableFields.res ) {
       const minOrder = Math.min(...f.filter_forms.map(ff => ff.filterOrder));
       const base = {

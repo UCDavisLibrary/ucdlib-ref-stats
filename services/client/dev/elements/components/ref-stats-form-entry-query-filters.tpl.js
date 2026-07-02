@@ -5,6 +5,7 @@ export function styles() {
     ref-stats-form-entry-query-filters {
       display: block;
       container-type: inline-size;
+      margin-bottom: 1rem;
     }
     ref-stats-form-entry-query-filters .filter-grid {
       display: grid;
@@ -36,6 +37,7 @@ return html`
   <div>
     <div class='filter-grid'>
       ${_renderFilter.call(this, 'group_id')}
+      ${_renderFilter.call(this, 'form', this._onFormFilterChange.bind(this))}
       ${_renderFilter.call(this, 'submitted_by')}
       ${_renderFilter.call(this, 'submitted_after')}
       ${_renderFilter.call(this, 'submitted_before')}
@@ -44,19 +46,18 @@ return html`
 
   </div>
 
-
 `;}
 
-function _renderFilter(filterName){
-  if ( this.availableFilters[filterName].type === 'date' ) return _renderDateFilter.call(this, filterName);
-  if ( this.availableFilters[filterName].type === 'select' ) return _renderSelectFilter.call(this, filterName);
+function _renderFilter(filterName, onChange){
+  if ( this.availableFilters[filterName]?.type === 'date' ) return _renderDateFilter.call(this, filterName, onChange);
+  if ( this.availableFilters[filterName]?.type === 'select' ) return _renderSelectFilter.call(this, filterName, onChange);
   return html``;
 }
 
-function _renderSelectFilter(filterName){
+function _renderSelectFilter(filterName, onChange){
   if ( !this.availableFilters?.[filterName]?.options?.length ) return html``;
   const filter = this.availableFilters[filterName];
-  const onChange = (e) => {
+  const _onChange = (e) => {
     const setOpts = {
       removeFalsey: true,
       reflect: true,
@@ -71,7 +72,7 @@ function _renderSelectFilter(filterName){
   return html`
     <div class='filter filter--select field-container'>
       <label for=${this.ctl.idGen.get(filterName)}>${filter.label}</label>
-      <ucd-theme-slim-select @change=${onChange}>
+      <ucd-theme-slim-select @change=${onChange ? onChange : _onChange}>
         <select
           id=${this.ctl.idGen.get(filterName)}
           ?multiple=${filter.multiple}>
@@ -89,7 +90,7 @@ function _renderSelectFilter(filterName){
   `
 }
 
-function _renderDateFilter(filterName){
+function _renderDateFilter(filterName, onChange){
   if ( !this.availableFilters?.[filterName] || this.availableFilters[filterName].type !== 'date' ) return html``;
   const filter = this.availableFilters[filterName];
   return html`
@@ -99,7 +100,7 @@ function _renderDateFilter(filterName){
         type="date" 
         id=${this.ctl.idGen.get(filterName)}
         value=${this.ctl.qs.query?.[filterName] || ''}
-        @change=${(e) => {
+        @change=${onChange ? onChange : (e) => {
           this.ctl.qs.setParam(filterName, e.target.value, {reflect: true, resetPage: true});
         }}>
     </div>

@@ -14,6 +14,7 @@ export default class RefStatsFormEntryQueryFilters extends Mixin(LitElement)
   static get properties() {
     return {
       formNameOrId: { type: Array },
+      showFormFilter: { type: Boolean, attribute: 'show-form-filter' },
       availableFilters: { type: Object },
       fieldFilters: { type: Array }
     }
@@ -30,6 +31,7 @@ export default class RefStatsFormEntryQueryFilters extends Mixin(LitElement)
     this.formNameOrId = [];
     this.availableFilters = {};
     this.fieldFilters = [];
+    this.showFormFilter = false;
 
     this.ctl = {
       appComponent : new AppComponentController(this),
@@ -56,7 +58,6 @@ export default class RefStatsFormEntryQueryFilters extends Mixin(LitElement)
       const fieldFilters = [];
       for ( const [filterName, filter] of Object.entries(this.availableFilters) ) {
         if ( !filter.isField ) continue;
-        // todo: skip filters that dont apply to the filtered form, when implemented
         fieldFilters.push({name: filterName, sort_order: filter.sort_order, sort_order_secondary: filter.sort_order_secondary || 0});
       }
       this.fieldFilters = fieldFilters.sort((a,b) => {
@@ -77,17 +78,33 @@ export default class RefStatsFormEntryQueryFilters extends Mixin(LitElement)
     await this.getFilters();
   }
 
+  /**
+   * @description Fetches available filters from the server based on element attributes and user role.
+   */
   async getFilters() {
     let filters = {};
     const opts = {};
     if ( this.formNameOrId.length > 0 ) {
       opts.form = this.formNameOrId[0];
     }
+    if ( this.showFormFilter ) {
+      opts.form_filter = true;
+    }
     const res = await this.FormEntryModel.filters(opts);
     if ( res.state === 'loaded' ) {
       filters = res.payload;
     }
     this.availableFilters = filters;
+  }
+
+  _onFormFilterChange(e) {
+    this.ctl.qs.setParam('form', e.detail.map( o => o.value ), {resetPage: true});
+    for ( const [filterName, filter] of Object.entries(this.availableFilters) ) {
+      if ( filter.isField && !filter.filter_forms?.some(f => this.ctl.qs.query?.form?.includes(f.form_name)) ) {
+        this.ctl.qs.deleteParam(filterName);
+      }
+    }
+    this.ctl.qs.setLocation();
   }
 
 }

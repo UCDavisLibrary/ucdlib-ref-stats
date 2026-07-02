@@ -90,6 +90,36 @@ class Form {
   }
 
   /**
+   * @description Get a simple list of all forms
+   * @param {Object} params - Query parameters
+   * @param {Boolean} params.active_only - If true, only return forms that are not archived
+   * @returns {Object} {res: [{form_id, name, label, is_archived}]} or {error}
+   */
+  async getAllForms(params={}){
+    const where = [];
+    const values = [];
+
+    if ( params.active_only ) {
+      values.push(false);
+      where.push(`is_archived = $${values.length}`);
+    }
+
+    const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+    const sql = `
+    SELECT form_id, name, label, is_archived
+    FROM ${config.db.tables.form}
+    ${whereSQL}
+    ORDER BY label ASC
+    `;
+    const r = await pgClient.query(sql, values);
+    if ( r.error ) {
+      return r;
+    }
+    return { res: r.res.rows };
+  }
+
+  /**
    * @description Create a new form
    * @param {Object} data - Form data to insert
    * @returns {Object} The new form's form_id and name, or an error object
