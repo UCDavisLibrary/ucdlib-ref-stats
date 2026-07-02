@@ -1,6 +1,7 @@
 import {BaseModel} from '@ucd-lib/cork-app-utils';
 import FormEntryService from '../services/FormEntryService.js';
 import FormEntryStore from '../stores/FormEntryStore.js';
+import config from '#lib/app-config.js';
 
 import clearCache from '../utils/clearCache.js';
 
@@ -76,6 +77,48 @@ class FormEntryModel extends BaseModel {
       clearCache();
     }
     return res;
+  }
+
+  /**
+   * @description Exports form entries as a CSV file download.
+   * Fetches the export endpoint with auth headers, converts the response to a blob,
+   * and triggers a browser file download.
+   * @param {Object} params - Query parameters forwarded as URL search params (same filters as query())
+   * @param {Object} opts - Options object
+   * @param {String} opts.filename - Download filename (default: 'library-services-form-submissions.csv')
+   * @returns {Promise<{error?: Error}>} Resolves with empty object on success, or {error} on failure
+   */
+  async export(params = {}, opts = {}) {
+    const filename = opts.filename || 'library-services-form-submissions.csv';
+    try {
+      const headers = {};
+      if ( config.auth?.keycloakClient ) {
+        const kc = config.auth.keycloakClient;
+        try { await kc.updateToken(10); } catch(e) {}
+        if ( kc.token ) headers.Authorization = `Bearer ${kc.token}`;
+      }
+      const qs = new URLSearchParams(
+        Object.entries(params).filter(([, v]) => v != null && v !== '')
+      ).toString();
+      const url = `/api/form-entry/export${qs ? `?${qs}` : ''}`;
+      const res = await fetch(url, { headers });
+      if ( !res.ok ) {
+        const text = await res.text().catch(() => '');
+        return { error: new Error(`Export failed: ${res.status} ${text}`) };
+      }
+      const blob = await res.blob();
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = href;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(href);
+      return {};
+    } catch(error) {
+      return { error };
+    }
   }
 
 }

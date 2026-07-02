@@ -94,9 +94,7 @@ const srOrderByFieldExists = async (value, ctx) => {
   }
 }
 
-const querySchema = z.object({
-  page: pageParam,
-  per_page: perPageParam(15),
+const queryBase = {
   form: z.string().optional(),
   is_latest_version: booleanParam,
   orderByField: z.string().optional().superRefine(srOrderByFieldExists),
@@ -105,7 +103,10 @@ const querySchema = z.object({
   submitted_by: z.string().optional(),
   submitted_after: isoDate.optional(),
   submitted_before: isoDate.optional()
-}).passthrough();
+};
+
+const querySchema  = z.object({ page: pageParam, per_page: perPageParam(15), ...queryBase }).passthrough();
+const exportSchema = z.object({ ...queryBase }).passthrough();
 
 const filterSchema = z.object({
   form: z.string().optional(),
@@ -302,6 +303,7 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
 
 export default {
   'query': querySchema,
+  'export': exportSchema,
   'filter': filterSchema,
 
   'example': {

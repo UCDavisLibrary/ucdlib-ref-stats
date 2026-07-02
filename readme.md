@@ -7,6 +7,4 @@ todo:
 - init and backup scripts
 - env file with get script
 - health endpoint
-- reports page\
-- csv export
 - superset

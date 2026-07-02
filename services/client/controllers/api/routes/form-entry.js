@@ -1,9 +1,47 @@
 import { Router, json } from 'express';
+import { stringify } from 'csv-stringify/sync';
 import handleError from '../utils/handleError.js';
 import { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema } from '../utils/validation/index.js';
 import models from '#models';
 import logger from '#lib/logger.js';
 import protect from '../utils/protect.js';
+
+/**
+ * @description Serializes a form field value for CSV output.
+ * Arrays are joined with semicolons; objects are JSON-stringified; null/undefined become empty string.
+ * @param {*} value - Raw field value from the form_entry_full view fields JSONB
+ * @returns {string}
+ */
+function serializeFieldValue(value) {
+  if ( value == null ) return '';
+  if ( Array.isArray(value) ) return value.join(';');
+  if ( typeof value === 'object' ) return JSON.stringify(value);
+  return value;
+}
+
+/**
+ * @description Discovers the set of field columns to include in a CSV export.
+ * Iterates over each requested form (or all forms if none specified), unions fields by form_field_id,
+ * and sorts by assignment sort_order then label. Archived fields are included so historical entries
+ * with values for those fields are not silently dropped.
+ * @param {string[]|null} forms - Array of form names/IDs to scope columns; null/empty means all forms
+ * @returns {Promise<Array<{name: string, label: string, sort_order: number}>>}
+ */
+async function resolveExportFieldColumns(forms) {
+  const targets = forms?.length ? forms : [null];
+  const seen = new Map();
+  for ( const form of targets ) {
+    const r = await models.field.query({ form: form || undefined, perPage: 1000 });
+    if ( r.error ) throw r.error;
+    for ( const f of r.res.results ) {
+      if ( !seen.has(f.form_field_id) ) {
+        const asgn = form ? f.forms?.find(fa => fa.name === form || fa.form_id === form) : null;
+        seen.set(f.form_field_id, { name: f.name, label: f.label, sort_order: asgn?.sort_order ?? 9999 });
+      }
+    }
+  }
+  return [...seen.values()].sort((a, b) => a.sort_order - b.sort_order || a.label.localeCompare(b.label));
+}
 
 const router = Router();
 
@@ -165,6 +203,116 @@ router.get('/filters', validate(schema.formEntry.filter, {reqParts: ['query']}),
     return handleError(res, req, e);
   }
 })
+
+router.get('/export', validate(schema.formEntry.export, {reqParts: ['query']}), async (req, res) => {
+  let client;
+  try {
+    logger.info('Form entry export request', req.context.logSignal);
+
+    const token = req.auth.token;
+    const userData = await models.libraryIam.getUserById(token.id);
+    if ( userData.error ) {
+      logger.error('Unable to get user data from Library IAM. Cannot test group access.', req.context.logSignal, { error: userData.error });
+    }
+    const headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
+
+    if ( req.payload.submitted_by ){
+      req.payload.submitted_by = req.payload.submitted_by.split(',').map(s => s.trim()).filter(s => s);
+    }
+    if ( req.payload.group_id ){
+      req.payload.group_id = req.payload.group_id.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+    }
+
+    // restrict query based on user access
+    if ( req.payload.mine ) {
+      req.payload.submitted_by = token.id;
+    } else if ( token.hasManagerAccess ) {
+      // no filter - manager access can see all entries
+    } else if ( headOfGroupIds.length > 0 ) {
+      const allGroupIds = await models.libraryIam.addChildGroupIds(headOfGroupIds);
+      if ( !req.payload.group_id ){
+        req.payload.group_id = allGroupIds;
+      } else {
+        for ( const groupId of req.payload.group_id ){
+          if ( !allGroupIds.includes(groupId) ){
+            return res.status(403).json({ message: 'You do not have permission to query this group.' });
+          }
+        }
+      }
+    } else {
+      req.payload.submitted_by = token.id;
+    }
+
+    if ( req.payload.form ) {
+      req.payload.form = req.payload.form.split(',').map(f => f.trim());
+    }
+
+    // extract field filters from passthrough query params
+    const filterableFields = await models.field.getFilters(req.payload.form || null);
+    if ( filterableFields.error ) throw filterableFields.error;
+
+    const fieldFilters = [];
+    for ( const f of filterableFields.res ) {
+      const entry = { field_name: f.name, field_type: f.field_type };
+
+      if ( ['date','datetime'].includes(f.field_type) ) {
+        entry.after  = req.payload[`${f.name}_after`]  || null;
+        entry.before = req.payload[`${f.name}_before`] || null;
+        delete req.payload[`${f.name}_after`];
+        delete req.payload[`${f.name}_before`];
+        if ( entry.after || entry.before ) fieldFilters.push(entry);
+      } else if ( ['select','radio','typeahead','checkbox-multiple'].includes(f.field_type) ) {
+        const raw = req.payload[f.name];
+        delete req.payload[f.name];
+        if ( raw ) {
+          entry.values = String(raw).split(',').map(v => v.trim()).filter(Boolean);
+          if ( entry.values.length ) fieldFilters.push(entry);
+        }
+      }
+    }
+    if ( fieldFilters.length ) req.payload.field_filters = fieldFilters;
+
+    const fieldCols = await resolveExportFieldColumns(req.payload.form);
+    const cursorResult = await models.formEntry.exportCursor(req.payload);
+    if ( cursorResult.error ) throw cursorResult.error;
+    ({ client } = cursorResult.res);
+    const cursor = cursorResult.res.cursor;
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="form-entries.csv"');
+
+    const staticHeaders = ['form_entry_id', 'form_name', 'created_at', 'submitted_by', 'submitted_by_first_name', 'submitted_by_last_name', 'department'];
+    res.write(stringify([[...staticHeaders, ...fieldCols.map(f => f.label)]]));
+
+    const READ_SIZE = 200;
+    while ( true ) {
+      const rows = await new Promise((resolve, reject) =>
+        cursor.read(READ_SIZE, (err, r) => err ? reject(err) : resolve(r))
+      );
+      if ( !rows.length ) break;
+      const batch = rows.map(entry => [
+        entry.form_entry_id,
+        entry.form_name,
+        entry.created_at ? new Date(entry.created_at).toISOString() : '',
+        entry.submitted_by,
+        entry.submitted_by_user?.first_name ?? '',
+        entry.submitted_by_user?.last_name  ?? '',
+        entry.group?.name ?? '',
+        ...fieldCols.map(f => serializeFieldValue(entry.fields?.[f.name]))
+      ]);
+      res.write(stringify(batch));
+    }
+
+    logger.info('Form entry export complete', req.context.logSignal);
+    res.end();
+  } catch (e) {
+    if ( !res.headersSent ) return handleError(res, req, e);
+    logger.error('Error during CSV export', req.context.logSignal, { error: e });
+    res.end();
+  } finally {
+    client?.release();
+  }
+});
 
 router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts: ['params']}), async (req, res) => {
   try {

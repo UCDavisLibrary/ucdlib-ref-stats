@@ -1,9 +1,17 @@
 import { html, css } from 'lit';
+import '#components/ref-stats-form-entry-query.js';
+import '#components/ref-stats-form-entry-query-filters.js';
+import '#components/ref-stats-form-entry-query-download.js';
 
 export function styles() {
   const elementStyles = css`
     ref-stats-page-reports {
       display: block;
+    }
+    ref-stats-page-reports .form-entry-query-download-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
     }
   `;
 
@@ -19,6 +27,9 @@ export function render() {
       <li>${pageTitle}</li>
     </ol>
     <div class='l-container'>
+      <div class='form-entry-query-download-container'>
+        <ref-stats-form-entry-query-download latest-version></ref-stats-form-entry-query-download>
+      </div>
       <ref-stats-form-entry-query-filters show-form-filter></ref-stats-form-entry-query-filters>
       <ref-stats-form-entry-query latest-version .displayedFields=${this.displayedFields}></ref-stats-form-entry-query>
     </div>

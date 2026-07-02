@@ -7,42 +7,26 @@ import logger from '#lib/logger.js';
 class FormEntry {
 
   /**
-   * @description Query form entries with optional filtering and pagination
-   * @param {Object} params - Query parameters
-   * @param {Number} params.page - Page number
-   * @param {Number} params.per_page - Number of results per page
+   * @description Builds the WHERE clause and bound values for a form entry query from filter params.
+   * Used by both query() and exportCursor() to avoid duplication.
+   * @param {Object} params - Filter parameters
    * @param {Boolean} params.is_latest_version - If true, only return the latest version of each entry
    * @param {String|String[]} params.form - Filter by form ID or name
-   * @param {String|String[]} params.submitted_by - Filter by submitter user ID(s); string or array of strings
+   * @param {String|String[]} params.submitted_by - Filter by submitter user ID(s)
    * @param {Number[]} params.group_id - Filter by group ID(s)
-   * @param {String} params.orderByField - Field name to order by; prefix with '-' for DESC or '+' for ASC
-   * @param {Array} [params.field_filters] - Normalized field filter specs from the route; each: {field_name, field_type, after?, before?, values?}
-   * @returns {Object} Paginated results object or an error object
+   * @param {String} params.submitted_after - ISO date lower bound on created_at
+   * @param {String} params.submitted_before - ISO date upper bound on created_at
+   * @param {Array} params.field_filters - Normalized field filter specs; each: {field_name, field_type, after?, before?, values?}
+   * @returns {{where: string[], values: any[]}}
    */
-  async query(params={}){
-    const page = params.page || 1;
-    const perPage = params.per_page || 15;
-    const offset = (page - 1) * perPage;
-
-    let orderByField;
-    if ( params.orderByField ) {
-      orderByField = params.orderByField;
-      if ( orderByField.startsWith('-')){
-        orderByField = `'${orderByField.slice(1)}' DESC`;
-      } else if ( orderByField.startsWith('+') ) {
-        orderByField = `'${orderByField.slice(1)}' ASC`;
-      } else {
-        orderByField = `'${orderByField}' ASC`;
-      }
-    }
-    
+  _buildQueryWhereClause(params = {}) {
     const where = [];
     const values = [];
 
     if ( params.is_latest_version ) {
       values.push(true);
       where.push(`is_latest_version = $${values.length}`);
-    } 
+    }
 
     if ( params.form ){
       values.push(params.form);
@@ -91,12 +75,47 @@ class FormEntry {
       }
     }
 
+    return { where, values };
+  }
+
+  /**
+   * @description Query form entries with optional filtering and pagination
+   * @param {Object} params - Query parameters
+   * @param {Number} params.page - Page number
+   * @param {Number} params.per_page - Number of results per page
+   * @param {Boolean} params.is_latest_version - If true, only return the latest version of each entry
+   * @param {String|String[]} params.form - Filter by form ID or name
+   * @param {String|String[]} params.submitted_by - Filter by submitter user ID(s); string or array of strings
+   * @param {Number[]} params.group_id - Filter by group ID(s)
+   * @param {String} params.orderByField - Field name to order by; prefix with '-' for DESC or '+' for ASC
+   * @param {Array} [params.field_filters] - Normalized field filter specs from the route; each: {field_name, field_type, after?, before?, values?}
+   * @returns {Object} Paginated results object or an error object
+   */
+  async query(params={}){
+    const page = params.page || 1;
+    const perPage = params.per_page || 15;
+    const offset = (page - 1) * perPage;
+
+    let orderByField;
+    if ( params.orderByField ) {
+      orderByField = params.orderByField;
+      if ( orderByField.startsWith('-')){
+        orderByField = `'${orderByField.slice(1)}' DESC`;
+      } else if ( orderByField.startsWith('+') ) {
+        orderByField = `'${orderByField.slice(1)}' ASC`;
+      } else {
+        orderByField = `'${orderByField}' ASC`;
+      }
+    }
+
+    const { where, values } = this._buildQueryWhereClause(params);
+
     const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const sql = `
       SELECT *, COUNT(*) OVER() as total_count FROM ${config.db.views.formEntryFull} fe
       ${whereSQL}
-      ${ orderByField ? 
-        `ORDER BY fields->>${orderByField} NULLS LAST` : 
+      ${ orderByField ?
+        `ORDER BY fields->>${orderByField} NULLS LAST` :
         `ORDER BY created_at DESC NULLS LAST`}
       LIMIT $${values.length + 1} OFFSET $${values.length + 2}
     `;
@@ -109,7 +128,9 @@ class FormEntry {
       delete row.total_count;
       return row;
     });
-    this.setPastEditWindow(results);
+    if ( !params.noPastEditWindow ) {
+      this.setPastEditWindow(results);
+    }
     return { res: {
       results,
       offset,
@@ -118,6 +139,52 @@ class FormEntry {
       max_page: Math.ceil(total_count / perPage),
       total_count
     }};
+  }
+
+  /**
+   * @description Opens a pg-cursor for streaming form entries matching the given params.
+   * The caller must read the cursor to completion and release the client when done.
+   * @param {Object} params - Same filter params as query() minus page/per_page
+   * @param {Boolean} params.is_latest_version - If true, only return the latest version of each entry
+   * @param {String|String[]} params.form - Filter by form ID or name
+   * @param {String|String[]} params.submitted_by - Filter by submitter user ID(s)
+   * @param {Number[]} params.group_id - Filter by group ID(s)
+   * @param {String} params.submitted_after - ISO date lower bound on created_at
+   * @param {String} params.submitted_before - ISO date upper bound on created_at
+   * @param {String} params.orderByField - Field name to order by; prefix with '-' for DESC or '+' for ASC
+   * @param {Array} params.field_filters - Normalized field filter specs
+   * @returns {Object} {res: {client, cursor}} or {error}
+   */
+  async exportCursor(params = {}) {
+    const { where, values } = this._buildQueryWhereClause(params);
+    const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+    let orderByClause = 'created_at DESC NULLS LAST';
+    if ( params.orderByField ) {
+      let f = params.orderByField;
+      if ( f.startsWith('-') ) {
+        orderByClause = `fields->>'${f.slice(1)}' DESC NULLS LAST`;
+      } else if ( f.startsWith('+') ) {
+        orderByClause = `fields->>'${f.slice(1)}' ASC NULLS LAST`;
+      } else {
+        orderByClause = `fields->>'${f}' ASC NULLS LAST`;
+      }
+    }
+
+    const sql = `
+      SELECT * FROM ${config.db.views.formEntryFull} fe
+      ${whereSQL}
+      ORDER BY ${orderByClause}
+    `;
+
+    try {
+      const Cursor = (await import('pg-cursor')).default;
+      const client = await pgClient.pool.connect();
+      const cursor = client.query(new Cursor(sql, values));
+      return { res: { client, cursor } };
+    } catch (error) {
+      return { error };
+    }
   }
 
   /**
