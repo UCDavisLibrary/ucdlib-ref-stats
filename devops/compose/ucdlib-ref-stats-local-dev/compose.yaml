@@ -26,9 +26,41 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
       - ../../../services/pg/schema:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   adminer:
     image: adminer:5
     ports:
       - ${ADMINER_HOST_PORT:-8080}:8080
+  redis:
+    image: redis:7
+  superset:
+    image: localhost/local-dev/ucdlib-ref-stats-superset:local-dev
+    env_file:
+      - .env
+    environment:
+      SUPERSET_OIDC_CLIENT_ID: ${SUPERSET_OIDC_CLIENT_ID:-ref-stats-superset}
+      SUPERSET_OIDC_DISCOVERY_URL: ${SUPERSET_OIDC_DISCOVERY_URL:-https://auth.library.ucdavis.edu/realms/internal/.well-known/openid-configuration}
+      PYTHONPATH: /app/pythonpath
+      DATABASE_DIALECT: postgresql+psycopg2
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: localhost
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_DB: superset
+    volumes:
+      - ../../../services/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - superset-home:/app/superset_home
+    ports:
+      - ${SUPERSET_HOST_PORT:-8088}:8088
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 volumes:
   db-data:
+  superset-home:

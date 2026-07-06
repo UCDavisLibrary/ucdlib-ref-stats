@@ -8,3 +8,8 @@ docker build \
   -t localhost/local-dev/ucdlib-ref-stats:local-dev \
   -f "${SERVICES_DIR}/Dockerfile" \
   ${ROOT_DIR}
+
+docker build \
+  -t localhost/local-dev/ucdlib-ref-stats-superset:local-dev \
+  -f "${SERVICES_DIR}/superset/Dockerfile" \
+  ${SERVICES_DIR}/superset
