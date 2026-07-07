@@ -9,7 +9,8 @@ export default preload([
       'spinner', 'circle-exclamation', 'upload', 'circle-info', 'plus',
       'check', 'circle-chevron-right', 'ellipsis', 'arrow-up', 'arrow-down',
       'database', 'eye-slash', 'keyboard', 'eye', 'rectangle-list', 'chevron-down',
-      'chevron-up', 'pen-to-square', 'sliders', 'table-list', 'table-columns', 'download'
+      'chevron-up', 'pen-to-square', 'sliders', 'table-list', 'table-columns', 'download',
+      'chart-pie'
     ]
   }, 
   { 

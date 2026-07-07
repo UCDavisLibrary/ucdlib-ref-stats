@@ -1,8 +1,7 @@
 import {createLogger} from '@ucd-lib/logger';
-import config from './config.js';
 
 const logger = createLogger({
-  name : config.app.loggerName
+  name: process.env.APP_LOGGER_NAME || 'ucdlib-ref-stats'
 });
 
 export default logger;

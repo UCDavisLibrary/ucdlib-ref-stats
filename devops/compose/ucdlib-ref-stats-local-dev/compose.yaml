@@ -19,6 +19,51 @@ services:
       - db
     ports:
       - ${APP_HOST_PORT:-3000}:${APP_CONTAINER_PORT:-3000}
+  backup:
+    image: *main-image
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      # RUN_BACKUP: true
+      APP_ENV: ${APP_ENV:-dev}
+      BACKUP_DATA_ENV: ${BACKUP_DATA_ENV:-localhost}
+      BACKUP_LOG_TABLE: ${BACKUP_LOG_TABLE:-backup_log}
+      PGUSER: 'postgres'
+      PGHOST: 'db'
+      PGDATABASE: 'postgres'
+      PGPASSWORD: 'localhost'
+      PGPORT: 5432
+      GOOGLE_APPLICATION_CREDENTIALS: /etc/service-account.json
+      GC_BACKUP_BUCKET: 'itis-backups/ucdlib-ref-stats'
+      BACKUP_FILE_NAME: 'db.sql.gz'
+    # command: /services/backup/entrypoint.sh
+    volumes:
+      - ../../../services/backup:/services/backup
+      - ../../secrets/gc-writer-key.json.json:/etc/service-account.json
+  init:
+    image: *main-image
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      # RUN_INIT: true
+      APP_ENV: ${APP_ENV:-dev}
+      BACKUP_DATA_ENV: ${BACKUP_DATA_ENV:-prod}
+      PGUSER: 'postgres'
+      PGHOST: 'db'
+      PGDATABASE: 'postgres'
+      PGPASSWORD: 'localhost'
+      PGPORT: 5432
+      GOOGLE_APPLICATION_CREDENTIALS: /etc/service-account.json
+      GC_BACKUP_BUCKET: 'itis-backups/ucdlib-ref-stats'
+      BACKUP_FILE_NAME: 'db.sql.gz'
+    command: /services/init/init.sh
+    volumes:
+      - ../../../services/init:/services/init
+      - ../../secrets/gc-reader-key.json.json:/etc/service-account.json
   db:
     image: postgres:17
     environment:

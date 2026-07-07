@@ -7,7 +7,6 @@ todo:
 - init and backup scripts
   - clear access tokens
 - env file with get script
-- cork build
 - health endpoint
 - superset
   - import assets, do RLS

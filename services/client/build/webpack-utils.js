@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import config from '../../lib/config.js';
+import config from '#lib/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

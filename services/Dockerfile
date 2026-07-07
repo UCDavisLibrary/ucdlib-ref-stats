@@ -28,16 +28,26 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] \
   > /etc/apt/sources.list.d/pgdg.list
 
 # Set up init/backup utils
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
   wait-for-it \
-  google-cloud-sdk
-RUN mkdir -p deploy-utils/data
-WORKDIR /app/deploy-utils
+  google-cloud-sdk \
+  && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 RUN mkdir /services
 WORKDIR /services
+
+# Backup
+RUN mkdir utils-data && mkdir utils-data/backup
+COPY services/backup ./backup
+COPY services/backup/cron /etc/cron.d/backup
+RUN chmod 0644 /etc/cron.d/backup
+
+# Init
+RUN mkdir utils-data/init
+COPY services/init ./init
+
 
 # Install app dependencies
 COPY services/package.json .

@@ -15,8 +15,5 @@ app.use('/api', apiRoutes);
 staticRoutes(app);
 
 app.listen(config.app.containerPort, () => {
-  const configSummary = {
-    port: config.app.containerPort,
-  };
-  logger.info(`Server started on port ${config.app.containerPort}`, { config: configSummary });
+  config.logSummary('Server started');
 });

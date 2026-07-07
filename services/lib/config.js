@@ -1,3 +1,6 @@
+import corkBuild from './corkBuild.js';
+import logger from './logger.js';
+
 class Config {
   constructor(){
     
@@ -7,9 +10,12 @@ class Config {
       bundleName: this.getEnv('APP_BUNDLE_NAME', 'ucdlib-ref-stats.js'),
       loggerName: this.getEnv('APP_LOGGER_NAME', 'ucdlib-ref-stats'),
       isDevEnv: this.getEnv('APP_ENV') === 'dev',
-      bundleVersion: (new Date()).toISOString()
+      bundleVersion: (new Date()).toISOString(),
+      corkBuildVersion: corkBuild.version
     }
-    // todo: if not dev env, read version from cork-build version file
+    if ( !this.app.isDevEnv && corkBuild.tag ) {
+      this.app.bundleVersion = corkBuild.tag;
+    }
 
     this.db = {
       tables: {
@@ -47,6 +53,20 @@ class Config {
       key: this.getEnv('UCDLIB_PERSONNEL_API_KEY', ''),
       serverCacheExpiration: this.getEnv('UCDLIB_PERSONNEL_API_CACHE_EXPIRATION', '12 hours')
     }
+  }
+
+  /**
+   * @description Log a summary of certain config values. 
+   */
+  logSummary(msg='Config Summary') {
+    const details = {
+      app: {
+        isDevEnv: this.app.isDevEnv,
+        corkBuildVersion: this.app.corkBuildVersion,
+        containerPort: this.app.containerPort
+      }
+    }
+    logger.info(msg, details);
   }
 
   /**
