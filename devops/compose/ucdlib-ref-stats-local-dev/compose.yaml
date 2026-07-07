@@ -41,7 +41,7 @@ services:
     # command: /services/backup/entrypoint.sh
     volumes:
       - ../../../services/backup:/services/backup
-      - ../../secrets/gc-writer-key.json.json:/etc/service-account.json
+      - ../../secrets/gc-writer-key.json:/etc/service-account.json
   init:
     image: *main-image
     env_file:
@@ -63,7 +63,7 @@ services:
     command: /services/init/init.sh
     volumes:
       - ../../../services/init:/services/init
-      - ../../secrets/gc-reader-key.json.json:/etc/service-account.json
+      - ../../secrets/gc-reader-key.json:/etc/service-account.json
   db:
     image: postgres:17
     environment:

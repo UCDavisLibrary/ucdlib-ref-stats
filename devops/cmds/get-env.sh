@@ -49,8 +49,7 @@ if [ -f "$ENV_FILE" ] && [ "$FORCE_OVERWRITE" = false ]; then
   exit 0
 fi
 
-# todo: implement gcloud secret fetch when set up
 touch "$ENV_FILE"
-#gcloud --project=digital-ucdavis-edu secrets versions access latest --secret=${PROJECT_NAME}-env > "$ENV_FILE"
+gcloud --project=digital-ucdavis-edu secrets versions access latest --secret=itis-ref-stats-env > "$ENV_FILE"
 
 echo ".env file has been downloaded to $DEPLOYMENT_DIR"
