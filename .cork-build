@@ -1,0 +1,13 @@
+{
+  "registry" : "us-west1-docker.pkg.dev/digital-ucdavis-edu/pub",
+
+  "images" : {
+    "ucdlib-ref-stats" : {
+      "contextPath" : ".",
+      "dockerfile": "./services/Dockerfile"
+    },
+    "ucdlib-ref-stats-superset" : {
+      "contextPath" : "./services/superset"
+    }
+  }
+}

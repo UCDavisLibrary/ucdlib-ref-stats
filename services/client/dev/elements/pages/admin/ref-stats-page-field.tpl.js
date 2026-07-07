@@ -29,7 +29,6 @@ export function render() {
 
         </div>
         <div class="l-sidebar-second">
-          <!-- Todo: Hide if not super admin -->
           ${focalLink({
             text: 'Add New Field',
             icon: 'fas.plus',

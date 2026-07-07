@@ -1,5 +1,9 @@
 #! /bin/bash
 
+###
+# Main build process to cutting production images
+###
+
 set -e
 
 CMDS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -11,14 +15,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-DEPTH=$2
-if [ -z "$DEPTH" ]; then
-  DEPTH=ALL
-fi
-
-cork-kube build exec \
+cork-kube build gcb \
   --project $PROJECT_NAME \
   --version $VERSION \
-  --override-tag local-dev \
-  --depth $DEPTH \
-  --no-cache-from
+  --depth ALL

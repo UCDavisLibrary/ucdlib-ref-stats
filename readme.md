@@ -10,13 +10,21 @@ todo:
 - cork build
 - health endpoint
 - superset
-  - Row Level Security (RLS)
-  - postgresql+psycopg2://postgres:localhost@db:5432/postgres
-  - reverse proxy url - `APPLICATION_ROOT= '/dashboards'`, `ENABLE_PROXY_FIX = True`
+  - import assets, do RLS
+  - reverse proxy url - `SUPERSET_APPLICATION_ROOT=/dashboards` in env
 
 ## Superset
 
 Superset runs as a separate service sharing the same Postgres instance. The main dataset for dashboards is the `form_entry_full` view (`postgres` database), which aggregates all form field values into a single `fields` JSONB column.
+
+### Row Level Security
+To limit users to only their own submissions, create a "Row Level Security" entry:
+| Field | Value |
+| ----- | ----- |
+| Filter Type | Base |
+| Excluded Roles | Admin, Alpha |
+| Clause | `submitted_by = '{{ current_username() }}'` |
+
 
 ### Connecting to the database
 

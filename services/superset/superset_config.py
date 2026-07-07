@@ -29,6 +29,14 @@ AUTH_USER_REGISTRATION = True
 AUTH_USER_REGISTRATION_ROLE = 'Gamma'
 AUTH_ROLES_SYNC_AT_LOGIN = True
 
+# Allow us to use the user's username in sql queries, e.g. {{ current_user.username }}.
+FEATURE_FLAGS = {
+    "ENABLE_TEMPLATE_PROCESSING": True,
+}
+
+APPLICATION_ROOT = os.environ.get('SUPERSET_APPLICATION_ROOT', '/')
+ENABLE_PROXY_FIX = APPLICATION_ROOT != '/'
+
 # Map Keycloak role names to Superset roles.
 # role_keys is populated by KeycloakSecurityManager.oauth_user_info below.
 AUTH_ROLES_MAPPING = {
