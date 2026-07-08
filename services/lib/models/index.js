@@ -1,4 +1,5 @@
 import assignment from "./assignment.js";
+import backupLog from "./backupLog.js";
 import cache from "./cache.js";
 import field from "./field.js";
 import formEntry from "./form-entry.js";
@@ -10,6 +11,7 @@ import user from "./user.js";
 
 export default {
   assignment,
+  backupLog,
   cache,
   field,
   formEntry,

@@ -4,7 +4,6 @@ Application for collecting and reporting librarian reference interactions.
 In active development.
 
 todo: 
-- health endpoint
 - superset
   - import assets, do RLS
   - reverse proxy url - `SUPERSET_APPLICATION_ROOT=/dashboards` in env

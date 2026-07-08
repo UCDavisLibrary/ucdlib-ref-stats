@@ -37,6 +37,39 @@ FEATURE_FLAGS = {
 APPLICATION_ROOT = os.environ.get('SUPERSET_APPLICATION_ROOT', '/')
 ENABLE_PROXY_FIX = APPLICATION_ROOT != '/'
 
+# Add custom time grains for academic quarter and academic year. 
+# Used for bucketing time series data
+# There is a little bit of error because we are using fixed dates due to implementation limitations
+# fall - sept 25 | winter - jan 1 | spring - mar 25 | summer - june 22
+TIME_GRAIN_ADDONS = {
+    "academic_quarter": "Academic Quarter",
+    "academic_year": "Academic Year",
+}
+TIME_GRAIN_ADDON_EXPRESSIONS = {
+    "postgresql": {
+        "academic_quarter": """
+            CASE
+                WHEN {col} >= make_date(extract(year from {col})::int, 9, 25)::timestamp
+                    THEN make_date(extract(year from {col})::int, 9, 25)::timestamp
+                WHEN {col} >= make_date(extract(year from {col})::int, 6, 22)::timestamp
+                    THEN make_date(extract(year from {col})::int, 6, 22)::timestamp
+                WHEN {col} >= make_date(extract(year from {col})::int, 3, 25)::timestamp
+                    THEN make_date(extract(year from {col})::int, 3, 25)::timestamp
+                WHEN {col} >= make_date(extract(year from {col})::int, 1, 1)::timestamp
+                    THEN make_date(extract(year from {col})::int, 1, 1)::timestamp
+                ELSE make_date(extract(year from {col})::int - 1, 9, 25)::timestamp
+            END
+        """,
+        "academic_year": """
+            CASE
+                WHEN {col} >= make_date(extract(year from {col})::int, 9, 25)::timestamp
+                    THEN make_date(extract(year from {col})::int, 9, 25)::timestamp
+                ELSE make_date(extract(year from {col})::int - 1, 9, 25)::timestamp
+            END
+        """,
+    }
+}
+
 # Map Keycloak role names to Superset roles.
 # role_keys is populated by KeycloakSecurityManager.oauth_user_info below.
 AUTH_ROLES_MAPPING = {

@@ -53,6 +53,17 @@ class Config {
       key: this.getEnv('UCDLIB_PERSONNEL_API_KEY', ''),
       serverCacheExpiration: this.getEnv('UCDLIB_PERSONNEL_API_CACHE_EXPIRATION', '12 hours')
     }
+
+    this.backup = {
+      tableName: this.getEnv('BACKUP_LOG_TABLE', 'backup_log'),
+      statusFailAfterInterval: this.getEnv('BACKUP_LOG_STATUS_FAIL_AFTER_INTERVAL', '2 days')
+    }
+
+    this.superset = {
+      applicationRoot: this.getEnv('SUPERSET_APPLICATION_ROOT', '/'),
+    }
+    const supersetRoot = this.superset.applicationRoot.replace(/\/$/, '');
+    this.superset.healthUrl = this.getEnv('SUPERSET_HEALTH_URL', `http://superset:8088${supersetRoot}/health`);
   }
 
   /**
