@@ -29,8 +29,8 @@ AUTH_USER_REGISTRATION = True
 AUTH_USER_REGISTRATION_ROLE = 'Gamma'
 AUTH_ROLES_SYNC_AT_LOGIN = True
 
-# Allow us to use the user's username in sql queries, e.g. {{ current_user.username }}.
 FEATURE_FLAGS = {
+    # Allow us to use the user's username in sql queries, e.g. {{ current_user.username }}.
     "ENABLE_TEMPLATE_PROCESSING": True,
 }
 
@@ -44,6 +44,7 @@ ENABLE_PROXY_FIX = APPLICATION_ROOT != '/'
 TIME_GRAIN_ADDONS = {
     "academic_quarter": "Academic Quarter",
     "academic_year": "Academic Year",
+    "fiscal_year": "Fiscal Year",
 }
 TIME_GRAIN_ADDON_EXPRESSIONS = {
     "postgresql": {
@@ -66,6 +67,10 @@ TIME_GRAIN_ADDON_EXPRESSIONS = {
                     THEN make_date(extract(year from {col})::int, 9, 25)::timestamp
                 ELSE make_date(extract(year from {col})::int - 1, 9, 25)::timestamp
             END
+        """,
+        "fiscal_year": """
+            date_trunc('year', ({col} - interval '6 months'))
+            + interval '6 months'
         """,
     }
 }

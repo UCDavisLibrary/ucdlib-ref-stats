@@ -5,7 +5,7 @@ In active development.
 
 todo: 
 - superset
-  - import assets, do RLS
+  - import assets, do RLS, grant access to dataset
   - reverse proxy url - `SUPERSET_APPLICATION_ROOT=/dashboards` in env
 
 ## Superset
