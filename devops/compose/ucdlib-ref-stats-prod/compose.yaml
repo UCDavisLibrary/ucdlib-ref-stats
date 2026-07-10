@@ -79,7 +79,7 @@ services:
     image: redis:7
     restart: always
   superset:
-    image: localhost/local-dev/ucdlib-ref-stats-superset:local-dev
+    image: *superset-image
     restart: always
     env_file:
       - .env
