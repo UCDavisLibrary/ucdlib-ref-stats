@@ -34,10 +34,10 @@ FEATURE_FLAGS = {
     "ENABLE_TEMPLATE_PROCESSING": True,
 }
 
-APPLICATION_ROOT = os.environ.get('SUPERSET_APPLICATION_ROOT', '/')
-ENABLE_PROXY_FIX = APPLICATION_ROOT != '/'
+ENABLE_PROXY_FIX = True
 # x_prefix=1 tells ProxyFix to read X-Forwarded-Prefix from Apache so Flask
 # generates URLs with the correct path prefix when behind a reverse proxy.
+# Harmless in local dev when those headers are absent.
 PROXY_FIX_CONFIG = {"x_for": 1, "x_proto": 1, "x_host": 1, "x_prefix": 1}
 
 # Add custom time grains for academic quarter and academic year. 
