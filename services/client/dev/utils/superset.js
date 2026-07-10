@@ -12,7 +12,7 @@ class Superset {
   }
 
   get dashboardListUrl() {
-    return `${this.url}/dashboard/list/`;
+    return `${this.url}/dashboard/list/?filters=(certified:(label:Yes,value:!t))`;
   }
 
 }
