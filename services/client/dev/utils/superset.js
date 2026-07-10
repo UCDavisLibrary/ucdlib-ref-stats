@@ -12,7 +12,12 @@ class Superset {
   }
 
   get dashboardListUrl() {
-    return `${this.url}/dashboard/list/?filters=(certified:(label:Yes,value:!t))`;
+    const url = `${this.url}/dashboard/list/?filters=(certified:(label:Yes,value:!t))`;
+    if ( window?.location?.hostname?.includes('localhost') ) return url;
+
+    // If not localhost, redirect to CAS login first
+    // necessary because there is currently a bug with superset's "login with cas" button where it doesn't respect the prefix/application root
+    return `${this.url}/login/cas?next=${encodeURIComponent(url)}`;
   }
 
 }
