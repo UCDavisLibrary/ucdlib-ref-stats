@@ -53,7 +53,7 @@ services:
     depends_on:
       - db
     environment:
-      RUN_INIT: true
+      # RUN_INIT: true
       BACKUP_DATA_ENV: ${BACKUP_DATA_ENV:-prod}
       PGUSER: 'postgres'
       PGHOST: 'db'
@@ -70,6 +70,7 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ../../../services/pg/schema:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
