@@ -8,10 +8,18 @@ set -e
 CMDS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source "$CMDS_DIR/config.sh"
 
+VERSION=$1
+if [ -z "$VERSION" ]; then
+  echo "Usage: init-local-dev.sh <version> [depth]"
+  exit 1
+fi
+
+DEPTH=$2
+
 cd $CMDS_DIR
 
 echo "Building local-dev docker image..."
-./build-local-dev.sh
+./build-local-dev.sh $VERSION $DEPTH
 echo "Local-dev docker image built."
 
 echo "Fetching .env for local-dev if not present..."
