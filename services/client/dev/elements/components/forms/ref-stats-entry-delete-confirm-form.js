@@ -99,7 +99,7 @@ export default class RefStatsEntryDeleteConfirmForm extends Mixin(LitElement)
       if ( r.payload.new_latest_id ) {
         this.AppStateModel.setLocation(`/form/${this.formNameOrId}/${r.payload.new_latest_id}`);
       } else {
-        this.AppStateModel.setLocation(`/form/${this.formNameOrId}/entries`);
+        this.AppStateModel.setLocation(`/form/${this.formNameOrId}/submissions`);
       }
     }
     return r;
