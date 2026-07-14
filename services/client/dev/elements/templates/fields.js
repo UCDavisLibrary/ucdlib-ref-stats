@@ -130,6 +130,7 @@ function select(ctl) {
           `)}
         </select>
       </ucd-theme-slim-select>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
     ${renderQuickAdd.call(this, field, ctl)}
   `;
