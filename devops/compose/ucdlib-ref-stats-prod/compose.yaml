@@ -14,6 +14,7 @@ services:
       PGHOST: 'db'
       PGDATABASE: 'postgres'
       PGPORT: 5432
+      SUPERSET_APPLICATION_ROOT: ${SUPERSET_APPLICATION_ROOT:-/dashboards}
     depends_on:
       - db
     ports:
@@ -34,7 +35,7 @@ services:
       - db
     environment:
       RUN_BACKUP: true
-      BACKUP_DATA_ENV: ${BACKUP_DATA_ENV:-localhost}
+      BACKUP_DATA_ENV: ${BACKUP_DATA_ENV:-prod}
       BACKUP_LOG_TABLE: ${BACKUP_LOG_TABLE:-backup_log}
       PGUSER: 'postgres'
       PGHOST: 'db'

@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
     // check superset
     try {
       const supersetRes = await fetch(config.superset.healthUrl);
-      const supersetText = await supersetRes.text().catch(() => '');
+      const supersetText = await supersetRes.text();
       services.superset = {
         status: supersetRes.ok && supersetText.includes('OK') ? 'pass' : 'fail'
       };
