@@ -43,6 +43,7 @@ function renderHeader(){
       <ucdlib-branding-bar
         site-name="UC Davis Library"
         slogan=${config?.title || ''}>
+        <a href='https://staff.library.ucdavis.edu'>Staff Intranet</a>
         <a href='/logout'>Logout</a>
       </ucdlib-branding-bar>
 
