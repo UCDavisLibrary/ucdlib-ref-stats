@@ -125,6 +125,36 @@ CREATE TABLE instruct_statistics_by_instructor (
   requestor_dept            text
 );
 
+DROP TABLE IF EXISTS research_metrics;
+CREATE TABLE research_metrics (
+  survey_recorded_date              date,
+  survey_response_id                text,
+  submitter_last_name               text,
+  submitter_first_name              text,
+  submitter_email                   text,
+  submitter_department              text,
+  informational_interaction         boolean,
+  consult_start                     date,
+  person_count                      integer,
+  audience_type                     text,
+  audience_type_other               text,
+  consult_medium                    text,
+  inperson_consult_format           text,
+  inperson_consult_format_other     text,
+  virtual_consult_format            text,
+  virtual_consult_format_other      text,
+  consult_duration                  integer,
+  read_scale                        integer,
+  subject_area                      text,
+  subject_area_other                text,
+  consult_focus                     text,
+  consult_focus_class_assignment    text,
+  consult_focus_other               text,
+  collaborator                      text,
+  collaborator_other                text,
+  notes                             text
+);
+
 DROP TABLE IF EXISTS refdesk;
 CREATE TABLE refdesk (
   id                    integer,

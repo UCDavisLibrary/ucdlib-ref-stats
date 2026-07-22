@@ -3,5 +3,6 @@ node_modules
 .DS_Store
 secrets
 /services/client/public/js
+/services/archive/data
 .claude
 app-requirements

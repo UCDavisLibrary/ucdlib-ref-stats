@@ -171,6 +171,11 @@ LEFT JOIN list_requestor req        ON req.id = s.requestor_id
 ORDER BY s.session_date, inst_user.lastname;
 ```
 
+### Research Consult Statistics
+This can be exported from Qualtrics: https://ucdavis.co1.qualtrics.com/responses/#/surveys/SV_2bL0KnwiRNLvfUy. 
+
+The file should be copied into `/services/archive/data`, and renamed according to property in `transform-research-metrics.js`. Run the script, and then copy to GCS.
+
 ## Importing Data
 
 CSV exports from the legacy sources are stored in GCS at `gs://itis-backups/ucdlib-ref-stats/archive/`. The import script downloads only the CSVs that correspond to tables defined in `services/archive/schema.sql` and loads them into a separate `archive` database on the running Postgres instance.

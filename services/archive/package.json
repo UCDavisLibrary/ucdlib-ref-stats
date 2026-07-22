@@ -1,0 +1,9 @@
+{
+  "name": "ucdlib-ref-stats-archive",
+  "type": "module",
+  "version": "1.0.0",
+  "dependencies": {
+    "csv-parse": "^5.0.0",
+    "csv-stringify": "^6.0.0"
+  }
+}
