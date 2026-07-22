@@ -1,0 +1,73 @@
+{# Custom JS that is appended to the end of every page. #}
+
+<script nonce="{{ macros.get_nonce() }}" id="ucdlib-custom-js">
+  document.addEventListener('DOMContentLoaded', function () {
+
+    const isLocalhost = [ 'localhost', '127.0.0.1' ].includes(window.location.hostname);
+    const APPLICATION_ROOT = '/dashboards';
+
+    /**
+     * @description Fixes a URL to ensure it has the correct application root prefix.
+     * and hasn't been double-prefixed.
+     * @param {string} href - The original URL to fix.
+     * @returns {string} The fixed URL with the correct application root prefix.
+     */
+    const fixHref = (href) => {
+      const url = new URL(href);
+      const double = APPLICATION_ROOT + APPLICATION_ROOT;
+      if (url.pathname.startsWith(double)) {
+        url.pathname = url.pathname.slice(APPLICATION_ROOT.length);
+      } else if (!url.pathname.startsWith(APPLICATION_ROOT)) {
+        url.pathname = APPLICATION_ROOT + url.pathname;
+      }
+      return url.toString();
+    }
+
+    /**
+     * @description Replaces all login links on the page with the correct application root prefix.
+     */
+    const replaceLoginLink = () => {
+      const TIMEOUT = 8000;
+      if ( isLocalhost ) return;
+
+      const processed = new Set();
+      const observer = new MutationObserver(() => {
+        const loginLinks = document.querySelectorAll('a[href^="/login"]');
+        for (const link of loginLinks) {
+          if (processed.has(link)) continue;
+          processed.add(link);
+          link.href = fixHref(link.href);
+        }
+      });
+      const timeout = setTimeout(() => observer.disconnect(), TIMEOUT);
+      observer.observe(document.body, { childList: true, subtree: true });
+    };
+
+    /**
+     * @description Fixes the header logo link and image source to ensure they have the correct application root prefix.
+     */
+    const fixHeaderLogo = () => {
+      const TIMEOUT = 8000;
+      if ( isLocalhost ) return;
+
+      const observer = new MutationObserver(() => {
+        const logoLink = document.querySelector('header .superset-icnvrn a');
+        if (logoLink) {
+          clearTimeout(timeout);
+          observer.disconnect();
+          logoLink.href = fixHref(logoLink.href);
+          const logoImg = logoLink.querySelector('img');
+          if (logoImg) {
+            logoImg.src = fixHref(logoImg.src);
+          }
+        }
+      });
+      const timeout = setTimeout(() => observer.disconnect(), TIMEOUT);
+      observer.observe(document.body, { childList: true, subtree: true });
+
+    }
+
+    replaceLoginLink();
+    fixHeaderLogo();
+  });
+</script>

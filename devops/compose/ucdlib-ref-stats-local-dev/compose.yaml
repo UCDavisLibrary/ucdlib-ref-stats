@@ -99,6 +99,7 @@ services:
       DATABASE_DB: superset
     volumes:
       - ../../../services/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ../../../services/superset/templates/tail_js_custom_extra.html:/app/superset/templates/tail_js_custom_extra.html:ro
       - superset-home:/app/superset_home
     ports:
       - ${SUPERSET_HOST_PORT:-8088}:8088
