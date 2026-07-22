@@ -24,15 +24,21 @@
     }
 
     /**
-     * @description Replaces all login links on the page with the correct application root prefix.
+     * @description Replaces all authentication links on the page with the correct application root prefix.
      */
-    const replaceLoginLink = () => {
+    const replaceAuthLinks = () => {
       const TIMEOUT = 8000;
       if ( isLocalhost ) return;
 
       const processed = new Set();
       const observer = new MutationObserver(() => {
-        const loginLinks = document.querySelectorAll('a[href^="/login"]');
+        const selectors = [
+          'a[href^="/login"]',
+          `a[href^="${APPLICATION_ROOT}${APPLICATION_ROOT}/login"]`,
+          'a[href^="/logout"]',
+          `a[href^="${APPLICATION_ROOT}${APPLICATION_ROOT}/logout"]`
+        ]
+        const loginLinks = document.querySelectorAll(selectors.join(', '));
         for (const link of loginLinks) {
           if (processed.has(link)) continue;
           processed.add(link);
@@ -67,7 +73,7 @@
 
     }
 
-    replaceLoginLink();
+    replaceAuthLinks();
     fixHeaderLogo();
   });
 </script>
