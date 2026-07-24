@@ -137,24 +137,6 @@ export function render() {
         <label for=${this.ctl.idGen.get('allowQuickAdd')}>Allow picklist item creation</label>
       </cork-field-container>
 
-      <cork-field-container class='field-container checkbox' ?hidden=${!isDate}>
-        <input
-          type="checkbox"
-          id=${this.ctl.idGen.get('defaultValueToday')}
-          .checked=${this.payload?.defaultValue === 'today'}
-          @input=${() => this._onPayloadInput('defaultValue', this.payload?.defaultValue === 'today' ? undefined : 'today')}>
-        <label for=${this.ctl.idGen.get('defaultValueToday')}>Default to today's date</label>
-      </cork-field-container>
-
-      <cork-field-container class='field-container' ?hidden=${isDate}>
-        <label for=${this.ctl.idGen.get('defaultValue')}>Default Value</label>
-        <input
-          type="text"
-          id=${this.ctl.idGen.get('defaultValue')}
-          .value=${this.payload?.defaultValue || ''}
-          @input=${e => this._onPayloadInput('defaultValue', e.target.value || undefined)}>
-      </cork-field-container>
-
       <cork-field-container class='field-container'>
         <label>Restrict to Groups</label>
         <p class='field-description u-space-mt--flush'>If one or more groups are selected, only members of those groups will see this field.</p>
@@ -180,6 +162,38 @@ export function render() {
           id=${this.ctl.idGen.get('filterOrder')}
           .value=${this.payload?.filterOrder ?? ''}
           @input=${e => this._onPayloadInput('filterOrder', e.target.value === '' ? undefined : Number(e.target.value))}>
+      </cork-field-container>
+    </fieldset>
+
+    <fieldset>
+      <legend>Default Value</legend>
+
+      <cork-field-container class='field-container checkbox' ?hidden=${!isDate}>
+        <input
+          type="checkbox"
+          id=${this.ctl.idGen.get('defaultValueToday')}
+          .checked=${this.payload?.defaultValue === 'today'}
+          @input=${() => this._onPayloadInput('defaultValue', this.payload?.defaultValue === 'today' ? undefined : 'today')}>
+        <label for=${this.ctl.idGen.get('defaultValueToday')}>Default to today's date</label>
+      </cork-field-container>
+
+      <cork-field-container class='field-container checkbox'>
+        <input
+          type="checkbox"
+          id=${this.ctl.idGen.get('defaultValueLastSubmitted')}
+          .checked=${this.payload?.defaultValue === 'last_value_submitted'}
+          @input=${() => this._onPayloadInput('defaultValue', this.payload?.defaultValue === 'last_value_submitted' ? undefined : 'last_value_submitted')}>
+        <label for=${this.ctl.idGen.get('defaultValueLastSubmitted')}>Use last submitted value</label>
+      </cork-field-container>
+
+      <cork-field-container class='field-container'
+        ?hidden=${isDate || this.payload?.defaultValue === 'last_value_submitted'}>
+        <label for=${this.ctl.idGen.get('defaultValue')}>Default Value</label>
+        <input
+          type="text"
+          id=${this.ctl.idGen.get('defaultValue')}
+          .value=${this.payload?.defaultValue || ''}
+          @input=${e => this._onPayloadInput('defaultValue', e.target.value || undefined)}>
       </cork-field-container>
     </fieldset>
   `;

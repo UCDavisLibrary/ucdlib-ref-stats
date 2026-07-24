@@ -466,14 +466,37 @@ export default class FormEntryController {
 
   /**
    * @description Build an initial payload for new submissions by applying any configured
-   * default values from field assignment settings. Resolves the special keyword 'today'
-   * on date fields to the current date in YYYY-MM-DD format. Skips fields hidden from the user.
-   * @returns {Object} Default payload object
+   * default values from field assignment settings. Resolves special keywords:
+   * - 'today' on date fields → current date in YYYY-MM-DD format
+   * - 'last_value_submitted' → value from the most recently submitted entry for that field
+   * Skips fields hidden from the user.
+   * @returns {Promise<Object>} Default payload object
    */
-  _getDefaultPayload(){
+  async _getDefaultPayload(){
     const defaults = {};
     const formId = this.form?.form_id;
     if ( !formId ) return defaults;
+
+    const needsLastEntry = this.fields.some(field => {
+      if ( !this.fieldIsVisibleForUser(field) ) return false;
+      const assignment = field.forms?.find(f => f.form_id === formId);
+      return assignment?.assignment_settings?.defaultValue === 'last_value_submitted';
+    });
+
+    let lastEntryFields = {};
+    if ( needsLastEntry ) {
+      const r = await this.models.FormEntryModel.query({
+        form: formId,
+        page: 1,
+        per_page: 1,
+        is_latest_version: true,
+        mine: true
+      });
+      if ( r.state === 'loaded' && r.payload.results?.length ) {
+        lastEntryFields = r.payload.results[0].fields || {};
+      }
+    }
+
     for ( const field of this.fields ) {
       if ( !this.fieldIsVisibleForUser(field) ) continue;
       const assignment = field.forms?.find(f => f.form_id === formId);
@@ -481,6 +504,10 @@ export default class FormEntryController {
       if ( !defaultValue ) continue;
       if ( field.field_type === 'date' && defaultValue === 'today' ) {
         defaults[field.name] = new Date().toISOString().split('T')[0];
+      } else if ( defaultValue === 'last_value_submitted' ) {
+        if ( lastEntryFields[field.name] !== undefined ) {
+          defaults[field.name] = lastEntryFields[field.name];
+        }
       } else {
         defaults[field.name] = defaultValue;
       }
@@ -491,12 +518,12 @@ export default class FormEntryController {
   /**
    * @description Reset the form payload to its original state (existing entry fields or default values for new submissions)
    */
-  _onReset(){
+  async _onReset(){
     this.errorResponse = null;
     if ( this.formEntry?.fields ) {
       this.setPayload({...this.formEntry.fields});
     } else {
-      this.setPayload(this._getDefaultPayload());
+      this.setPayload(await this._getDefaultPayload());
     }
   }
 
@@ -514,7 +541,7 @@ export default class FormEntryController {
     if ( this.formEntry?.fields ) {
       this.setPayload({...this.formEntry.fields});
     } else {
-      this.setPayload(this._getDefaultPayload());
+      this.setPayload(await this._getDefaultPayload());
     }
   }
 

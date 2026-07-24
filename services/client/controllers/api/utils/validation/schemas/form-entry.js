@@ -65,7 +65,6 @@ const srOriginalFormEntryExists = async (data, ctx) => {
  */
 const srOrderByFieldExists = async (value, ctx) => {
   if ( !value ) return;
-  console.log('Validating orderByField:', value);
   if ( value.startsWith('-') || value.startsWith('+') ) {
     value = value.substring(1);
   }
