@@ -18,6 +18,8 @@ import '@ucd-lib/theme-elements/brand/ucd-theme-slim-select/ucd-theme-slim-selec
 import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
+import "@aejkatappaja/phantom-ui";
+
 // pages loaded upfront
 import './pages/ref-stats-page-home.js';
 import './pages/ref-stats-page-form-single.js';

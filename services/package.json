@@ -21,6 +21,7 @@
     "start-client": "node ./client/index.js"
   },
   "dependencies": {
+    "@aejkatappaja/phantom-ui": "^1.4.0",
     "@ucd-lib/cork-app-build": "^0.5.0",
     "@ucd-lib/cork-app-state": "^3.2.0",
     "@ucd-lib/cork-app-utils": "^6.4.1",
