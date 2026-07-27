@@ -48,14 +48,13 @@ function checkboxMulti(ctl) {
                 id=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}
                 .checked=${(ctl.payload?.[field.name] || []).includes(item.value)}
                 @input=${() => ctl.togglePayloadArrayItem(field.name, item.value)}>
-              <label for=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}>
-                ${item.label}
-              </label>
+              <label for=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}>${item.label}</label>
+              <div class='option-description' ?hidden=${!item.description}>${unsafeHTML(item.description)}</div>
             </div>
-            <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
           </div>
           `)}
       </fieldset>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
     ${renderQuickAdd.call(this, field, ctl)}
   `;
@@ -83,14 +82,13 @@ function radio(ctl) {
                 id=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}
                 .checked=${ctl.payload?.[field.name] === item.value}
                 @input=${() => ctl.setPayloadField(field.name, item.value)}>
-              <label for=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}>
-                ${item.label}
-              </label>
+              <label for=${ctl.idGen.get(`field-${field.name}-item-${item.value}`)}>${item.label}</label>
+              <div class='option-description' ?hidden=${!item.description}>${unsafeHTML(item.description)}</div>
             </div>
-            <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
           </div>
           `)}
       </fieldset>
+      <div class='field-description' ?hidden=${!this._description}>${unsafeHTML(this._description)}</div>
     </cork-field-container>
     ${renderQuickAdd.call(this, field, ctl)}
   `;
