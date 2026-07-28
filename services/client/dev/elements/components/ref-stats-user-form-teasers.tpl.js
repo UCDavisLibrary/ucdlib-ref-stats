@@ -25,6 +25,11 @@ export function styles() {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
+    @container (min-width: 1200px) {
+      ref-stats-user-form-teasers .teaser-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
   `;
 
   return [elementStyles];
@@ -34,7 +39,8 @@ export function styles() {
 export function render() { 
 return html`
   <div><h2 class="heading--center-underline u-space-mb--large">My Forms</h2></div>
-  <div class='teaser-grid'>
+  <div ?hidden=${this.forms.length} class='alert'>You do not have access to any forms</div>
+  <div class='teaser-grid' ?hidden=${!this.forms.length}>
     ${this.forms.map(form => html`
       <a href='/form/${form.name}' class="tile-link category-brand--${form.form_display_settings?.brandColor || 'primary'} category-brand__background">
         <div class="tile-link__title">

@@ -106,11 +106,15 @@ export default class CorkAppError extends Mixin(LitElement)
     const statusCode = serviceError?.response?.status || '';
 
     const details = serviceError?.payload;
-    const heading = error?.errorMessage ||
+    let heading = error?.errorMessage ||
       error?.errorSettings?.message ||
       details?.message ||
       serviceError?.message ||
       'Unknown error';
+
+    if ( statusCode == 403 ){
+      heading = `${heading}: You do not have permission to access this resource.`;
+    }
 
     if ( details?.stack ){
       details.stack = details.stack.replaceAll('\n', '<br/>')

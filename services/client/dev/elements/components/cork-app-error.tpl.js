@@ -86,15 +86,21 @@ export function styles() {
       font-weight: 700;
       font-size: .875rem;
     }
-    .error-heading {
-      color: #13639e;
-      font-weight: 700;
+    .error-heading-container button {
+      all: unset;
       cursor: pointer;
-      display: inline-flex;
-    }
-    .error-heading:hover {
+      color: #13639e;
       text-decoration: underline;
-      color: #001124;
+      font-size: .875rem;
+      font-weight: 700;
+    }
+    .error-heading-container button:hover {
+      color: #00b2e3;
+    }
+
+    .error-heading {
+      color: var(--ucd-blue, #022851);
+      font-weight: 700;
     }
     .error {
       margin-bottom: 1rem;
@@ -130,7 +136,11 @@ return html`
     <div ?hidden=${!this.errors.length} class='errors'>
       ${this.errors.map(error => html`
         <div class='error'>
-          <div class='error-heading' @click=${() => this.toggleDetails(error)}>${error.heading}</div>
+          <div class='error-heading-container'>
+            <div class='error-heading'>${error.heading}</div>
+            <button @click=${() => this.toggleDetails(error)}>${error.showDetails ? 'Hide' : 'Show'} Details</button>
+          </div>
+          
           <div class='error-details' ?hidden=${!error.showDetails}>
             <div ?hidden=${!error.url} class='error-detail'>
               <div>URL</div>

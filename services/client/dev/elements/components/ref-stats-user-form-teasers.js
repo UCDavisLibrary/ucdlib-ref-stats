@@ -44,7 +44,11 @@ export default class RefStatsUserFormTeasers extends Mixin(LitElement)
   async query(){
     const q = {active_only: true};
     if ( !this.AuthModel.token.hasManagerAccess ){
-      q.name = this.AuthModel.token.forms;
+      q.name = this.AuthModel.token.forms.join(',');
+      if ( !q.name ) {
+        this.forms = [];
+        return;
+      }
     }
     const res = await this.FormModel.query(q);
     if ( res.state !== 'loaded' ) {
