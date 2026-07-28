@@ -80,8 +80,8 @@ VALUES (
 INSERT INTO form (form_id, name, label, description, intro, edit_interval_amount, edit_interval_unit, form_display_settings)
 VALUES (
   gen_random_uuid(),
-  'reference-desk',
-  'Reference Desk',
+  'information-desk',
+  'Information Desk Interactions',
   'Record desk interactions and referrals.',
   '<p>Use this form to record desk interactions and referrals. For live entry, accept the default date and Number of Interactions of 1. For retrospective or batch entry, change the date to the date the interactions occurred and adjust the Number of Interactions as needed. If entering data for multiple days, submit separate entries for each date. Do not combine different READ levels or referrals in a single entry.</p>
 <p>Questions about READ levels? Refer to the <a href="https://readscale.org/read-scale.html">READ Scale definitions</a> or contact your supervisor.</p>',
@@ -89,7 +89,7 @@ VALUES (
   'days',
   jsonb_build_object('brandColor', 'bodega', 'queryElementFields', jsonb_build_array(
     jsonb_build_object('field', 'event-date',                'desktopFr', 1, 'mobileFr', 1),
-    jsonb_build_object('field', 'reference-desk', 'desktopFr', 2, 'mobileFr', 3),
+    jsonb_build_object('field', 'information-desk', 'desktopFr', 2, 'mobileFr', 3),
     jsonb_build_object('field', 'event-count',               'desktopFr', 1),
     jsonb_build_object('field', 'reference-level')
   ))
@@ -102,7 +102,7 @@ VALUES
   (gen_random_uuid(), 'instruction-session-type', 'Instruction Session Type'),
   (gen_random_uuid(), 'outreach-type',            'Outreach Type'),
   (gen_random_uuid(), 'reference-topic',          'Reference Topic'),
-  (gen_random_uuid(), 'reference-desk',          'Reference Desk'),
+  (gen_random_uuid(), 'information-desk',          'Information Desk'),
   (gen_random_uuid(), 'reference-level', 'Reference Level');
 
 
@@ -154,10 +154,10 @@ VALUES
 
 INSERT INTO picklist_item (picklist_item_id, picklist_id, value, label, sort_order)
 VALUES
-  (gen_random_uuid(), get_picklist_id('reference-desk'), 'asc-desk', 'ASC Desk', 0),
-  (gen_random_uuid(), get_picklist_id('reference-desk'), 'bml-desk', 'BML Info Desk', 1),
-  (gen_random_uuid(), get_picklist_id('reference-desk'), 'shields-circ-desk', 'Shields Circ Desk', 2),
-  (gen_random_uuid(), get_picklist_id('reference-desk'), 'welcome-desk', 'Welcome Desk', 3);
+  (gen_random_uuid(), get_picklist_id('information-desk'), 'asc-desk', 'ASC Desk', 0),
+  (gen_random_uuid(), get_picklist_id('information-desk'), 'bml-desk', 'BML Info Desk', 1),
+  (gen_random_uuid(), get_picklist_id('information-desk'), 'shields-circ-desk', 'Shields Circ Desk', 2),
+  (gen_random_uuid(), get_picklist_id('information-desk'), 'welcome-desk', 'Welcome Desk', 3);
 
 INSERT INTO picklist_item (picklist_item_id, picklist_id, value, label, sort_order, description)
 VALUES
@@ -186,7 +186,7 @@ VALUES
   (gen_random_uuid(), 'instruction-session-type', 'Instruction Session Type', 'select', get_picklist_id('instruction-session-type')),
   (gen_random_uuid(), 'outreach-type',           'Outreach Type',            'select', get_picklist_id('outreach-type')),
   (gen_random_uuid(), 'reference-topic',         'Reference Topic',          'select', get_picklist_id('reference-topic')),
-  (gen_random_uuid(), 'reference-desk',        'Reference Desk',           'select', get_picklist_id('reference-desk')),
+  (gen_random_uuid(), 'information-desk',        'Information Desk',           'select', get_picklist_id('information-desk')),
   (gen_random_uuid(), 'reference-level',       'Reference Level',          'radio', get_picklist_id('reference-level'));
 
 
@@ -263,14 +263,14 @@ VALUES
 -- refdesk form 
 INSERT INTO form_field_assignment (form_field_assignment_id, form_id, form_field_id, sort_order, assignment_settings)
 VALUES
-  (gen_random_uuid(), get_form_id('reference-desk'), get_form_field_id('reference-desk'), 0,
-    jsonb_build_object('required', true, 'label', 'Reference Desk', 'defaultValue', 'last_value_submitted')),
-  (gen_random_uuid(), get_form_id('reference-desk'), get_form_field_id('event-date'), 1,
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('information-desk'), 0,
+    jsonb_build_object('required', true, 'label', 'Information Desk', 'defaultValue', 'last_value_submitted')),
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-date'), 1,
     jsonb_build_object('required', true, 'label', 'Date of activity', 'defaultValue', 'today', 'filterOrder', 1, 'description', 'For retrospective entry, select the date the interactions occurred.')),
-  (gen_random_uuid(), get_form_id('reference-desk'), get_form_field_id('reference-level'), 2,
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('reference-level'), 2,
     jsonb_build_object('required', true, 'label', 'Interaction Type')),
-  (gen_random_uuid(), get_form_id('reference-desk'), get_form_field_id('event-count'), 3,
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-count'), 3,
     jsonb_build_object('required', true, 'label', 'Number of interactions', 'defaultValue', '1',
       'description', 'Increase this number only when recording multiple interactions with the same Interaction Type. Record different READ levels or referrals as separate entries.')),
-  (gen_random_uuid(), get_form_id('reference-desk'), get_form_field_id('notes'), 4,
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('notes'), 4,
     jsonb_build_object('required', false, 'rows', 5, 'description', 'Optional. Use only if additional context is needed.'));
