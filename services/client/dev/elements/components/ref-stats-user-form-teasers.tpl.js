@@ -20,11 +20,6 @@ export function styles() {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
-    @container (min-width: 950px) {
-      ref-stats-user-form-teasers .teaser-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
     @container (min-width: 1200px) {
       ref-stats-user-form-teasers .teaser-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
