@@ -18,7 +18,7 @@ export default (app) => {
   let assetsDir = path.join(__dirname, '../public');
   logger.info(`Serving static assets from ${assetsDir}`);
 
-  const routes = ['picklist', 'field', 'form-admin', 'form', 'logout', 'reports'];
+  const routes = ['picklist', 'field', 'form-admin', 'form', 'logout', 'reports', 'analytics', 'dashboard-admin'];
   const appTitle = 'Library Services Statistics';
 
   spaMiddleware({
@@ -39,6 +39,9 @@ export default (app) => {
           clientInit: config.auth.keycloakJsClient,
           oidcScope: config.auth.oidcScope
         },
+        superset: {
+          publicUrl: config.superset.publicUrl
+        }
       });
     },
 

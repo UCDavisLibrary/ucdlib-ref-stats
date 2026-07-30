@@ -21,6 +21,18 @@ router.get('/', validate(schema.formQuery, {reqParts: ['query']}), async (req, r
   }
 });
 
+router.get('/all', async (req, res) => {
+  try {
+    const params = {};
+    if ( req.query.active_only === 'true' ) params.active_only = true;
+    const r = await models.form.getAllForms(params);
+    if ( r.error ) throw r.error;
+    res.status(200).json(r.res);
+  } catch (e) {
+    return handleError(res, req, e);
+  }
+});
+
 router.get('/:idOrName', async (req, res) => {
   try {
     const r = await models.form.get(req.params.idOrName, { errorOnMissing: true });

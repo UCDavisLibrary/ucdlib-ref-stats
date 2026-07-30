@@ -27,12 +27,15 @@ class Config {
         formEntry: 'form_entry',
         formEntryFieldValue: 'form_entry_field_value',
         users: 'users',
-        groups: 'groups'
+        groups: 'groups',
+        dashboard: 'dashboard',
+        dashboardToForm: 'dashboard_to_form'
       },
       views: {
         picklistWithItems: 'picklist_with_items',
         fieldFull: 'form_field_full',
-        formEntryFull: 'form_entry_full'
+        formEntryFull: 'form_entry_full',
+        dashboardFull: 'dashboard_full'
       }
     }
 
@@ -64,6 +67,12 @@ class Config {
     }
     const supersetRoot = this.superset.applicationRoot.replace(/\/$/, '');
     this.superset.healthUrl = this.getEnv('SUPERSET_HEALTH_URL', `http://superset:8088${supersetRoot}/health`);
+    this.superset.apiUrl = this.getEnv('SUPERSET_API_URL', 'http://superset:8088');
+    this.superset.publicUrl = this.getEnv('SUPERSET_PUBLIC_URL', 'http://localhost:8088');
+    this.superset.adminUsername = this.getEnv('SUPERSET_ADMIN_USERNAME', '');
+    this.superset.adminPassword = this.getEnv('SUPERSET_ADMIN_PASSWORD', '');
+    this.superset.oidcClientId = this.getEnv('SUPERSET_OIDC_CLIENT_ID', 'ref-stats-superset');
+    this.superset.guestTokenSecret = this.getEnv('SUPERSET_GUEST_TOKEN_JWT_SECRET', '');
   }
 
   /**

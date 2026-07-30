@@ -26,6 +26,13 @@ import {
 
 import formEntrySchemas, { buildDynamicFormEntrySchema } from './schemas/form-entry.js';
 
+import {
+  dashboardCreateSchema,
+  dashboardUpdateSchema,
+  dashboardQuerySchema,
+  dashboardIdOrNameSchema
+} from './schemas/dashboard.js';
+
 /**
  * @description Middleware to validate request data against a Zod schema.
  * Combines req.params, req.query, and req.body for validation.
@@ -89,7 +96,11 @@ const schema = {
   formUpdate: formUpdateSchema,
   formIdOrNameSchema: formIdOrNameSchema,
   assignment: assignmentSchema,
-  formEntry: formEntrySchemas
+  formEntry: formEntrySchemas,
+  dashboardCreate: dashboardCreateSchema,
+  dashboardUpdate: dashboardUpdateSchema,
+  dashboardQuery: dashboardQuerySchema,
+  dashboardIdOrNameSchema: dashboardIdOrNameSchema
 };
 
 export { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema };

@@ -11,7 +11,8 @@ class FormStore extends BaseStore {
       query: new LruStore({name: 'form.query'}),
       get: new LruStore({name: 'form.get'}),
       patch: new LruStore({name: 'form.patch'}),
-      delete: new LruStore({name: 'form.delete'})
+      delete: new LruStore({name: 'form.delete'}),
+      all: new LruStore({name: 'form.all'})
     };
     this.events = {};
   }

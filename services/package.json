@@ -21,6 +21,7 @@
     "start-client": "node ./client/index.js"
   },
   "dependencies": {
+    "@superset-ui/embedded-sdk": "^0.4.0",
     "@ucd-lib/cork-app-build": "^0.5.0",
     "@ucd-lib/cork-app-state": "^3.2.0",
     "@ucd-lib/cork-app-utils": "^6.4.1",
@@ -31,6 +32,7 @@
     "@ucd-lib/theme-sass": "^6.0.1",
     "csv-stringify": "^6.8.0",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
     "jwt-decode": "^4.0.0",
     "keycloak-js": "^26.2.4",
     "lit": "^3.3.1",

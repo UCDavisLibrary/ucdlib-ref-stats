@@ -32,7 +32,11 @@ AUTH_ROLES_SYNC_AT_LOGIN = True
 FEATURE_FLAGS = {
     # Allow us to use the user's username in sql queries, e.g. {{ current_user.username }}.
     "ENABLE_TEMPLATE_PROCESSING": True,
+    # Required to enable the guest token API endpoint used for embedded dashboards.
+    "EMBEDDED_SUPERSET": True,
 }
+
+GUEST_TOKEN_JWT_SECRET = os.environ.get('SUPERSET_GUEST_TOKEN_JWT_SECRET', SECRET_KEY)
 
 APPLICATION_ROOT = os.environ.get('SUPERSET_APPLICATION_ROOT', '/')
 ENABLE_PROXY_FIX = APPLICATION_ROOT != '/'

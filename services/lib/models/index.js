@@ -1,6 +1,7 @@
 import assignment from "./assignment.js";
 import backupLog from "./backupLog.js";
 import cache from "./cache.js";
+import dashboard from "./dashboard.js";
 import field from "./field.js";
 import formEntry from "./form-entry.js";
 import form from "./form.js";
@@ -13,6 +14,7 @@ export default {
   assignment,
   backupLog,
   cache,
+  dashboard,
   field,
   formEntry,
   form,

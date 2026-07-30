@@ -23,10 +23,23 @@
     margin: 0;
     padding: 0;
   }
-  fieldset.radio > legend, fieldset.checkbox > legend {
+  fieldset.radio > legend, fieldset.checkbox > legend, fieldset > legend.basic-legend {
     all: unset;
     display: block;
     padding-bottom: 0.25rem;
     color: var(--ucd-blue-100, #022851);
     font-weight: 700;
+  }
+
+  fieldset.basic-legend {
+    border: none;
+  }
+
+  fieldset.basic-legend > legend {
+    all: unset;
+    display: block;
+    padding-bottom: 0.25rem;
+    color: var(--ucd-blue-100, #022851);
+    font-weight: 700;
+    font-size: 1.1rem;
   }
