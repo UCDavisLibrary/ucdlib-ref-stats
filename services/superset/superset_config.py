@@ -32,11 +32,31 @@ AUTH_ROLES_SYNC_AT_LOGIN = True
 FEATURE_FLAGS = {
     # Allow us to use the user's username in sql queries, e.g. {{ current_user.username }}.
     "ENABLE_TEMPLATE_PROCESSING": True,
-    # Required to enable the guest token API endpoint used for embedded dashboards.
+    # Required to enable embedding of dashboards in web applications.
     "EMBEDDED_SUPERSET": True,
 }
 
 GUEST_TOKEN_JWT_SECRET = os.environ.get('SUPERSET_GUEST_TOKEN_JWT_SECRET', SECRET_KEY)
+GUEST_TOKEN_JWT_AUDIENCE = "superset"
+# Public role has no permissions by default. Gamma is the standard viewer role
+# and has the API permissions the embedded SDK needs (e.g. CurrentUserRestApi, SecurityRestApi).
+# Access to specific dashboards is still gated by the resources claim in the guest token.
+GUEST_ROLE_NAME = "Alpha"
+
+from superset.config import TALISMAN_CONFIG as _talisman_defaults
+
+_embedded_domain = os.environ.get('SUPERSET_EMBEDDED_DOMAIN', '')
+_csp = dict(_talisman_defaults.get('content_security_policy', {}))
+if _embedded_domain:
+    _csp['frame-ancestors'] = ["'self'", _embedded_domain]
+
+# Merge with defaults so only the iframe-relevant settings change.
+# frame_options=None suppresses the X-Frame-Options header entirely.
+TALISMAN_CONFIG = {
+    **_talisman_defaults,
+    'content_security_policy': _csp,
+    'frame_options': None,
+}
 
 APPLICATION_ROOT = os.environ.get('SUPERSET_APPLICATION_ROOT', '/')
 ENABLE_PROXY_FIX = APPLICATION_ROOT != '/'

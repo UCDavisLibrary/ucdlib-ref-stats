@@ -65,22 +65,22 @@ const srValidateDashboardId = async (data, ctx) => {
 };
 
 const rlsSchema = z.object({
-  identifier: z.enum(['username', 'email']).optional(),
-  column: z.string().max(250).optional(),
+  identifier: z.preprocess(v => v || undefined, z.enum(['username', 'email']).optional()),
+  column: z.preprocess(v => v || undefined, z.string().max(250).optional()),
   applyToRoles: z.array(z.string()).optional(),
   applyIfMissingRoles: z.array(z.string()).optional()
 }).optional();
 
 const uiConfigSchema = z.preprocess(
   v => {
-    if ( v === null || v === undefined || v === '' ) return {};
+    if ( v === null || v === undefined || v === '' ) return undefined;
     if ( typeof v === 'string' ) {
-      try { return JSON.parse(v); } catch { return v; }
+      try { return JSON.parse(v); } catch { return undefined; }
     }
     return v;
   },
-  z.record(z.unknown())
-).optional();
+  z.record(z.string(), z.unknown()).optional()
+);
 
 const dashboardBaseSchema = z.object({
   label: requiredString().pipe(z.string().max(250)),

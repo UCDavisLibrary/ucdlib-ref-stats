@@ -61,7 +61,8 @@ function buildRlsClauses(supersetRls, userInfo, userRoles) {
   if ( !supersetRls || typeof supersetRls !== 'object' ) return [];
 
   const { identifier, column, applyToRoles = [], applyIfMissingRoles = [] } = supersetRls;
-  if ( !column ) return [];
+  if ( !identifier || !column ) return [];
+  if ( !applyToRoles.length && !applyIfMissingRoles.length ) return [];
 
   const hasApplyToRole = applyToRoles.some(role => userRoles.includes(role));
   const missingRequiredRole = applyIfMissingRoles.some(role => !userRoles.includes(role));

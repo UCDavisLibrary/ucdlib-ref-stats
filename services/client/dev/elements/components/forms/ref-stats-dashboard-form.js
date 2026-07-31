@@ -75,6 +75,7 @@ export default class RefStatsDashboardForm extends Mixin(LitElement)
 
     if ( dashRes?.state === 'loaded' ) {
       this.payload = {...dashRes.payload};
+      this.payload._superset_dashboard_ui_config = this.payload.superset_dashboard_ui_config ? JSON.stringify(this.payload.superset_dashboard_ui_config, null, 2) : '{}'
     }
   }
 
@@ -118,6 +119,16 @@ export default class RefStatsDashboardForm extends Mixin(LitElement)
         applyIfMissingRoles: this._splitRoles(rls.applyIfMissingRoles)
       }
     };
+    if ( !this.payload._superset_dashboard_ui_config ) {
+      submitPayload.superset_dashboard_ui_config = {};
+    } else {
+      try {
+        submitPayload.superset_dashboard_ui_config = JSON.parse(this.payload._superset_dashboard_ui_config);
+      } catch (e) {
+        this.AppStateModel.showToast({text: 'Unable to save. Invalid JSON in dashboardUiConfig', type: 'error'});
+        return;
+      }
+    }
 
     let r;
     if ( this.nameOrId ) {

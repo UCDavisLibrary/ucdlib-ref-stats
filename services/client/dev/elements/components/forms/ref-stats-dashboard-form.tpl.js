@@ -137,9 +137,9 @@ export function render() {
           <textarea
             id=${this.ctl.idGen.get('ui-config')}
             ?disabled=${!hasAdminAccess}
-            .value=${this.payload?.superset_dashboard_ui_config ? JSON.stringify(this.payload.superset_dashboard_ui_config, null, 2) : ''}
+            .value=${this.payload?._superset_dashboard_ui_config || ''}
             rows="5"
-            @input=${e => this._onPayloadInput('superset_dashboard_ui_config', e.target.value)}></textarea>
+            @input=${e => this._onPayloadInput('_superset_dashboard_ui_config', e.target.value)}></textarea>
           <div class='field-description'>Optional JSON object passed as <code>dashboardUiConfig</code> to the embedded SDK (e.g. <code>{"hideTitle": true}</code>).</div>
         </cork-field-container>
 

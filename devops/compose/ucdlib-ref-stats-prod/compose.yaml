@@ -93,6 +93,7 @@ services:
       SUPERSET_APPLICATION_ROOT: ${SUPERSET_APPLICATION_ROOT:-/dashboards}
       SUPERSET_OIDC_CLIENT_ID: ${SUPERSET_OIDC_CLIENT_ID:-ref-stats-superset}
       SUPERSET_OIDC_DISCOVERY_URL: ${SUPERSET_OIDC_DISCOVERY_URL:-https://auth.library.ucdavis.edu/realms/internal/.well-known/openid-configuration}
+      SUPERSET_EMBEDDED_DOMAIN: ${SUPERSET_EMBEDDED_DOMAIN:-https://statistics.staff.library.ucdavis.edu}
       PYTHONPATH: /app/pythonpath
       DATABASE_DIALECT: postgresql+psycopg2
       DATABASE_USER: postgres

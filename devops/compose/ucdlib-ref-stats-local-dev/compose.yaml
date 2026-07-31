@@ -13,10 +13,7 @@ services:
       PGDATABASE: 'postgres'
       PGPASSWORD: 'localhost'
       PGPORT: 5432
-      SUPERSET_API_URL: ${SUPERSET_API_URL:-http://superset:8088}
       SUPERSET_PUBLIC_URL: ${SUPERSET_PUBLIC_URL:-http://localhost:8088}
-      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-ref-stats-api}
-      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-ref-stats-api}
       SUPERSET_OIDC_CLIENT_ID: ${SUPERSET_OIDC_CLIENT_ID:-ref-stats-superset}
       SUPERSET_GUEST_TOKEN_JWT_SECRET: ${SUPERSET_GUEST_TOKEN_JWT_SECRET:-change-me-in-production}
     volumes:
@@ -96,10 +93,8 @@ services:
     environment:
       SUPERSET_OIDC_CLIENT_ID: ${SUPERSET_OIDC_CLIENT_ID:-ref-stats-superset}
       SUPERSET_OIDC_DISCOVERY_URL: ${SUPERSET_OIDC_DISCOVERY_URL:-https://auth.library.ucdavis.edu/realms/internal/.well-known/openid-configuration}
-      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-ref-stats-api}
-      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-ref-stats-api}
-      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-svc@localhost}
       SUPERSET_GUEST_TOKEN_JWT_SECRET: ${SUPERSET_GUEST_TOKEN_JWT_SECRET:-change-me-in-production}
+      SUPERSET_EMBEDDED_DOMAIN: ${SUPERSET_EMBEDDED_DOMAIN:-http://localhost:3000}
       PYTHONPATH: /app/pythonpath
       DATABASE_DIALECT: postgresql+psycopg2
       DATABASE_USER: postgres
