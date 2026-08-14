@@ -33,7 +33,7 @@ export function render() {
       <div class='form-entry-query-download-container'>
         <cork-prefixed-icon-button 
           icon='fas.chart-pie'
-          href=${superset.dashboardListUrl}>
+          href='/analytics'>
           View Dashboards
         </cork-prefixed-icon-button>
         <ref-stats-form-entry-query-download latest-version></ref-stats-form-entry-query-download>

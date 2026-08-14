@@ -66,6 +66,15 @@ class FormModel extends BaseModel {
   }
 
   /**
+   * @description Get a simple list of all forms
+   * @param {Object} opts - Query options (e.g. active_only)
+   * @returns {Promise}
+   */
+  async getAllForms(opts={}) {
+    return this.service.getAll(opts);
+  }
+
+  /**
    * @description Delete a form by id
    * @param {String} id - Form id
    * @returns {Promise}

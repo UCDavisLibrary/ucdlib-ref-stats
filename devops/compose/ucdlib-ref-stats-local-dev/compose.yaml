@@ -13,6 +13,9 @@ services:
       PGDATABASE: 'postgres'
       PGPASSWORD: 'localhost'
       PGPORT: 5432
+      SUPERSET_PUBLIC_URL: ${SUPERSET_PUBLIC_URL:-http://localhost:8088}
+      SUPERSET_OIDC_CLIENT_ID: ${SUPERSET_OIDC_CLIENT_ID:-ref-stats-superset}
+      SUPERSET_GUEST_TOKEN_JWT_SECRET: ${SUPERSET_GUEST_TOKEN_JWT_SECRET:-change-me-in-production}
     volumes:
       - ../../../services:/services
       - /services/node_modules
@@ -90,6 +93,8 @@ services:
     environment:
       SUPERSET_OIDC_CLIENT_ID: ${SUPERSET_OIDC_CLIENT_ID:-ref-stats-superset}
       SUPERSET_OIDC_DISCOVERY_URL: ${SUPERSET_OIDC_DISCOVERY_URL:-https://auth.library.ucdavis.edu/realms/internal/.well-known/openid-configuration}
+      SUPERSET_GUEST_TOKEN_JWT_SECRET: ${SUPERSET_GUEST_TOKEN_JWT_SECRET:-change-me-in-production}
+      SUPERSET_EMBEDDED_DOMAIN: ${SUPERSET_EMBEDDED_DOMAIN:-http://localhost:3000}
       PYTHONPATH: /app/pythonpath
       DATABASE_DIALECT: postgresql+psycopg2
       DATABASE_USER: postgres
@@ -99,6 +104,7 @@ services:
       DATABASE_DB: superset
     volumes:
       - ../../../services/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ../../../services/superset/docker-entrypoint.sh:/app/docker-entrypoint.sh
       - ../../../services/superset/templates/tail_js_custom_extra.html:/app/superset/templates/tail_js_custom_extra.html:ro
       - superset-home:/app/superset_home
     ports:

@@ -23,6 +23,8 @@ import './pages/ref-stats-page-home.js';
 import './pages/ref-stats-page-form-single.js';
 import './pages/ref-stats-page-form-entries.js';
 import './pages/ref-stats-page-reports.js';
+import './pages/ref-stats-page-dashboards.js';
+import './pages/ref-stats-page-dashboard-single.js';
 
 // app global components
 import './components/cork-app-dialog-modal.js';
@@ -45,6 +47,7 @@ import '#lib/cork/models/FieldModel.js';
 import '#lib/cork/models/FormEntryModel.js';
 import '#lib/cork/models/FormModel.js';
 import '#lib/cork/models/PicklistModel.js';
+import '#lib/cork/models/DashboardModel.js';
 import AuthModel from '#lib/cork/models/AuthModel.js';
 
 Registry.ready();

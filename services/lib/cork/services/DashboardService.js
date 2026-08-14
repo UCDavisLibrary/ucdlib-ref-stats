@@ -1,48 +1,48 @@
 import {digest} from '@ucd-lib/cork-app-utils';
 import BaseService from "./BaseService.js";
-import FormStore from '../stores/FormStore.js';
+import DashboardStore from '../stores/DashboardStore.js';
 
 import payload from '../utils/payload.js';
 import serviceUtils from '../utils/serviceUtils.js';
 
-class FormService extends BaseService {
+class DashboardService extends BaseService {
 
   constructor() {
     super();
-    this.store = FormStore;
+    this.store = DashboardStore;
   }
 
   /**
-   * @description Base URL for form API endpoints.
+   * @description Base URL for dashboard API endpoints.
    * @returns {string}
    */
-  get baseUrl(){
-    return `/api/form`;
+  get baseUrl() {
+    return `/api/dashboard`;
   }
 
   /**
-   * @description Creates a new form.
-   * @param {object} data - Form data to submit.
+   * @description Creates a new dashboard.
+   * @param {object} data - Dashboard data to submit.
    * @returns {Promise<object>} Store state object for the request.
    */
-  async create(data){
+  async create(data) {
     let id = await digest(data);
     const store = this.store.data.create;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to create form'}
+      errorSettings: {message: 'Unable to create dashboard'}
     };
 
     await this.checkRequesting(
       id, store,
       () => this.request({
-        url : `${this.baseUrl}`,
+        url: `${this.baseUrl}`,
         json: true,
-        fetchOptions: { 
+        fetchOptions: {
           method: 'POST',
           body: data
         },
-        onUpdate : resp => this.store.set(
+        onUpdate: resp => this.store.set(
           {...resp, id},
           store,
           null,
@@ -54,28 +54,28 @@ class FormService extends BaseService {
   }
 
   /**
-   * @description Updates an existing form.
-   * @param {object} data - Partial form data to patch.
+   * @description Updates an existing dashboard.
+   * @param {object} data - Partial dashboard data to patch.
    * @returns {Promise<object>} Store state object for the request.
    */
-  async patch(data){
+  async patch(data) {
     let id = await digest(data);
     const store = this.store.data.patch;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to update form'}
+      errorSettings: {message: 'Unable to update dashboard'}
     };
 
     await this.checkRequesting(
       id, store,
       () => this.request({
-        url : `${this.baseUrl}`,
+        url: `${this.baseUrl}`,
         json: true,
-        fetchOptions: { 
+        fetchOptions: {
           method: 'PATCH',
           body: data
         },
-        onUpdate : resp => this.store.set(
+        onUpdate: resp => this.store.set(
           {...resp, id},
           store,
           null,
@@ -87,30 +87,27 @@ class FormService extends BaseService {
   }
 
   /**
-   * @description Queries forms with the given filters.
+   * @description Queries dashboards with the given filters.
    * @param {object} query - Query parameters.
    * @param {object} appStateOptions - Options passed to the app state error handler.
    * @returns {Promise<object>} Store state object for the request.
    */
-  async query(query={}, appStateOptions={}){
+  async query(query={}, appStateOptions={}) {
     if ( !query.page ) query.page = 1;
-    if ( Array.isArray(query.form) ){
-      query.form = query.form.sort().join(',');
-    }
     let id = payload.getKey(query);
     const store = this.store.data.query;
 
     await this.checkRequesting(
       id, store,
       () => this.request({
-        url : `${this.baseUrl}`,
+        url: `${this.baseUrl}`,
         qs: query,
-        checkCached : () => store.get(id),
-        onUpdate : resp => this.store.set(
+        checkCached: () => store.get(id),
+        onUpdate: resp => this.store.set(
           payload.generate(query, resp),
           store,
           null,
-          serviceUtils.getAppStateOptions('Unable to retrieve forms', appStateOptions)
+          serviceUtils.getAppStateOptions('Unable to retrieve dashboards', appStateOptions)
         )
       })
     );
@@ -119,56 +116,24 @@ class FormService extends BaseService {
   }
 
   /**
-   * @description Retrieves a single form by ID or name.
-   * @param {string|number} idOrName - Form ID or name.
-   * @param {object} opts - Additional query parameters.
+   * @description Retrieves a single dashboard by ID or name.
+   * @param {string} idOrName - Dashboard ID or name.
+   * @param {object} opts - Additional options.
    * @returns {Promise<object>} Store state object for the request.
    */
-  async get(idOrName, opts={}){
+  async get(idOrName, opts={}) {
     const ido = { ...opts, idOrName };
     const id = payload.getKey(ido);
     const store = this.store.data.get;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to get form'}
+      errorSettings: {message: 'Unable to get dashboard'}
     };
 
     await this.checkRequesting(
       id, store,
       () => this.request({
-        url : `${this.baseUrl}/${idOrName}`,
-        qs: opts,
-        checkCached : () => store.get(id),
-        onUpdate : resp => this.store.set(
-          payload.generate(ido, resp),
-          store,
-          null,
-          appStateOptions
-        )
-      })
-    );
-
-    return store.get(id);
-  }
-
-  /**
-   * @description Retrieves a simple list of all forms.
-   * @param {object} opts - Query options (e.g. active_only).
-   * @returns {Promise<object>} Store state object for the request.
-   */
-  async getAll(opts={}) {
-    const ido = { ...opts, action: 'getAll' };
-    const id = payload.getKey(ido);
-    const store = this.store.data.all;
-
-    const appStateOptions = {
-      errorSettings: {message: 'Unable to retrieve forms'}
-    };
-
-    await this.checkRequesting(
-      id, store,
-      () => this.request({
-        url: `${this.baseUrl}/all`,
+        url: `${this.baseUrl}/${idOrName}`,
         qs: opts,
         checkCached: () => store.get(id),
         onUpdate: resp => this.store.set(
@@ -184,25 +149,86 @@ class FormService extends BaseService {
   }
 
   /**
-   * @description Deletes a form by ID.
-   * @param {string|number} id - Form ID.
+   * @description Retrieves a simple list of all dashboards.
+   * @param {object} opts - Query options (e.g. active_only).
    * @returns {Promise<object>} Store state object for the request.
    */
-  async delete(id){
-    const store = this.store.data.delete;
+  async getAll(opts={}) {
+    const id = payload.getKey(opts);
+    const store = this.store.data.all;
 
     const appStateOptions = {
-      errorSettings: {message: 'Unable to delete form'}
+      errorSettings: {message: 'Unable to retrieve dashboards'}
     };
 
     await this.checkRequesting(
       id, store,
       () => this.request({
-        url : `${this.baseUrl}/${id}`,
-        fetchOptions: { 
+        url: `${this.baseUrl}/all`,
+        qs: opts,
+        checkCached: () => store.get(id),
+        onUpdate: resp => this.store.set(
+          payload.generate(opts, resp),
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+
+    return store.get(id);
+  }
+
+  /**
+   * @description Fetches a Superset guest token for a dashboard.
+   * @param {string} idOrName - Dashboard ID or name.
+   * @returns {Promise<object>} Store state object for the request.
+   */
+  async getGuestToken(idOrName) {
+    const id = idOrName;
+    const store = this.store.data.guestToken;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to get Superset guest token', showToast: true},
+      loaderSettings: {suppressLoader: true}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url: `${this.baseUrl}/${idOrName}/guest-token`,
+        onUpdate: resp => this.store.set(
+          {...resp, id},
+          store,
+          null,
+          appStateOptions
+        )
+      })
+    );
+
+    return store.get(id);
+  }
+
+  /**
+   * @description Deletes a dashboard by ID.
+   * @param {string} id - Dashboard ID.
+   * @returns {Promise<object>} Store state object for the request.
+   */
+  async delete(id) {
+    const store = this.store.data.delete;
+
+    const appStateOptions = {
+      errorSettings: {message: 'Unable to delete dashboard'}
+    };
+
+    await this.checkRequesting(
+      id, store,
+      () => this.request({
+        url: `${this.baseUrl}/${id}`,
+        fetchOptions: {
           method: 'DELETE'
         },
-        onUpdate : resp => this.store.set(
+        onUpdate: resp => this.store.set(
           {...resp, id},
           store,
           null,
@@ -216,5 +242,5 @@ class FormService extends BaseService {
 
 }
 
-const service = new FormService();
+const service = new DashboardService();
 export default service;
