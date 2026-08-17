@@ -504,6 +504,8 @@ export default class FormEntryController {
       if ( !defaultValue ) continue;
       if ( field.field_type === 'date' && defaultValue === 'today' ) {
         defaults[field.name] = new Date().toISOString().split('T')[0];
+      } else if ( defaultValue === 'current_hour' ) {
+        defaults[field.name] = String(new Date().getHours());
       } else if ( defaultValue === 'last_value_submitted' ) {
         if ( lastEntryFields[field.name] !== undefined ) {
           defaults[field.name] = lastEntryFields[field.name];

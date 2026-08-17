@@ -91,6 +91,7 @@ VALUES (
     jsonb_build_object('field', 'event-date',                'desktopFr', 1, 'mobileFr', 1),
     jsonb_build_object('field', 'information-desk', 'desktopFr', 2, 'mobileFr', 3),
     jsonb_build_object('field', 'event-count',               'desktopFr', 1),
+    jsonb_build_object('field', 'event-hour'),
     jsonb_build_object('field', 'reference-level')
   ))
 );
@@ -103,7 +104,8 @@ VALUES
   (gen_random_uuid(), 'outreach-type',            'Outreach Type'),
   (gen_random_uuid(), 'reference-topic',          'Reference Topic'),
   (gen_random_uuid(), 'information-desk',          'Information Desk'),
-  (gen_random_uuid(), 'reference-level', 'Reference Level');
+  (gen_random_uuid(), 'reference-level', 'Reference Level'),
+  (gen_random_uuid(), 'hour',            'Hour');
 
 
 -- 4. Picklist items
@@ -159,6 +161,33 @@ VALUES
   (gen_random_uuid(), get_picklist_id('information-desk'), 'shields-circ-desk', 'Shields Circ Desk', 2),
   (gen_random_uuid(), get_picklist_id('information-desk'), 'welcome-desk', 'Welcome Desk', 3);
 
+INSERT INTO picklist_item (picklist_item_id, picklist_id, value, label, sort_order)
+VALUES
+  (gen_random_uuid(), get_picklist_id('hour'), '0',  '12 AM',  0),
+  (gen_random_uuid(), get_picklist_id('hour'), '1',  '1 AM',   1),
+  (gen_random_uuid(), get_picklist_id('hour'), '2',  '2 AM',   2),
+  (gen_random_uuid(), get_picklist_id('hour'), '3',  '3 AM',   3),
+  (gen_random_uuid(), get_picklist_id('hour'), '4',  '4 AM',   4),
+  (gen_random_uuid(), get_picklist_id('hour'), '5',  '5 AM',   5),
+  (gen_random_uuid(), get_picklist_id('hour'), '6',  '6 AM',   6),
+  (gen_random_uuid(), get_picklist_id('hour'), '7',  '7 AM',   7),
+  (gen_random_uuid(), get_picklist_id('hour'), '8',  '8 AM',   8),
+  (gen_random_uuid(), get_picklist_id('hour'), '9',  '9 AM',   9),
+  (gen_random_uuid(), get_picklist_id('hour'), '10', '10 AM',  10),
+  (gen_random_uuid(), get_picklist_id('hour'), '11', '11 AM',  11),
+  (gen_random_uuid(), get_picklist_id('hour'), '12', '12 PM',  12),
+  (gen_random_uuid(), get_picklist_id('hour'), '13', '1 PM',   13),
+  (gen_random_uuid(), get_picklist_id('hour'), '14', '2 PM',   14),
+  (gen_random_uuid(), get_picklist_id('hour'), '15', '3 PM',   15),
+  (gen_random_uuid(), get_picklist_id('hour'), '16', '4 PM',   16),
+  (gen_random_uuid(), get_picklist_id('hour'), '17', '5 PM',   17),
+  (gen_random_uuid(), get_picklist_id('hour'), '18', '6 PM',   18),
+  (gen_random_uuid(), get_picklist_id('hour'), '19', '7 PM',   19),
+  (gen_random_uuid(), get_picklist_id('hour'), '20', '8 PM',   20),
+  (gen_random_uuid(), get_picklist_id('hour'), '21', '9 PM',   21),
+  (gen_random_uuid(), get_picklist_id('hour'), '22', '10 PM',  22),
+  (gen_random_uuid(), get_picklist_id('hour'), '23', '11 PM',  23);
+
 INSERT INTO picklist_item (picklist_item_id, picklist_id, value, label, sort_order, description)
 VALUES
   (gen_random_uuid(), get_picklist_id('reference-level'), 'read-1', 'READ 1', 0, 'e.g., directions, hours, assistance not requiring specialized expertise'),
@@ -187,7 +216,8 @@ VALUES
   (gen_random_uuid(), 'outreach-type',           'Outreach Type',            'select', get_picklist_id('outreach-type')),
   (gen_random_uuid(), 'reference-topic',         'Reference Topic',          'select', get_picklist_id('reference-topic')),
   (gen_random_uuid(), 'information-desk',        'Information Desk',           'select', get_picklist_id('information-desk')),
-  (gen_random_uuid(), 'reference-level',       'Reference Level',          'radio', get_picklist_id('reference-level'));
+  (gen_random_uuid(), 'reference-level',         'Reference Level',            'radio',  get_picklist_id('reference-level')),
+  (gen_random_uuid(), 'event-hour',              'Hour',                       'select', get_picklist_id('hour'));
 
 
 -- 6. Form field assignments
@@ -267,10 +297,12 @@ VALUES
     jsonb_build_object('required', true, 'label', 'Information Desk', 'defaultValue', 'last_value_submitted')),
   (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-date'), 1,
     jsonb_build_object('required', true, 'label', 'Date of activity', 'defaultValue', 'today', 'filterOrder', 1, 'description', 'For retrospective entry, select the date the interactions occurred.')),
-  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('reference-level'), 2,
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-hour'), 2,
+    jsonb_build_object('required', true, 'label', 'Hour of activity', 'defaultValue', 'current_hour')),
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('reference-level'), 3,
     jsonb_build_object('required', true, 'label', 'Interaction Type')),
-  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-count'), 3,
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-count'), 4,
     jsonb_build_object('required', true, 'label', 'Number of interactions', 'defaultValue', '1',
       'description', 'Increase this number only when recording multiple interactions with the same Interaction Type. Record different READ levels or referrals as separate entries.')),
-  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('notes'), 4,
+  (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('notes'), 5,
     jsonb_build_object('required', false, 'rows', 5, 'description', 'Optional. Use only if additional context is needed.'));

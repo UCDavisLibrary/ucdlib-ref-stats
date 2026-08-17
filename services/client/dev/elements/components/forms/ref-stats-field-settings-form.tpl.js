@@ -20,6 +20,7 @@ export function render() {
   const isSelectOrTypeahead = t === 'select' || t === 'typeahead';
   const isPicklist = ['select', 'typeahead', 'radio', 'checkbox-multiple'].includes(t);
   const isDate = t === 'date';
+  const isHourSelect = this.fieldName === 'event-hour';
   const isFilterable = ['date','datetime','select','radio','typeahead','checkbox-multiple'].includes(t);
 
   return html`
@@ -177,6 +178,15 @@ export function render() {
         <label for=${this.ctl.idGen.get('defaultValueToday')}>Default to today's date</label>
       </cork-field-container>
 
+      <cork-field-container class='field-container checkbox' ?hidden=${!isHourSelect}>
+        <input
+          type="checkbox"
+          id=${this.ctl.idGen.get('defaultValueCurrentHour')}
+          .checked=${this.payload?.defaultValue === 'current_hour'}
+          @input=${() => this._onPayloadInput('defaultValue', this.payload?.defaultValue === 'current_hour' ? undefined : 'current_hour')}>
+        <label for=${this.ctl.idGen.get('defaultValueCurrentHour')}>Default to current hour</label>
+      </cork-field-container>
+
       <cork-field-container class='field-container checkbox'>
         <input
           type="checkbox"
@@ -187,7 +197,7 @@ export function render() {
       </cork-field-container>
 
       <cork-field-container class='field-container'
-        ?hidden=${isDate || this.payload?.defaultValue === 'last_value_submitted'}>
+        ?hidden=${isDate || isHourSelect || this.payload?.defaultValue === 'last_value_submitted'}>
         <label for=${this.ctl.idGen.get('defaultValue')}>Default Value</label>
         <input
           type="text"
