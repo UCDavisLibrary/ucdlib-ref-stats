@@ -1,0 +1,22 @@
+.dashboard-teaser {
+  container-type: inline-size;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 1px solid var(--ucd-gold, #ffbf00);
+  box-shadow: 0 0 10px 0 rgba(0,0,0,.1);
+  display: flex;
+  justify-content: space-between;
+}
+.dashboard-teaser .dashboard-teaser__content {
+  flex: 1;
+}
+.dashboard-teaser .dashboard-teaser__title {
+  margin: 0;
+  font-size: 1.3em;
+  font-weight: 800;
+  color: var(--forced-contrast-heading-primary, #022851);
+  text-decoration: none;
+}
+.dashboard-teaser .dashboard-teaser__title:hover {
+  text-decoration: underline;
+}

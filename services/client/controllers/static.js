@@ -18,7 +18,7 @@ export default (app) => {
   let assetsDir = path.join(__dirname, '../public');
   logger.info(`Serving static assets from ${assetsDir}`);
 
-  const routes = ['picklist', 'field', 'form-admin', 'form', 'logout', 'reports', 'analytics', 'dashboard-admin'];
+  const routes = ['picklist', 'field', 'form-admin', 'form', 'logout', 'reports', 'analytics', 'analytics-admin'];
   const appTitle = 'Library Services Statistics';
 
   spaMiddleware({

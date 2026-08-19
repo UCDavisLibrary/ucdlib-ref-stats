@@ -67,11 +67,11 @@ export default class RefStatsPageDashboardAdminSingle extends Mixin(LitElement)
    */
   _onDashboardUpdated(e) {
     if ( e.detail?.deleted ) {
-      this.AppStateModel.setLocation('/dashboard-admin');
+      this.AppStateModel.setLocation('/analytics-admin');
       return;
     }
     if ( e.detail?.newDashboard ) {
-      this.AppStateModel.setLocation(`/dashboard-admin/${e.detail.dashboard.name}`);
+      this.AppStateModel.setLocation(`/analytics-admin/${e.detail.dashboard.name}`);
     } else {
       this.AppStateModel.refresh();
     }

@@ -35,8 +35,8 @@ return html`
     <ref-stats-page-field-single page-id='field-single'></ref-stats-page-field-single>
     <ref-stats-page-form-admin page-id='form-admin'></ref-stats-page-form-admin>
     <ref-stats-page-form-admin-single page-id='form-admin-single'></ref-stats-page-form-admin-single>
-    <ref-stats-page-dashboard-admin page-id='dashboard-admin'></ref-stats-page-dashboard-admin>
-    <ref-stats-page-dashboard-admin-single page-id='dashboard-admin-single'></ref-stats-page-dashboard-admin-single>
+    <ref-stats-page-dashboard-admin page-id='analytics-admin'></ref-stats-page-dashboard-admin>
+    <ref-stats-page-dashboard-admin-single page-id='analytics-admin-single'></ref-stats-page-dashboard-admin-single>
   </ucdlib-pages>
   <div class="u-space-mb--huge"></div>
 `;}
@@ -79,7 +79,7 @@ function renderHeader(){
         <a href="/form-admin">Form Administration</a>
         <a href="/field">Field Library</a>
         <a href="/picklist">Picklist Management</a>
-        <a href="/dashboard-admin">Dashboard Administration</a>
+        <a href="/analytics-admin">Dashboard Administration</a>
       </ucd-theme-quick-links>
     </ucd-theme-header>
   `;

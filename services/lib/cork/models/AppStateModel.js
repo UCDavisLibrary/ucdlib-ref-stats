@@ -42,7 +42,7 @@ class AppStateModelImpl extends AppStateModel {
 
       if ( page === 'form' && update.location.path?.[2] === 'submissions' ) {
         page = 'form-entries';
-      } else if ( ['picklist', 'field', 'form-admin', 'form', 'analytics', 'dashboard-admin'].includes(page) && update.location.path?.length > 1 ) {
+      } else if ( ['picklist', 'field', 'form-admin', 'form', 'analytics', 'analytics-admin'].includes(page) && update.location.path?.length > 1 ) {
         page += '-single';
       }
 

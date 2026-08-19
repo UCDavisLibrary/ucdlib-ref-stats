@@ -6,6 +6,7 @@ import forms from './forms.css';
 import headings from './headings.css';
 import linkList from './link-list.css';
 import typeahead from './typeahead.css';
+import dashboardTeaser from './dashboard-teaser.css';
 
 import { styles as corkFieldContainerStyles } from '#components/cork-field-container.tpl.js';
 import { styles as picklistTypeaheadStyles } from '#components/ref-stats-picklist-typeahead.tpl.js';
@@ -30,6 +31,7 @@ const styles = `
   ${headings}
   ${linkList}
   ${typeahead}
+  ${dashboardTeaser}
   [hidden] {
     display: none !important;
   }

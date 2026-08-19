@@ -10,7 +10,7 @@ export default preload([
       'check', 'circle-chevron-right', 'ellipsis', 'arrow-up', 'arrow-down',
       'database', 'eye-slash', 'keyboard', 'eye', 'rectangle-list', 'chevron-down',
       'chevron-up', 'pen-to-square', 'sliders', 'table-list', 'table-columns', 'download',
-      'chart-pie'
+      'chart-pie', 'gear'
     ]
   }, 
   { 

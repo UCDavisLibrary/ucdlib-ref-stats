@@ -62,7 +62,7 @@ export function render() {
               <div class='ucd-link-list-item'>
                 <cork-icon icon='fas.circle-chevron-right' class='ucd-link-list-item--icon'></cork-icon>
                 <div>
-                  <a href='/dashboard-admin/${d.name}' class='ucd-link-list-item--title'>${d.label || d.name}</a>
+                  <a href='/analytics-admin/${d.name}' class='ucd-link-list-item--title'>${d.label || d.name}</a>
                   <div class='ucd-link-list-item--badge' ?hidden=${!d.is_archived}>Archived</div>
                   <div class='ucd-link-list-item--excerpt'>
                     <span>${d.name}</span>
@@ -85,7 +85,7 @@ export function render() {
           ${focalLink({
             text: 'Add New Dashboard',
             icon: 'fas.plus',
-            href: '/dashboard-admin/new',
+            href: '/analytics-admin/new',
             brandColor: 'quad'
           })}
         </div>

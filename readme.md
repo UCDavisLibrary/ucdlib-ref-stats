@@ -132,7 +132,7 @@ By default, users can only see their own submissions. By setting up a "Row Level
 
 Superset dashboards can be embedded in the main web app using the `@superset-ui/embedded-sdk`. The flow is:
 
-1. An admin creates a **Dashboard** record in the web app (at `/dashboard-admin`) and sets the `Superset Dashboard ID` field to the UUID of a Superset dashboard.
+1. An admin creates a **Dashboard** record in the web app (at `/analytics-admin`) and sets the `Superset Dashboard ID` field to the UUID of a Superset dashboard.
 2. When an authenticated user visits `/analytics/:name`, the app server mints a signed **guest token** JWT and passes it to the embedded SDK.
 3. The SDK renders the dashboard in an iframe pointed at Superset's `/embedded/{uuid}` endpoint.
 

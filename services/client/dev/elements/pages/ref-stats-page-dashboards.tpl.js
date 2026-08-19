@@ -1,6 +1,7 @@
 import { html, css } from 'lit';
 
 import '#components/ref-stats-form-typeahead.js';
+import { dashboardTeaser } from '#templates';
 
 export function styles() {
   const elementStyles = css`
@@ -58,7 +59,7 @@ return html`
         <div ?hidden=${this.dashboards.length} class='alert'>No dashboards found.</div>
         <ul ?hidden=${!this.dashboards.length} class='list--arrow'>
           ${this.dashboards.map(d => html`
-            <li><a href='/analytics/${d.name}'>${d.label || d.name}</a></li>
+            ${dashboardTeaser(d)}
           `)}
         </ul>
         <ucd-theme-pagination

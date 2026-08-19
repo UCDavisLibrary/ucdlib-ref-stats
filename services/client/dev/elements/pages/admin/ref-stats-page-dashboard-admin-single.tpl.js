@@ -18,7 +18,7 @@ export function render() {
     <div><h1 class="page-title">${pageTitle}</h1></div>
     <ol class="breadcrumbs">
       <li><a href="/">Home</a></li>
-      <li><a href="/dashboard-admin">Dashboard Administration</a></li>
+      <li><a href="/analytics-admin">Dashboard Administration</a></li>
       <li>${pageTitle}</li>
     </ol>
     <div class="l-container ${!this.nameOrId ? 'l-container--narrow l-container--narrow-desktop' : ''}">
