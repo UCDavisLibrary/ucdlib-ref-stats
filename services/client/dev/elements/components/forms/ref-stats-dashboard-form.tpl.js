@@ -191,7 +191,7 @@ export function render() {
               ?disabled=${!hasAdminAccess}
               .value=${this._joinRoles(rls.applyIfMissingRoles)}
               @input=${e => this._onRlsInput('applyIfMissingRoles', e.target.value)}>
-            <div class='field-description'>Comma-separated role names. If the user is missing any of these roles, RLS is applied.</div>
+            <div class='field-description'>Comma-separated role names. If the user has none of these roles, RLS is applied.</div>
           </cork-field-container>
         </fieldset>
       </fieldset>
