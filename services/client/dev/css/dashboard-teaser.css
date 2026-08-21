@@ -6,9 +6,14 @@
   box-shadow: 0 0 10px 0 rgba(0,0,0,.1);
   display: flex;
   justify-content: space-between;
+  --cork-icon-button-size: 2rem;
 }
 .dashboard-teaser .dashboard-teaser__content {
   flex: 1;
+}
+.dashboard-teaser .badge {
+  background-color: var(--ucd-blue-40, #dbeaf7);
+  color: var(--ucd-blue, #022851);
 }
 .dashboard-teaser .dashboard-teaser__title {
   margin: 0;

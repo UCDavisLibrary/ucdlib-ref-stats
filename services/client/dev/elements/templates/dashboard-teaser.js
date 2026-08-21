@@ -8,6 +8,11 @@ export default (dashboard) => {
   return html`
     <div class="dashboard-teaser">
       <div class="dashboard-teaser__content">
+        <div class="dashboard-teaser__badges" ?hidden=${!dashboard.forms?.length}>
+          ${dashboard.forms.filter(form => !form.is_archived).map(form => html`
+            <div class="badge badge--form">${form.label}</div>
+          `)}
+        </div>
         <div><a class='dashboard-teaser__title' href='/analytics/${dashboard.name}'>${dashboard.label}</a></div>
         <div class='dashboard-teaser__description'>${dashboard.description}</div>
       </div>

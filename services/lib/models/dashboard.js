@@ -44,7 +44,7 @@ class Dashboard {
     const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const sql = `
       SELECT d.*, COUNT(*) OVER() AS total_count
-      FROM ${config.db.tables.dashboard} d
+      FROM ${config.db.views.dashboardFull} d
       ${whereSQL}
       ORDER BY d.label ASC
       LIMIT $${values.length + 1} OFFSET $${values.length + 2}

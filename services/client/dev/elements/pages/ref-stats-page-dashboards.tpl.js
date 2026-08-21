@@ -57,11 +57,11 @@ return html`
           </div>
         </div>
         <div ?hidden=${this.dashboards.length} class='alert'>No dashboards found.</div>
-        <ul ?hidden=${!this.dashboards.length} class='list--arrow'>
+        <div ?hidden=${!this.dashboards.length} class='list--arrow'>
           ${this.dashboards.map(d => html`
             ${dashboardTeaser(d)}
           `)}
-        </ul>
+        </div>
         <ucd-theme-pagination
           current-page=${this.ctl.qs.query.page || 1}
           max-pages=${this.maxPage}
