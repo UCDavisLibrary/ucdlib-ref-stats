@@ -17,7 +17,7 @@ VALUES (
   'reference',
   'Reference Transactions/Consultations',
   'Record research assistance, information consultations, resource recommendations, and instruction in using information resources.',
-  '<p>Reference entries may represent either individual transactions recorded in real time or multiple transactions entered retrospectively. Therefore, the system should allow users to specify the number of transactions represented by a single entry.</p>
+  '<p>Reference entries may represent either individual transactions recorded in real time or multiple transactions entered retrospectively. Therefore, if desired, you can enter multiple transactions using a single form entry.</p>
 <p><strong>Count:</strong> research assistance, information consultations, resource recommendations instruction in using information resources</p>
 <p><strong>Do NOT count: </strong>questions about hours directions, policies, printing, or basic equipment assistance (i.e., directional)</p>',
   7,
@@ -62,8 +62,8 @@ VALUES (
   'Outreach',
   'Record Library-sponsored outreach and engagement activities intended to increase awareness of Library services, foster relationships, and advance the Library''s land-grant mission outside of formal instructional settings.',
   '<p>Use this form to record Library-sponsored outreach and engagement activities intended to increase awareness of Library services, foster relationships, and advance the Library''s land-grant mission outside of formal instructional settings.</p>
-<p><strong>Count:</strong> tabling events, resource fairs, open houses, community engagement activities, promotional events highlighting Library services and resources, other non-instructional activities designed to connect with campus or community audiences</p>
-<p><strong>Do NOT count: </strong>reference interactions reported through the Reference Transactions/Consultations form; workshops, orientations, tours, or other planned presentations to groups reported through the Instruction Sessions form; internal Library meetings or staff training activities</p>',
+<p><strong>Count:</strong> tabling events, resource fairs, open houses, community engagement activities, promotional events highlighting Library services and resources, oral histories/interviews, other non-instructional activities designed to connect with campus or community audiences</p>
+<p><strong>Do NOT count: </strong>reference interactions reported through the Reference Transactions/Consultations form; workshops, orientations, tours, or other planned presentations to groups reported through the Instruction Sessions form; internal Library meetings or staff training activities; donor cultivation or stewardship</p>',
   7,
   'days',
   jsonb_build_object('brandColor', 'redbud', 'queryElementFields', jsonb_build_array(
@@ -83,7 +83,7 @@ VALUES (
   'information-desk',
   'Information Desk Interactions',
   'Record desk interactions and referrals.',
-  '<p>Use this form to record desk interactions and referrals. For live entry, accept the default date and Number of Interactions of 1. For retrospective or batch entry, change the date to the date the interactions occurred and adjust the Number of Interactions as needed. If entering data for multiple days, submit separate entries for each date. Do not combine different READ levels or referrals in a single entry.</p>
+  '<p>Use this form to record desk interactions and referrals. For live entry of a single interaction, accept the default date, add the Hour of Interaction, and accept the Number of Interactions of 1. For retrospective or batch entry, change the date to the date the interactions occurred and adjust the Number of Interactions as needed. If entering data for multiple days, submit separate entries for each date. Do not combine different READ levels or referrals in a single entry.</p>
 <p>Questions about READ levels? Refer to the <a href="https://readscale.org/read-scale.html">READ Scale definitions</a> or contact your supervisor.</p>',
   7,
   'days',
@@ -282,7 +282,7 @@ VALUES
       'description', 'Enter the number of individuals engaged through the activity. Estimates are acceptable when exact counts are unavailable.')),
   (gen_random_uuid(), get_form_id('outreach'), get_form_field_id('ucd-constituency'), 3,
     jsonb_build_object('required', true, 'label', 'Intended audience',
-      'description', 'Select the choice that represents the primary intended audience for this activity')),
+      'description', 'Select the primary intended audience for this activity. If the activity was intentionally designed for several audience groups equally, choose "Multiple audiences."')),
   (gen_random_uuid(), get_form_id('outreach'), get_form_field_id('outreach-type'), 4,
     jsonb_build_object('required', false)),
   (gen_random_uuid(), get_form_id('outreach'), get_form_field_id('ucd-community-organization'), 5,
@@ -294,9 +294,9 @@ VALUES
 INSERT INTO form_field_assignment (form_field_assignment_id, form_id, form_field_id, sort_order, assignment_settings)
 VALUES
   (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('information-desk'), 0,
-    jsonb_build_object('required', true, 'label', 'Information Desk', 'defaultValue', 'last_value_submitted')),
+    jsonb_build_object('required', true, 'label', 'Information Desk', 'defaultValue', 'last_value_submitted', 'description', 'Desk name/location')),
   (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-date'), 1,
-    jsonb_build_object('required', true, 'label', 'Date of activity', 'defaultValue', 'today', 'filterOrder', 1, 'description', 'For retrospective entry, select the date the interactions occurred.')),
+    jsonb_build_object('required', true, 'label', 'Date of interaction', 'defaultValue', 'today', 'filterOrder', 1, 'description', 'For retrospective entry, select the date the interactions occurred.')),
   (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('event-hour'), 2,
     jsonb_build_object('required', true, 'label', 'Hour of activity', 'defaultValue', 'current_hour')),
   (gen_random_uuid(), get_form_id('information-desk'), get_form_field_id('reference-level'), 3,
