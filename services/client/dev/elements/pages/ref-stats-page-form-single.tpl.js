@@ -38,6 +38,12 @@ export function render() {
             href: `/form/${this.data?.name || ''}/submissions`,
             brandColor: 'cabernet'
           })}
+          ${focalLink({
+            text: 'View Dashboards',
+            icon: 'fas.chart-pie',
+            href: `/analytics/?form=${this.data?.name || ''}`,
+            brandColor: 'redbud'
+          })}
         </div>
       </div>
     </div>

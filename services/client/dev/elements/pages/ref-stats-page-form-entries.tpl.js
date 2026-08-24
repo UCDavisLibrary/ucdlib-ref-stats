@@ -12,6 +12,8 @@ export function styles() {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
   `;
 
@@ -31,6 +33,11 @@ export function render() {
     </ol>
     <div class="l-container">
       <div class='form-entry-query-download-container'>
+        <cork-prefixed-icon-button 
+          icon='fas.chart-pie'
+          href='/analytics?form=${this.nameOrId}'>
+          View Dashboards
+        </cork-prefixed-icon-button>
         <ref-stats-form-entry-query-download
           latest-version
           .formNameOrId=${[this.nameOrId]}
