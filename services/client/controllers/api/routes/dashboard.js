@@ -108,15 +108,15 @@ router.get('/:idOrName/guest-token', async (req, res) => {
     const token = req.auth.token;
     const userRoles = [
       ...(token.realmAccessRoles || []),
-      ...(token.resourceAccessRoles || [])
+      ...(token.token?.resource_access?.[config.superset.oidcClientId]?.roles || [])
     ];
-    const rls = buildRlsClauses(dashboard.superset_rls, req.auth.userInfo, userRoles);
+    const rls = buildRlsClauses(dashboard.superset_rls, token, userRoles);
 
     const guestToken = signGuestToken({
       user: {
-        username: req.auth.userInfo.preferred_username,
-        first_name: req.auth.userInfo.given_name || '',
-        last_name: req.auth.userInfo.family_name || ''
+        username: token.id,
+        first_name: token.firstName || '',
+        last_name: token.lastName || ''
       },
       dashboardId: dashboard.superset_dashboard_id,
       rls

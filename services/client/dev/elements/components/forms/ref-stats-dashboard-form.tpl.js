@@ -129,7 +129,7 @@ export function render() {
             ?disabled=${!hasAdminAccess}
             .value=${this.payload?.superset_dashboard_id || ''}
             @input=${e => this._onPayloadInput('superset_dashboard_id', e.target.value)}>
-          <div class='field-description'>The UUID of the dashboard in Superset. Found in the Superset dashboard URL.</div>
+          <div class='field-description'>The UUID of the dashboard in Superset. Found in the "Embed Dashboard" section of the Superset dashboard UI.</div>
         </cork-field-container>
 
         <cork-field-container schema='dashboard' path='superset_dashboard_ui_config' class='field-container'>
