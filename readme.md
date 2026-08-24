@@ -94,7 +94,7 @@ Key tables and views:
 
 ## Superset
 
-Superset is a data visualization tool that runs as a separate service sharing the same Postgres instance. In production it is mounted at `/dashboards` via an Apache reverse proxy.
+Superset is a data visualization tool that runs as a separate service sharing the same Postgres instance. In production it runs on its own subdomain (`superset.staff.library.ucdavis.edu`), reverse-proxied via Apache.
 
 ### Roles
 

@@ -58,10 +58,6 @@ TALISMAN_CONFIG = {
     'frame_options': None,
 }
 
-APPLICATION_ROOT = os.environ.get('SUPERSET_APPLICATION_ROOT', '/')
-ENABLE_PROXY_FIX = APPLICATION_ROOT != '/'
-PROXY_FIX_CONFIG = {"x_for": 1, "x_proto": 1, "x_host": 1, "x_prefix": 0}
-
 # Add custom time grains for academic quarter and academic year. 
 # Used for bucketing time series data
 # There is a little bit of error because we are using fixed dates due to implementation limitations

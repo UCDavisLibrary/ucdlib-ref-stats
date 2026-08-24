@@ -2,7 +2,6 @@ import { html, css } from 'lit';
 import '#components/ref-stats-form-entry-query.js';
 import '#components/ref-stats-form-entry-query-filters.js';
 import '#components/ref-stats-form-entry-query-download.js';
-import { superset } from '#client-utils';
 
 export function styles() {
   const elementStyles = css`

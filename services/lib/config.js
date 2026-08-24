@@ -63,11 +63,9 @@ class Config {
     }
 
     this.superset = {
-      applicationRoot: this.getEnv('SUPERSET_APPLICATION_ROOT', '/'),
+      healthUrl: this.getEnv('SUPERSET_HEALTH_URL', 'http://superset:8088/health'),
+      publicUrl: this.getEnv('SUPERSET_PUBLIC_URL', 'http://localhost:8088'),
     }
-    const supersetRoot = this.superset.applicationRoot.replace(/\/$/, '');
-    this.superset.healthUrl = this.getEnv('SUPERSET_HEALTH_URL', `http://superset:8088${supersetRoot}/health`);
-    this.superset.publicUrl = this.getEnv('SUPERSET_PUBLIC_URL', 'http://localhost:8088');
     this.superset.oidcClientId = this.getEnv('SUPERSET_OIDC_CLIENT_ID', 'ref-stats-superset');
     this.superset.guestTokenSecret = this.getEnv('SUPERSET_GUEST_TOKEN_JWT_SECRET', '');
   }
