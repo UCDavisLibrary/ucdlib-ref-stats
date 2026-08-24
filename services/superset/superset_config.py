@@ -58,6 +58,12 @@ TALISMAN_CONFIG = {
     'frame_options': None,
 }
 
+# Apache terminates TLS and proxies plain HTTP to this container, so trust its
+# X-Forwarded-Proto/-For/-Host headers to generate correct https:// URLs (e.g. the
+# OAuth redirect_uri). Not needed in local dev, where Superset is accessed directly.
+ENABLE_PROXY_FIX = os.environ.get('SUPERSET_ENABLE_PROXY_FIX', 'false').lower() == 'true'
+PROXY_FIX_CONFIG = {"x_for": 1, "x_proto": 1, "x_host": 1, "x_prefix": 0}
+
 # Add custom time grains for academic quarter and academic year. 
 # Used for bucketing time series data
 # There is a little bit of error because we are using fixed dates due to implementation limitations
