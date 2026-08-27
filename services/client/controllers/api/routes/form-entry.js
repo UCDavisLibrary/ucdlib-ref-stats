@@ -373,9 +373,9 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
 
     const d = { ...validated.data };
     if ( isUpdate ){
-      existingEntry.submitted_by = existingEntry.submitted_by;
-      existingEntry.group_id = existingEntry.group_id;
-      existingEntry.impersonated_by = existingEntry.submitted_by !== token.id ? token.id : null;
+      d.submitted_by = existingEntry.submitted_by;
+      d.group_id = existingEntry.group_id;
+      d.impersonated_by = existingEntry.submitted_by !== token.id ? token.id : null;
     } else {
       d.submitted_by = token.id;
       d.group_id = userDepartmentGroupId;

@@ -108,7 +108,8 @@ router.get('/:idOrName/guest-token', async (req, res) => {
     const token = req.auth.token;
     const userRoles = [
       ...(token.realmAccessRoles || []),
-      ...(token.token?.resource_access?.[config.superset.oidcClientId]?.roles || [])
+      ...(token.token?.resource_access?.[config.superset.oidcClientId]?.roles || []),
+      ...(token.resourceAccessRoles || [])
     ];
     const rls = buildRlsClauses(dashboard.superset_rls, token, userRoles);
 
