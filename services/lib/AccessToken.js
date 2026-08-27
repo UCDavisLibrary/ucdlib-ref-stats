@@ -4,6 +4,12 @@ import config from './app-config.js';
  * @description Class for accessing properties of an access token for this client
  */
 export default class AccessToken {
+  static ADMIN_ROLE = 'admin-access';
+  static MANAGER_ROLE = 'manager';
+  static BASIC_ROLE = 'basic-access';
+  static FORM_ROLE_PREFIX = 'form--';
+  static FORM_MANAGER_ROLE_PREFIX = 'form-manager--';
+
   constructor(token, client){
     this.token = token || {};
     this.client = client || config.auth?.clientInit?.clientId;
@@ -24,14 +30,14 @@ export default class AccessToken {
    * @description Returns true if user has basic access to this client
    */
   get hasBasicAccess(){
-    return this._inRoleList('basic-access');
+    return this._inRoleList(AccessToken.BASIC_ROLE);
   }
 
   /**
    * @description Returns true if user has admin access to this client
    */
   get hasAdminAccess(){
-    return this._inRoleList('admin-access');
+    return this._inRoleList(AccessToken.ADMIN_ROLE);
   }
 
   /**
@@ -39,14 +45,39 @@ export default class AccessToken {
    */
   get hasManagerAccess(){
     if ( this.hasAdminAccess ) return true;
-    return this._inRoleList('manager', 'resource');
+    return this._inRoleList(AccessToken.MANAGER_ROLE, 'resource');
+  }
+
+  /**
+   * @description Returns true if user has manager-equivalent access for a specific form, either
+   * globally (hasManagerAccess) or scoped to that form via a form-manager--<slug> role
+   * @param {String} formName - The form's `name` (slug) to check
+   * @returns {Boolean}
+   */
+  hasManagerAccessForForm(formName){
+    return this.hasManagerAccess || this.formManagerForms.includes(formName);
   }
 
   /**
    * @description Returns list of form names for which user has access to this client
    */
   get forms(){
-    return this.resourceAccessRoles.filter(r => r.startsWith('form--')).map(r => r.replace('form--', ''));
+    return this.resourceAccessRoles.filter(r => r.startsWith(AccessToken.FORM_ROLE_PREFIX)).map(r => r.replace(AccessToken.FORM_ROLE_PREFIX, ''));
+  }
+
+  /**
+   * @description Returns list of form names for which user has form-manager access to this client
+   */
+  get formManagerForms(){
+    return this.resourceAccessRoles.filter(r => r.startsWith(AccessToken.FORM_MANAGER_ROLE_PREFIX)).map(r => r.replace(AccessToken.FORM_MANAGER_ROLE_PREFIX, ''));
+  }
+
+  /**
+   * @description Returns the deduped union of forms with submit access and forms with form-manager
+   * access, for populating nav/teaser lists of forms visible to the user
+   */
+  get visibleFormNames(){
+    return [...new Set([...this.forms, ...this.formManagerForms])];
   }
 
   /**

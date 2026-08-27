@@ -58,7 +58,7 @@ function renderHeader(){
               <ul link-text=${form.label}>
                 <li><a href='/form/${form.name}'>New Submission</a></li>
                 <li><a href='/form/${form.name}/submissions'>View Submissions</a></li>
-                ${this.AuthModel?.token?.hasManagerAccess ? html`
+                ${this.AuthModel?.token?.hasManagerAccessForForm(form.name) ? html`
                   <li><a href='/form-admin/${form.name}'>Form Settings</a></li>
                 ` : html``}
               </ul>

@@ -5,6 +5,7 @@ import { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema } fr
 import models from '#models';
 import logger from '#lib/logger.js';
 import protect from '../utils/protect.js';
+import resolveFormEntryAccessScope from '../utils/formEntryAccessScope.js';
 
 /**
  * @description Serializes a form field value for CSV output.
@@ -55,7 +56,6 @@ router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (
     if ( userData.error ) {
       logger.error('Unable to get user data from Library IAM. Cannot test group access.', req.context.logSignal, { error: userData.error });
     }
-    const headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
 
     if ( req.payload.submitted_by ){
       req.payload.submitted_by = req.payload.submitted_by.split(',').map(s => s.trim()).filter(s => s);
@@ -63,29 +63,41 @@ router.get('/', validate(schema.formEntry.query, {reqParts: ['query']}), async (
     if ( req.payload.group_id ){
       req.payload.group_id = req.payload.group_id.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
     }
+    if ( req.payload.form ) {
+      req.payload.form = req.payload.form.split(',').map(f => f.trim());
+    }
 
     // restrict query based on user access
     if ( req.payload.mine ) {
       req.payload.submitted_by = token.id;
-    } else if ( token.hasManagerAccess ) {
-      // no filter - manager access can see all entries
-    } else if ( headOfGroupIds.length > 0 ) {
-      const allGroupIds = await models.libraryIam.addChildGroupIds(headOfGroupIds);
-      if ( !req.payload.group_id ){
-        req.payload.group_id = allGroupIds;
+    } else {
+      const scope = await resolveFormEntryAccessScope(token, userData.res, req.payload.form);
+      if ( scope.tier === 'none' ) {
+        req.payload.submitted_by = token.id;
       } else {
-        for ( const groupId of req.payload.group_id ){
-          if ( !allGroupIds.includes(groupId) ){
-            return res.status(403).json({ message: 'You do not have permission to query this group.' });
+        if ( scope.forms ) {
+          if ( !req.payload.form ) {
+            req.payload.form = scope.forms;
+          } else {
+            for ( const f of req.payload.form ){
+              if ( !scope.forms.includes(f) ){
+                return res.status(403).json({ message: 'You do not have permission to query this form.' });
+              }
+            }
+          }
+        }
+        if ( scope.groupIds ) {
+          if ( !req.payload.group_id ){
+            req.payload.group_id = scope.groupIds;
+          } else {
+            for ( const groupId of req.payload.group_id ){
+              if ( !scope.groupIds.includes(groupId) ){
+                return res.status(403).json({ message: 'You do not have permission to query this group.' });
+              }
+            }
           }
         }
       }
-    } else {
-      req.payload.submitted_by = token.id;
-    }
-
-    if ( req.payload.form ) {
-      req.payload.form = req.payload.form.split(',').map(f => f.trim());
     }
 
     // extract field filters from passthrough query params
@@ -134,13 +146,12 @@ router.get('/filters', validate(schema.formEntry.filter, {reqParts: ['query']}),
     if ( userData.error ) {
       logger.error('Unable to get user data from Library IAM. Cannot test group access.', req.context.logSignal, { error: userData.error });
     }
-    const headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
-    const allGroupIds = await models.libraryIam.addChildGroupIds(headOfGroupIds);
-
 
     if ( req.payload.form ) {
       req.payload.form = req.payload.form.split(',').map(f => f.trim()).filter(f => f);
     }
+
+    const scope = await resolveFormEntryAccessScope(token, userData.res, req.payload.form);
 
     const out = {
       submitted_by: { label: 'Submitted By', options: [], multiple: true, type: 'select' },
@@ -151,12 +162,15 @@ router.get('/filters', validate(schema.formEntry.filter, {reqParts: ['query']}),
     };
 
     // advanced access filters
-    if ( allGroupIds.length || token.hasManagerAccess ) {
-      const submitters = await models.user.getFormSubmitters(req.payload.form, allGroupIds);
+    if ( scope.tier !== 'none' ) {
+      const formsForOptions = scope.forms || req.payload.form;
+      const groupsForOptions = scope.groupIds || [];
+
+      const submitters = await models.user.getFormSubmitters(formsForOptions, groupsForOptions);
       if ( submitters.error ) throw submitters.error;
       out.submitted_by.options = submitters.res.map(u => ({ value: u.user_id, label: `${u.first_name} ${u.last_name}`.trim() || u.user_id }));
 
-      const groups = await models.group.getFormGroups(req.payload.form, allGroupIds);
+      const groups = await models.group.getFormGroups(formsForOptions, groupsForOptions);
       if ( groups.error ) throw groups.error;
       out.group_id.options = groups.res.map(g => ({ value: g.group_id, label: g.name }));
     }
@@ -214,7 +228,6 @@ router.get('/export', validate(schema.formEntry.export, {reqParts: ['query']}), 
     if ( userData.error ) {
       logger.error('Unable to get user data from Library IAM. Cannot test group access.', req.context.logSignal, { error: userData.error });
     }
-    const headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
 
     if ( req.payload.submitted_by ){
       req.payload.submitted_by = req.payload.submitted_by.split(',').map(s => s.trim()).filter(s => s);
@@ -222,29 +235,41 @@ router.get('/export', validate(schema.formEntry.export, {reqParts: ['query']}), 
     if ( req.payload.group_id ){
       req.payload.group_id = req.payload.group_id.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
     }
+    if ( req.payload.form ) {
+      req.payload.form = req.payload.form.split(',').map(f => f.trim());
+    }
 
     // restrict query based on user access
     if ( req.payload.mine ) {
       req.payload.submitted_by = token.id;
-    } else if ( token.hasManagerAccess ) {
-      // no filter - manager access can see all entries
-    } else if ( headOfGroupIds.length > 0 ) {
-      const allGroupIds = await models.libraryIam.addChildGroupIds(headOfGroupIds);
-      if ( !req.payload.group_id ){
-        req.payload.group_id = allGroupIds;
+    } else {
+      const scope = await resolveFormEntryAccessScope(token, userData.res, req.payload.form);
+      if ( scope.tier === 'none' ) {
+        req.payload.submitted_by = token.id;
       } else {
-        for ( const groupId of req.payload.group_id ){
-          if ( !allGroupIds.includes(groupId) ){
-            return res.status(403).json({ message: 'You do not have permission to query this group.' });
+        if ( scope.forms ) {
+          if ( !req.payload.form ) {
+            req.payload.form = scope.forms;
+          } else {
+            for ( const f of req.payload.form ){
+              if ( !scope.forms.includes(f) ){
+                return res.status(403).json({ message: 'You do not have permission to query this form.' });
+              }
+            }
+          }
+        }
+        if ( scope.groupIds ) {
+          if ( !req.payload.group_id ){
+            req.payload.group_id = scope.groupIds;
+          } else {
+            for ( const groupId of req.payload.group_id ){
+              if ( !scope.groupIds.includes(groupId) ){
+                return res.status(403).json({ message: 'You do not have permission to query this group.' });
+              }
+            }
           }
         }
       }
-    } else {
-      req.payload.submitted_by = token.id;
-    }
-
-    if ( req.payload.form ) {
-      req.payload.form = req.payload.form.split(',').map(f => f.trim());
     }
 
     // extract field filters from passthrough query params
@@ -323,7 +348,7 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     }
     form = form.res;
 
-    if ( !token.hasManagerAccess && !token.forms.includes(form.name) ){
+    if ( !token.hasManagerAccessForForm(form.name) && !token.forms.includes(form.name) ){
       return res.status(403).json({ message: 'You do not have permission to submit this form.' });
     }
 

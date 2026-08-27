@@ -68,7 +68,8 @@ const rlsSchema = z.object({
   identifier: z.preprocess(v => v || undefined, z.enum(['username', 'email']).optional()),
   column: z.preprocess(v => v || undefined, z.string().max(250).optional()),
   applyToRoles: z.array(z.string()).optional(),
-  applyIfMissingRoles: z.array(z.string()).optional()
+  applyIfMissingRoles: z.array(z.string()).optional(),
+  departmentHeadColumn: z.preprocess(v => v || undefined, z.string().max(250).optional())
 }).optional();
 
 const uiConfigSchema = z.preprocess(

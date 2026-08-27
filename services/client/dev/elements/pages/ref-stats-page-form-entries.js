@@ -58,7 +58,7 @@ export default class RefStatsPageFormEntries extends Mixin(LitElement)
       ? configured
       : [{field: '_id', desktopFr: 1, mobileFr: 1}, {field: '_created_at', desktopFr: 1, mobileFr: 1}];
     
-    if ( this.AuthModel.token.hasManagerAccess || this.AuthModel.userIsAGroupHead ) {
+    if ( this.AuthModel.token.hasManagerAccessForForm(this.data?.name) || this.AuthModel.userIsAGroupHead ) {
       displayedFields.splice(0, 0, {field: '_submitter', desktopFr: 1, mobileFr: 1});
     }
     this.displayedFields = displayedFields;

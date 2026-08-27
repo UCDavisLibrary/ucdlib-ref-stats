@@ -64,8 +64,14 @@ router.post('/', protect('hasManagerAccess'), json(), validate(schema.formCreate
   }
 });
 
-router.patch('/', protect('hasManagerAccess'), json(), validate(schema.formUpdate, {reqParts: ['body']}), async (req, res) => {
+router.patch('/', json(), validate(schema.formUpdate, {reqParts: ['body']}), async (req, res) => {
   try {
+    const existing = await models.form.get(req.payload.form_id);
+    if ( existing.error ) throw existing.error;
+    if ( !req.auth.token.hasManagerAccessForForm(existing.res?.name) ) {
+      return res.status(403).json({ message: 'You do not have permission to update this form.' });
+    }
+
     logger.info('Form update validated', req.context.logSignal, {formId: req.payload.form_id});
     const r = await models.form.patch(req.payload.form_id, req.payload);
     if (r.error) {

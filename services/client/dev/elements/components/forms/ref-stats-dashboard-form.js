@@ -6,6 +6,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { AppComponentController } from '#controllers';
 import { IdGenerator } from '#client-utils';
+import AccessToken from '#lib/AccessToken.js';
 
 /**
  * @description Form element for creating and editing a dashboard definition.
@@ -102,6 +103,91 @@ export default class RefStatsDashboardForm extends Mixin(LitElement)
   }
 
   /**
+   * @description Maps the dashboard's currently-linked forms to their form-manager--<slug> role
+   * names. Falls back to the loaded `payload.forms` join data if `form_ids` hasn't been touched yet.
+   * @returns {Array<String>}
+   */
+  _linkedFormManagerRoleNames() {
+    const formIds = this.payload.form_ids ?? (this.payload.forms || []).map(f => f.form_id);
+    return this.allForms
+      .filter(f => formIds.includes(f.form_id))
+      .map(f => `${AccessToken.FORM_MANAGER_ROLE_PREFIX}${f.name}`);
+  }
+
+  /**
+   * @description Returns the "Other roles" portion of an RLS role array for display: everything
+   * except the Admin role, the Manager role, and any form-manager--<slug> roles.
+   * @param {Array<String>} roles
+   * @returns {String} Comma-separated role names
+   */
+  _otherRolesString(roles) {
+    return (roles || [])
+      .filter(r => r !== AccessToken.ADMIN_ROLE && r !== AccessToken.MANAGER_ROLE && !r.startsWith(AccessToken.FORM_MANAGER_ROLE_PREFIX))
+      .join(', ');
+  }
+
+  /**
+   * @description Toggles the Admin or Form Manager role in an RLS role array (applyToRoles/
+   * applyIfMissingRoles). Form Manager also grants the current form-manager--<slug> role for
+   * every form linked to this dashboard.
+   * @param {String} listProp - 'applyToRoles' or 'applyIfMissingRoles'
+   * @param {'admin'|'formManager'} roleType
+   * @param {Boolean} checked
+   */
+  _onRlsRoleCheckbox(listProp, roleType, checked) {
+    if ( !this.payload.superset_rls ) this.payload.superset_rls = {};
+    const roles = this.payload.superset_rls[listProp] || [];
+
+    let next;
+    if ( roleType === 'admin' ) {
+      next = checked
+        ? [...new Set([...roles, AccessToken.ADMIN_ROLE])]
+        : roles.filter(r => r !== AccessToken.ADMIN_ROLE);
+    } else {
+      const withoutFormManager = roles.filter(r => r !== AccessToken.MANAGER_ROLE && !r.startsWith(AccessToken.FORM_MANAGER_ROLE_PREFIX));
+      next = checked
+        ? [...withoutFormManager, AccessToken.MANAGER_ROLE, ...this._linkedFormManagerRoleNames()]
+        : withoutFormManager;
+    }
+
+    this.payload.superset_rls[listProp] = next;
+    this.requestUpdate();
+  }
+
+  /**
+   * @description Updates the freeform "Other roles" portion of an RLS role array, preserving
+   * any Admin/Manager/form-manager roles already present.
+   * @param {String} listProp - 'applyToRoles' or 'applyIfMissingRoles'
+   * @param {String} value - Comma-separated "other roles" text input value
+   */
+  _onRlsOtherRolesInput(listProp, value) {
+    if ( !this.payload.superset_rls ) this.payload.superset_rls = {};
+    const roles = this.payload.superset_rls[listProp] || [];
+    const structured = roles.filter(r => r === AccessToken.ADMIN_ROLE || r === AccessToken.MANAGER_ROLE || r.startsWith(AccessToken.FORM_MANAGER_ROLE_PREFIX));
+    this.payload.superset_rls[listProp] = [...structured, ...this._splitRoles(value)];
+    this.requestUpdate();
+  }
+
+  /**
+   * @description Updates the dashboard's linked forms and, for any RLS role list with the Form
+   * Manager role active, rebuilds its form-manager--<slug> entries to match the new form set.
+   * @param {Array<String>} formIds - New array of linked form UUIDs
+   */
+  _onFormIdsChange(formIds) {
+    this.payload.form_ids = formIds;
+    const linkedRoleNames = this._linkedFormManagerRoleNames();
+
+    for ( const listProp of ['applyToRoles', 'applyIfMissingRoles'] ) {
+      const roles = this.payload.superset_rls?.[listProp] || [];
+      if ( !roles.includes(AccessToken.MANAGER_ROLE) ) continue;
+      const withoutFormManagerRoles = roles.filter(r => r === AccessToken.MANAGER_ROLE || !r.startsWith(AccessToken.FORM_MANAGER_ROLE_PREFIX));
+      this.payload.superset_rls[listProp] = [...withoutFormManagerRoles, ...linkedRoleNames];
+    }
+
+    this.requestUpdate();
+  }
+
+  /**
    * @description Handles form submission. Creates or patches the dashboard depending
    * on whether nameOrId is set. Fires a `ref-stats-dashboard-updated` custom event on success.
    * @param {Event} e - The form submit event
@@ -110,15 +196,7 @@ export default class RefStatsDashboardForm extends Mixin(LitElement)
   async _onSubmit(e) {
     e.preventDefault();
 
-    const rls = this.payload.superset_rls || {};
-    const submitPayload = {
-      ...this.payload,
-      superset_rls: {
-        ...rls,
-        applyToRoles: this._splitRoles(rls.applyToRoles),
-        applyIfMissingRoles: this._splitRoles(rls.applyIfMissingRoles)
-      }
-    };
+    const submitPayload = { ...this.payload };
     if ( !this.payload._superset_dashboard_ui_config ) {
       submitPayload.superset_dashboard_ui_config = {};
     } else {
@@ -190,18 +268,6 @@ export default class RefStatsDashboardForm extends Mixin(LitElement)
     if ( !value ) return [];
     if ( Array.isArray(value) ) return value;
     return value.split(',').map(s => s.trim()).filter(Boolean);
-  }
-
-  /**
-   * @description Joins an array of role strings back into a comma-separated display string.
-   * Returns an empty string for falsy or empty arrays.
-   * @param {Array<String>|String} value - Role array or existing string value
-   * @returns {String}
-   */
-  _joinRoles(value) {
-    if ( !value ) return '';
-    if ( Array.isArray(value) ) return value.join(', ');
-    return value;
   }
 
 }

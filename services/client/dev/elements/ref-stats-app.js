@@ -120,7 +120,7 @@ export default class RefStatsApp extends Mixin(LitElement)
   async getForms(){
     const q = {active_only: true};
     if ( !this.AuthModel.token.hasManagerAccess ){
-      q.name = this.AuthModel.token.forms.join(',');
+      q.name = this.AuthModel.token.visibleFormNames.join(',');
       if ( !q.name ) {
         this.forms = [];
         return;

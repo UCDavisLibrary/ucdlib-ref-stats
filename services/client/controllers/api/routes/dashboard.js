@@ -51,17 +51,21 @@ function signGuestToken({ user, dashboardId, rls }) {
 }
 
 /**
- * @description Build the RLS clause array for a Superset guest token request.
+ * @description Build the RLS clause array for a Superset guest token request. If
+ * `departmentHeadColumn` is configured and the requester is a department head, that rule takes
+ * over (identifier/column are ignored for them); otherwise falls back to the identifier/column rule.
  * @param {Object} supersetRls - The superset_rls config from the dashboard record
- * @param {Object} userInfo - Keycloak userInfo from req.auth.userInfo
+ * @param {import('#lib/AccessToken.js').default} accessToken - req.auth.token
  * @param {String[]} userRoles - Combined realm + resource roles for the user
+ * @param {Object} [opts]
+ * @param {Number[]} [opts.headOfGroupIds] - Group IDs the user directly heads
+ * @param {Number[]} [opts.allGroupIds] - headOfGroupIds plus all descendant sub-department group IDs
  * @returns {Array} Array of RLS clause objects for the guest token payload
  */
-function buildRlsClauses(supersetRls, userInfo, userRoles) {
+function buildRlsClauses(supersetRls, accessToken, userRoles, { headOfGroupIds = [], allGroupIds = [] } = {}) {
   if ( !supersetRls || typeof supersetRls !== 'object' ) return [];
 
-  const { identifier, column, applyToRoles = [], applyIfMissingRoles = [] } = supersetRls;
-  if ( !identifier || !column ) return [];
+  const { identifier, column, applyToRoles = [], applyIfMissingRoles = [], departmentHeadColumn } = supersetRls;
   if ( !applyToRoles.length && !applyIfMissingRoles.length ) return [];
 
   const hasApplyToRole = applyToRoles.some(role => userRoles.includes(role));
@@ -69,7 +73,12 @@ function buildRlsClauses(supersetRls, userInfo, userRoles) {
 
   if ( !hasApplyToRole && !missingRequiredRole ) return [];
 
-  const value = identifier === 'email' ? userInfo.email : userInfo.preferred_username;
+  if ( departmentHeadColumn && headOfGroupIds.length ) {
+    return [{ clause: `${departmentHeadColumn} IN (${allGroupIds.join(',')})` }];
+  }
+
+  if ( !identifier || !column ) return [];
+  const value = identifier === 'email' ? accessToken.email : accessToken.id;
   return [{ clause: `${column} = '${value}'` }];
 }
 
@@ -111,7 +120,18 @@ router.get('/:idOrName/guest-token', async (req, res) => {
       ...(token.token?.resource_access?.[config.superset.oidcClientId]?.roles || []),
       ...(token.resourceAccessRoles || [])
     ];
-    const rls = buildRlsClauses(dashboard.superset_rls, token, userRoles);
+
+    let headOfGroupIds = [];
+    let allGroupIds = [];
+    if ( dashboard.superset_rls?.departmentHeadColumn ) {
+      const userData = await models.libraryIam.getUserById(token.id);
+      headOfGroupIds = (userData.res?.groups || []).filter(g => g.isHead).map(g => g.id);
+      if ( headOfGroupIds.length ) {
+        allGroupIds = await models.libraryIam.addChildGroupIds(headOfGroupIds);
+      }
+    }
+
+    const rls = buildRlsClauses(dashboard.superset_rls, token, userRoles, { headOfGroupIds, allGroupIds });
 
     const guestToken = signGuestToken({
       user: {

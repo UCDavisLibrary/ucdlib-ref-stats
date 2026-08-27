@@ -15,6 +15,14 @@ export default class AdminPageController {
     if ( e.page !== this.host.pageId ) return;
 
     this.userCanAccess = this.AuthModel.token?.hasManagerAccess;
+
+    if ( !this.userCanAccess && this.host.pageId === 'form-admin-single' ) {
+      const formName = e.location.path[1];
+      if ( formName && formName !== 'new' && this.AuthModel.token?.formManagerForms?.includes(formName) ) {
+        this.userCanAccess = true;
+      }
+    }
+
     if ( !this.userCanAccess ) {
       this.AppStateModel.showError({message: 'You do not have permission to access this page.'});
     }

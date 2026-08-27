@@ -71,6 +71,7 @@ Access is controlled by realm roles (`basic-access` and `admin-access`) and dedi
 | ---- | ------ |
 | `basic-access` | Log in to the application, and view their previous submissions. |
 | `form--reference` / `form--instruction` / `form--outreach` | Submit the specific named form |
+| `form-manager--<slug-of-form>` | Manager-equivalent access scoped to one form: submit it, see all submissions for it, edit its settings, and manage its field assignments. Does not extend to creating/deleting forms, fields, or picklists. |
 | `manager` | Admin access without any destructive actions |
 | `admin-access` | Full admin access |
 
@@ -196,6 +197,16 @@ Unfortunately, the RLS rules set in the Superset UI cannot be reused when embedd
 However, the embedded sdk lets you pass in arbitrary rls rules in the jwt token. In the webapp's dashboard form, an admin can generate an rls rule based on select fields from the current user's keycloak token (email, username, realm and client roles). Then, when a guest token is issued, the app server evaluates this config against the user's Keycloak roles and injects RLS clauses directly into the token payload. 
 
 There should be an RLS for most dashboards that mirrors the RLS rule established in Superset (see above) - `submitted_by = ${kc_username}` where user does not have roles `admin-access` or `refstats-superset-alpha`
+
+**Apply to Roles / Apply if Missing Roles** — rather than typing free-text role names, the dashboard form renders two checkboxes (Admin, Form Manager) plus an "Other roles" text input for each of these two fields. Admin adds the `admin-access` role; Form Manager adds the `manager` role plus a `form-manager--<slug>` role for every form currently linked to the dashboard (via `dashboard_to_form`) — both are kept in sync automatically if the linked forms change. Anything else typed into "Other roles" is appended as-is.
+
+**Department head RLS** — a dashboard can also be configured with an "Allow Department Head to View Employee Submissions" column/expression. If set, and the requesting user is a department head (per the UC Davis Library IAM API, same as elsewhere in the app), this rule takes over and filters rows to their department + all sub-departments, ignoring the User Identifier/Column rule above for that user. Non-department-heads are unaffected and fall back to the User Identifier/Column rule, if configured.
+
+This value must reference a real column (or a valid SQL expression) on the dataset — **not** a Superset calculated column. RLS clauses from the guest token are injected as raw SQL against the dataset's base query, before Superset expands calculated columns into the outer SELECT, so a calculated column's name won't resolve at that point (you'll see an error like `column "group_id" does not exist`, hinting at the real underlying column instead). If your group ID is stored inside a JSON column (e.g. `form_entry_full`'s `"group"` column), reference the expression directly instead of a calculated column built on top of it:
+
+```sql
+("group"->>'group_id')::numeric
+```
 
 ## Production
 
