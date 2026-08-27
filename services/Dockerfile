@@ -16,7 +16,7 @@ RUN install -d -m 0755 /etc/apt/keyrings \
   | gpg --dearmor -o /etc/apt/keyrings/cloud.google.gpg \
  && chmod 0644 /etc/apt/keyrings/cloud.google.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
-  > /etc/apt/sources.list.d/google-cloud-sdk.list
+  > /etc/apt/sources.list.d/google-cloud-cli.list
 
 # prep for postgres
 RUN install -d -m 0755 /etc/apt/keyrings \
@@ -31,7 +31,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] \
 RUN apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
   wait-for-it \
-  google-cloud-sdk \
+  google-cloud-cli \
   && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
