@@ -41,7 +41,7 @@ GUEST_TOKEN_JWT_AUDIENCE = "superset"
 # Public role has no permissions by default. Gamma is the standard viewer role
 # and has the API permissions the embedded SDK needs (e.g. CurrentUserRestApi, SecurityRestApi).
 # Access to specific dashboards is still gated by the resources claim in the guest token.
-GUEST_ROLE_NAME = "Alpha"
+GUEST_ROLE_NAME = "Gamma"
 
 from superset.config import TALISMAN_CONFIG as _talisman_defaults
 
