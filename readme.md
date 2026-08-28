@@ -191,6 +191,8 @@ GUEST_ROLE_NAME = "ucdlib_guest"
 
 `ucdlib_guest` is a dedicated role, auto-created on startup (see `FLASK_APP_MUTATOR` in `superset_config.py`) as a one-time clone of `Gamma`'s permissions if it doesn't already exist — so it has the same dataset/API access Gamma does, but is excluded from Gamma's RLS rule (see below) in the Superset UI. We don't use `Gamma` directly because our `Gamma` has an RLS rule that limits returned rows to only the current user's submissions, which isn't meaningful for the shared `GUEST` pseudo-user.
 
+When deploying for the first time, remove `can explore on Superset` from the guest user, which hides "Edit Chart" and similar superfluous links on the embedded dashboards.
+
 #### Row-Level Security in Embedded Context
 Unfortunately, the RLS rules set in the Superset UI cannot be reused when embedding since the `GUEST` user can only have one role, which cannot be temporarily adjusted to match the role of the user making the embedding request.
 
