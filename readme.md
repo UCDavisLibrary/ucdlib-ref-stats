@@ -126,7 +126,7 @@ By default, users can only see their own submissions. By setting up a "Row Level
 | Field | Value |
 | ----- | ----- |
 | Filter Type | Base |
-| Excluded Roles | Admin, Alpha |
+| Excluded Roles | Admin, Alpha, ucdlib_guest |
 | Clause | `submitted_by = '{{ current_username() }}'` |
 
 ### Embedded Dashboards
@@ -186,10 +186,10 @@ In production, set `SUPERSET_EMBEDDED_DOMAIN` (e.g. `https://statistics.staff.li
 Superset makes all embed requests from a single `GUEST` psuedo user. Superset's default `GUEST_ROLE_NAME` is `Public`, which has no permissions. Set the role with:
 
 ```python
-GUEST_ROLE_NAME = "Alpha"  
+GUEST_ROLE_NAME = "ucdlib_guest"
 ```
 
-We use `Alpha` instead of `Gamma` because our `Gamma` has an rls rule that limits returned rows to only the current user's submissions.
+`ucdlib_guest` is a dedicated role, auto-created on startup (see `FLASK_APP_MUTATOR` in `superset_config.py`) as a one-time clone of `Gamma`'s permissions if it doesn't already exist — so it has the same dataset/API access Gamma does, but is excluded from Gamma's RLS rule (see below) in the Superset UI. We don't use `Gamma` directly because our `Gamma` has an RLS rule that limits returned rows to only the current user's submissions, which isn't meaningful for the shared `GUEST` pseudo-user.
 
 #### Row-Level Security in Embedded Context
 Unfortunately, the RLS rules set in the Superset UI cannot be reused when embedding since the `GUEST` user can only have one role, which cannot be temporarily adjusted to match the role of the user making the embedding request.

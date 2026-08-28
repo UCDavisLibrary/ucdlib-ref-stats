@@ -38,10 +38,12 @@ FEATURE_FLAGS = {
 
 GUEST_TOKEN_JWT_SECRET = os.environ.get('SUPERSET_GUEST_TOKEN_JWT_SECRET', SECRET_KEY)
 GUEST_TOKEN_JWT_AUDIENCE = "superset"
-# Public role has no permissions by default. Gamma is the standard viewer role
-# and has the API permissions the embedded SDK needs (e.g. CurrentUserRestApi, SecurityRestApi).
+# ucdlib_guest is cloned from Gamma (see FLASK_APP_MUTATOR below) so it has the same dataset/API
+# permissions the embedded SDK needs (e.g. CurrentUserRestApi, SecurityRestApi), but — unlike
+# Gamma — it's excluded from the submitted_by RLS rule configured in the Superset UI, since the
+# GUEST pseudo-user can only hold one role and that role can't be swapped per embedding request.
 # Access to specific dashboards is still gated by the resources claim in the guest token.
-GUEST_ROLE_NAME = "Gamma"
+GUEST_ROLE_NAME = "ucdlib_guest"
 
 from superset.config import TALISMAN_CONFIG as _talisman_defaults
 
@@ -109,6 +111,27 @@ AUTH_ROLES_MAPPING = {
     'refstats-superset-alpha': ['Alpha'],
     'basic-access': ['Gamma'],
 }
+
+
+def _ensure_role_cloned_from(app, new_role_name, source_role_name):
+    """
+    @description Creates new_role_name with a copy of source_role_name's permissions,
+    if it doesn't already exist. Idempotent — safe to run on every app boot.
+    """
+    sm = app.appbuilder.sm
+    if sm.find_role(new_role_name):
+        return
+    source_role = sm.find_role(source_role_name)
+    if not source_role:
+        return
+    new_role = sm.add_role(new_role_name)
+    for permission in source_role.permissions:
+        sm.add_permission_role(new_role, permission)
+
+
+def FLASK_APP_MUTATOR(app):
+    with app.app_context():
+        _ensure_role_cloned_from(app, 'ucdlib_guest', 'Gamma')
 
 OAUTH_PROVIDERS = [{
     'name': 'cas',
