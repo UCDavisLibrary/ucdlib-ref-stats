@@ -1,6 +1,7 @@
 import {AppStateModel} from '@ucd-lib/cork-app-state';
 import AppStateStore from '../stores/AppStateStore.js';
 import config from '../../app-config.js';
+import { legacyReferral } from '#templates';
 
 class AppStateModelImpl extends AppStateModel {
 
@@ -50,8 +51,34 @@ class AppStateModelImpl extends AppStateModel {
     }
     
     this.ValidationModel?.dismissAll();
+    this.onLegacyReferral(update);
 
     return super.set(update);
+  }
+
+  /**
+   * @description Check for and handle a referral from legacy bigsys statistics application.
+   * Strips the legacy-referral query param from the URL via the History API directly
+   * (replacing, not pushing, the current entry) so it doesn't trigger another app-state update.
+   */
+  onLegacyReferral(update) {
+    const location = update.location;
+    if ( location?.query?.['legacy-referral'] === undefined ) return;
+    if ( !this.AuthModel?.token?.id ) return;
+
+    this.showDialogModal({
+      title: `Welcome ${this.AuthModel?.token?.firstName}!`,
+      content: () => legacyReferral(),
+      actions: [
+        {text: 'Close', value: 'dismiss', invert: true, color: 'secondary'},
+      ]
+    })
+
+    const qs = new URLSearchParams(window.location.search);
+    qs.delete('legacy-referral');
+    location.query = Object.fromEntries(qs.entries());
+    location.fullpath = window.location.pathname + (qs.toString() ? `?${qs.toString()}` : '') + window.location.hash;
+    window.history.replaceState({location}, null, location.fullpath);
   }
 
   /**
