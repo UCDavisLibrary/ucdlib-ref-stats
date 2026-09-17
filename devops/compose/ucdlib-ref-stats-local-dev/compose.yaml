@@ -13,6 +13,7 @@ services:
       PGDATABASE: 'postgres'
       PGPASSWORD: 'localhost'
       PGPORT: 5432
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-https://sandbox.auth.library.ucdavis.edu}
       SUPERSET_PUBLIC_URL: ${SUPERSET_PUBLIC_URL:-http://localhost:8088}
       SUPERSET_OIDC_CLIENT_ID: ${SUPERSET_OIDC_CLIENT_ID:-ref-stats-superset}
       SUPERSET_GUEST_TOKEN_JWT_SECRET: ${SUPERSET_GUEST_TOKEN_JWT_SECRET:-change-me-in-production}

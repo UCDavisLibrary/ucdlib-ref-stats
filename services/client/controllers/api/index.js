@@ -6,6 +6,8 @@ import picklist from './routes/picklist.js';
 import form from './routes/form.js';
 import field from './routes/field.js';
 import formEntry from './routes/form-entry.js';
+import studentAssistant from './routes/student-assistant.js';
+import group from './routes/group.js';
 
 import authenticate from './utils/authenticate.js';
 
@@ -24,5 +26,7 @@ router.use('/field', field);
 router.use('/form', form);
 router.use('/picklist', picklist);
 router.use('/form-entry', formEntry);
+router.use('/student-assistant', studentAssistant);
+router.use('/group', group);
 
 export default router;

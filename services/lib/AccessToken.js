@@ -59,6 +59,15 @@ export default class AccessToken {
   }
 
   /**
+   * @description Returns true if user has manager-equivalent access to at least one form, either
+   * globally (hasManagerAccess) or scoped to one or more specific forms via form-manager--<slug> roles
+   * @returns {Boolean}
+   */
+  get hasManagerAccessToAnyForm(){
+    return this.hasManagerAccess || this.formManagerForms.length > 0;
+  }
+
+  /**
    * @description Returns list of form names for which user has access to this client
    */
   get forms(){

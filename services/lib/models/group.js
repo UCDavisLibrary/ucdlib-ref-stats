@@ -24,6 +24,35 @@ class Group {
   }
 
   /**
+   * @description Get a simple list of all groups
+   * @param {Object} params - Query parameters
+   * @param {Boolean} params.active_only - If true, only return groups that are not archived
+   * @returns {Object} {res: [{group_id, name, is_archived}]} or {error}
+   */
+  async getAllGroups(params={}){
+    const where = [];
+    const values = [];
+
+    if ( params.active_only ) {
+      values.push(false);
+      where.push(`is_archived = $${values.length}`);
+    }
+
+    const whereSQL = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+    const sql = `
+      SELECT group_id, name, is_archived
+      FROM ${config.db.tables.groups}
+      ${whereSQL}
+      ORDER BY name ASC
+    `;
+
+    const r = await pgClient.query(sql, values);
+    if ( r.error ) return r;
+    return { res: r.res.rows };
+  }
+
+  /**
    * @description Returns a deduplicated list of groups that appear in form entries,
    * optionally filtered by form and/or group. Results are ordered by name.
    * @param {String|String[]|null} form - Form name, ID, or array thereof. Null returns all forms.

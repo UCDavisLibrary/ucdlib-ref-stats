@@ -23,6 +23,13 @@ export default class AdminPageController {
       }
     }
 
+    if ( !this.userCanAccess && this.host.pageId === 'student-assistant' && e.location.path[0] === 'form-admin' ) {
+      const formName = e.location.path[1];
+      if ( formName && this.AuthModel.token?.formManagerForms?.includes(formName) ) {
+        this.userCanAccess = true;
+      }
+    }
+
     if ( !this.userCanAccess ) {
       this.AppStateModel.showError({message: 'You do not have permission to access this page.'});
     }

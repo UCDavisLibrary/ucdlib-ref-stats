@@ -33,6 +33,10 @@ import {
   dashboardIdOrNameSchema
 } from './schemas/dashboard.js';
 
+import {
+  studentAssistantAssignmentSchema
+} from './schemas/student-assistant.js';
+
 /**
  * @description Middleware to validate request data against a Zod schema.
  * Combines req.params, req.query, and req.body for validation.
@@ -100,7 +104,8 @@ const schema = {
   dashboardCreate: dashboardCreateSchema,
   dashboardUpdate: dashboardUpdateSchema,
   dashboardQuery: dashboardQuerySchema,
-  dashboardIdOrNameSchema: dashboardIdOrNameSchema
+  dashboardIdOrNameSchema: dashboardIdOrNameSchema,
+  studentAssistantAssignment: studentAssistantAssignmentSchema
 };
 
 export { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema };

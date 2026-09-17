@@ -47,6 +47,10 @@ class AppStateModelImpl extends AppStateModel {
         page += '-single';
       }
 
+      if ( page === 'form-admin-single' && update.location.path?.[2] === 'student-assistant' ) {
+        page = 'student-assistant';
+      }
+
       update.page = page;
     }
     

@@ -37,6 +37,7 @@ return html`
     <ref-stats-page-form-admin-single page-id='form-admin-single'></ref-stats-page-form-admin-single>
     <ref-stats-page-dashboard-admin page-id='analytics-admin'></ref-stats-page-dashboard-admin>
     <ref-stats-page-dashboard-admin-single page-id='analytics-admin-single'></ref-stats-page-dashboard-admin-single>
+    <ref-stats-page-student-assistant page-id='student-assistant'></ref-stats-page-student-assistant>
   </ucdlib-pages>
   <div class="u-space-mb--huge"></div>
 `;}
@@ -80,6 +81,7 @@ function renderHeader(){
         <a href="/field">Field Library</a>
         <a href="/picklist">Picklist Management</a>
         <a href="/analytics-admin">Dashboard Administration</a>
+        <a href="/student-assistant">Student Assistant Access</a>
       </ucd-theme-quick-links>
     </ucd-theme-header>
   `;

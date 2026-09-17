@@ -48,6 +48,8 @@ import '#lib/cork/models/FormEntryModel.js';
 import '#lib/cork/models/FormModel.js';
 import '#lib/cork/models/PicklistModel.js';
 import '#lib/cork/models/DashboardModel.js';
+import '#lib/cork/models/StudentAssistantModel.js';
+import '#lib/cork/models/GroupModel.js';
 import AuthModel from '#lib/cork/models/AuthModel.js';
 
 Registry.ready();

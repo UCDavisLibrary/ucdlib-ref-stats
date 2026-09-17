@@ -29,13 +29,15 @@ class Config {
         users: 'users',
         groups: 'groups',
         dashboard: 'dashboard',
-        dashboardToForm: 'dashboard_to_form'
+        dashboardToForm: 'dashboard_to_form',
+        studentAssistant: 'student_assistant_assignment'
       },
       views: {
         picklistWithItems: 'picklist_with_items',
         fieldFull: 'form_field_full',
         formEntryFull: 'form_entry_full',
-        dashboardFull: 'dashboard_full'
+        dashboardFull: 'dashboard_full',
+        studentAssistantFull: 'student_assistant_assignment_full'
       }
     }
 
@@ -68,6 +70,17 @@ class Config {
     }
     this.superset.oidcClientId = this.getEnv('SUPERSET_OIDC_CLIENT_ID', 'ref-stats-superset');
     this.superset.guestTokenSecret = this.getEnv('SUPERSET_GUEST_TOKEN_JWT_SECRET', '');
+
+    // Rosetta API (UC Davis IAM API) configuration
+    this.rosetta = {
+      baseUrl: this.getEnv('ROSETTA_API_BASE_URL', 'https://rosetta.dev.api.ucdavis.edu/api/v1'),
+      oauthUrl: this.getEnv('ROSETTA_API_OAUTH_URL', 'https://oauth.dev.api.ucdavis.edu/token'),
+      clientId: this.getEnv('ROSETTA_API_CLIENT_ID', ''),
+      clientSecret: this.getEnv('ROSETTA_API_CLIENT_SECRET', ''),
+      cacheExpiration: this.getEnv('ROSETTA_API_CACHE_EXPIRATION', '4 hours'),
+      apiQueryLimit: this.getEnv('ROSETTA_API_QUERY_LIMIT', 20),
+      defaultScope: this.getEnv('ROSETTA_API_DEFAULT_SCOPE', 'read:public read:legalNames'),
+    }
   }
 
   /**

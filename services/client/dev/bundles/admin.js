@@ -6,3 +6,4 @@ import '../elements/pages/admin/ref-stats-page-form-admin.js';
 import '../elements/pages/admin/ref-stats-page-form-admin-single.js';
 import '../elements/pages/admin/ref-stats-page-dashboard-admin.js';
 import '../elements/pages/admin/ref-stats-page-dashboard-admin-single.js';
+import '../elements/pages/admin/ref-stats-page-student-assistant.js';

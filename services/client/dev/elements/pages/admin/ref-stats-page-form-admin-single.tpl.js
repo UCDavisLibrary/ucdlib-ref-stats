@@ -43,6 +43,12 @@ export function render() {
             href: `/form/${this.nameOrId}/submissions`,
             brandColor: 'cabernet'
           })}
+          ${focalLink({
+            text: 'Student Assistant Access',
+            icon: 'fas.user-graduate',
+            href: `/form-admin/${this.nameOrId}/student-assistant`,
+            brandColor: 'poppy'
+          })}
           <ref-stats-field-assignment form-name-or-id=${this.nameOrId} class='u-space-mt--large'></ref-stats-field-assignment>
 
         </div>

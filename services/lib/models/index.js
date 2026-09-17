@@ -8,6 +8,7 @@ import form from "./form.js";
 import group from "./group.js";
 import libraryIam from "./libraryIam.js";
 import picklist from "./picklist.js";
+import studentAssistant from "./studentAssistant.js";
 import user from "./user.js";
 
 export default {
@@ -21,5 +22,6 @@ export default {
   group,
   libraryIam,
   picklist,
+  studentAssistant,
   user
 };
