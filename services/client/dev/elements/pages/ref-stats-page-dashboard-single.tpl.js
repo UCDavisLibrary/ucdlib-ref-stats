@@ -9,6 +9,7 @@ export function styles() {
     ref-stats-page-dashboard-single #superset-embed {
       width: 100%;
       min-height: 600px;
+      border: 1px solid var(--ucd-black-20, #ccc);
     }
     ref-stats-page-dashboard-single #superset-embed iframe {
       width: 100%;
