@@ -53,7 +53,8 @@ export default class CorkDateDisplay extends LitElement {
 
   willUpdate(props){
     if ( props.has('iso') && this.iso ) {
-      this.date = new Date(this.iso);
+      const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(this.iso);
+      this.date = new Date(isDateOnly ? `${this.iso}T00:00:00` : this.iso);
     }
     
     if ( props.has('date') ) {
