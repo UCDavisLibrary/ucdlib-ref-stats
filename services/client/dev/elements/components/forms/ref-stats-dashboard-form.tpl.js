@@ -173,28 +173,7 @@ export function render() {
             <div class='field-description'>The dataset column to filter on (e.g. <code>submitted_by</code>).</div>
           </cork-field-container>
 
-          <cork-field-container schema='dashboard' path='superset_rls.departmentHeadColumn' class='field-container'>
-            <label for=${this.ctl.idGen.get('rls-department-head-column')}>Allow Department Head to View Employee Submissions</label>
-            <input
-              type="text"
-              id=${this.ctl.idGen.get('rls-department-head-column')}
-              ?disabled=${!hasAdminAccess}
-              .value=${rls.departmentHeadColumn || ''}
-              @input=${e => this._onRlsInput('departmentHeadColumn', e.target.value)}>
-            <div class='field-description'>
-              The dataset column (or SQL expression) to filter on. If set, and the requesting user is a
-              department head, this rule takes over: they see rows where this column matches their
-              department or any sub-department, and the User Identifier/Column fields above are ignored
-              for them. Users who are not department heads are unaffected by this field and fall back to
-              the User Identifier/Column rule above, if configured. This must reference a real column on
-              the dataset, not a Superset calculated column &mdash; calculated columns aren't available
-              yet at the point RLS is applied. If your group ID is stored inside a JSON column (e.g.
-              <code>"group"</code>), use the expression directly, e.g.
-              <code>("group"->>'group_id')::numeric</code>.
-            </div>
-          </cork-field-container>
-
-          <fieldset class='basic-legend'>
+          <fieldset class='basic-legend flush-x'>
             <legend>Apply to Roles</legend>
             <p class='field-description u-space-mt--flush'>If the user has any of these roles, RLS is applied.</p>
 
@@ -230,7 +209,7 @@ export function render() {
             </cork-field-container>
           </fieldset>
 
-          <fieldset class='basic-legend'>
+          <fieldset class='basic-legend flush-x'>
             <legend>Apply if Missing Roles</legend>
             <p class='field-description u-space-mt--flush'>If the user has none of these roles, RLS is applied.</p>
 
@@ -265,6 +244,27 @@ export function render() {
               <div class='field-description'>Comma-separated role names.</div>
             </cork-field-container>
           </fieldset>
+
+          <cork-field-container schema='dashboard' path='superset_rls.departmentHeadColumn' class='field-container'>
+            <label for=${this.ctl.idGen.get('rls-department-head-column')}>Department Head Override</label>
+            <input
+              type="text"
+              id=${this.ctl.idGen.get('rls-department-head-column')}
+              ?disabled=${!hasAdminAccess}
+              .value=${rls.departmentHeadColumn || ''}
+              @input=${e => this._onRlsInput('departmentHeadColumn', e.target.value)}>
+            <div class='field-description'>
+              The dataset column (or SQL expression) to filter on. If set, and the requesting user is a
+              department head, this rule takes over: they see rows where this column matches their
+              department or any sub-department, and the User Identifier/Column fields above are ignored
+              for them. Users who are not department heads are unaffected by this field and fall back to
+              the User Identifier/Column rule above, if configured. This must reference a real column on
+              the dataset, not a Superset calculated column &mdash; calculated columns aren't available
+              yet at the point RLS is applied. If your group ID is stored inside a JSON column (e.g.
+              <code>"group"</code>), use the expression directly, e.g.
+              <code>("group"->>'group_id')::numeric</code>.
+            </div>
+          </cork-field-container>
         </fieldset>
       </fieldset>
 
