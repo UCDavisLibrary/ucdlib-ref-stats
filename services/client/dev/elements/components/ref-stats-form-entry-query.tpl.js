@@ -131,8 +131,8 @@ function _renderFormEntry(formEntry, mobile) {
         <div class='entry-actions'>
           <cork-icon-button 
             basic
-            icon='fas.pen-to-square'
-            link-aria-label='Edit Submission'
+            icon=${formEntry.past_edit_window ? 'fas.arrow-up-right-from-square' : 'fas.pen-to-square'}
+            link-aria-label=${formEntry.past_edit_window ? 'View Submission' : 'Edit Submission'}
             href='/form/${formEntry.form_name}/${formEntry.form_entry_id}'
             >
           </cork-icon-button>
