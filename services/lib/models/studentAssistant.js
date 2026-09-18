@@ -235,8 +235,15 @@ class StudentAssistant {
   async syncKeycloakAccess({ userId }) {
     const current = await this.query({ user_id: userId, per_page: 1 });
     if ( current.error ) return current;
-    const formNames = (current.res.results[0]?.forms || []).map(f => f.name);
-    return keycloakAdmin.syncFormAccess({ userId, formNames });
+    const row = current.res.results[0];
+    const formNames = (row?.forms || []).map(f => f.name);
+    return keycloakAdmin.syncFormAccess({
+      userId,
+      formNames,
+      email: row?.email,
+      firstName: row?.first_name,
+      lastName: row?.last_name
+    });
   }
 }
 

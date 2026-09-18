@@ -106,6 +106,7 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
       if ( r.state === 'loaded' ) {
         this.AppStateModel.showToast({text: 'Keycloak roles synced successfully', type: 'success'});
       }
+      this.AppStateModel.refresh();
       return;
     }
 

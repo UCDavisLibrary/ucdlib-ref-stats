@@ -49,28 +49,42 @@ class KeycloakAdmin {
   /**
    * @description Ensures a Keycloak account exists for userId (creating one linked to the
    * cas-oidc identity provider if missing and formNames is non-empty) and syncs their
-   * form--<slug> client roles on ref-stats-client to match formNames exactly. An empty
-   * formNames removes all form roles and, if they now have no groups or other direct roles,
-   * deletes the account entirely.
+   * form--<slug> client roles on ref-stats-client to match formNames exactly. Also keeps
+   * email/first name/last name and the isStudentAssistant attribute current on every call,
+   * for both newly-created and pre-existing accounts. An empty formNames removes all form
+   * roles and, if they now have no groups or other direct roles, deletes the account entirely.
    * @param {Object} opts
    * @param {String} opts.userId
    * @param {String[]} opts.formNames - Exact set of form slugs the user should have access to
+   * @param {String} [opts.email]
+   * @param {String} [opts.firstName]
+   * @param {String} [opts.lastName]
    * @returns {Object} {res: {added, removed, created, deleted}} or {error}
    */
-  async syncFormAccess({ userId, formNames }) {
+  async syncFormAccess({ userId, formNames, email, firstName, lastName }) {
     return this._withAuth(async (client) => {
       let [kcUser] = await client.users.find({ username: userId, exact: true });
       let created = false;
+
+      const profile = {
+        email,
+        firstName,
+        lastName,
+        attributes: { ...(kcUser?.attributes || {}), isStudentAssistant: ['true'] }
+      };
 
       if ( !kcUser && formNames.length ) {
         const result = await client.users.create({
           username: userId,
           emailVerified: true,
           enabled: true,
+          ...profile,
           federatedIdentities: [{ identityProvider: 'cas-oidc', userId, userName: userId }]
         });
         kcUser = { id: result.id };
         created = true;
+      } else if ( kcUser ) {
+        await client.users.update({ id: kcUser.id }, profile);
       }
 
       if ( !kcUser ) return { added: 0, removed: 0, created: false, deleted: false };
