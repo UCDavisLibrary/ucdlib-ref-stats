@@ -1,6 +1,7 @@
 import { html, css } from 'lit';
 
 import '#components/forms/ref-stats-new-student-assistant-form.js';
+import '#components/ref-stats-student-assistant.js';
 
 export function styles() {
   const elementStyles = css`
@@ -23,10 +24,24 @@ export function render() {
     <div class="l-container">
       <div class="l-basic--flipped">
         <div class="l-content">
-          <p>List of student assistants will go here</p>
+          <div ?hidden=${!this.assignments?.length}>
+            ${this.assignments.map(a => html`
+              <ref-stats-student-assistant .data=${a} .formNameOrId=${this.formNameOrId}></ref-stats-student-assistant>
+            `)}
+            <ucd-theme-pagination
+              current-page=${this.ctl.qs.query.page || 1}
+              max-pages=${this.assignmentsMaxPage}
+              ellipses
+              xs-screen
+              @page-change=${this._onPageChange}
+            ></ucd-theme-pagination>
+          </div>
+          <div ?hidden=${this.assignments?.length}>
+            <p>No student assistants found. Use the "Grant Access" form to add new student assistants.</p>
+          </div>
         </div>
         <div class="l-sidebar-second">
-          <ref-stats-new-student-assistant-form form-name-or-id="${this.formNameOrId}"></ref-stats-new-student-assistant-form>
+          <ref-stats-new-student-assistant-form .formNameOrId=${this.formNameOrId}></ref-stats-new-student-assistant-form>
         </div>
       </div>
     </div>

@@ -59,6 +59,11 @@ class Config {
       serverCacheExpiration: this.getEnv('UCDLIB_PERSONNEL_API_CACHE_EXPIRATION', '12 hours')
     }
 
+    this.keycloakAdmin = {
+      user: this.getEnv('KEYCLOAK_ADMIN_USER', ''),
+      password: this.getEnv('KEYCLOAK_ADMIN_PASSWORD', '')
+    }
+
     this.backup = {
       tableName: this.getEnv('BACKUP_LOG_TABLE', 'backup_log'),
       statusFailAfterInterval: this.getEnv('BACKUP_LOG_STATUS_FAIL_AFTER_INTERVAL', '2 days')

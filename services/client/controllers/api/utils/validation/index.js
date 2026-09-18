@@ -34,7 +34,10 @@ import {
 } from './schemas/dashboard.js';
 
 import {
-  studentAssistantAssignmentSchema
+  studentAssistantAssignmentSchema,
+  studentAssistantQuerySchema,
+  studentAssistantUpdateFormAccessSchema,
+  studentAssistantSyncSchema
 } from './schemas/student-assistant.js';
 
 /**
@@ -105,7 +108,10 @@ const schema = {
   dashboardUpdate: dashboardUpdateSchema,
   dashboardQuery: dashboardQuerySchema,
   dashboardIdOrNameSchema: dashboardIdOrNameSchema,
-  studentAssistantAssignment: studentAssistantAssignmentSchema
+  studentAssistantAssignment: studentAssistantAssignmentSchema,
+  studentAssistantQuery: studentAssistantQuerySchema,
+  studentAssistantUpdateFormAccess: studentAssistantUpdateFormAccessSchema,
+  studentAssistantSync: studentAssistantSyncSchema
 };
 
 export { validate, schema, formatErrorResponse, buildDynamicFormEntrySchema };

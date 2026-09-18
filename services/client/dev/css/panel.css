@@ -1,0 +1,6 @@
+.panel__title--cork {
+  display: flex;
+  align-items: center;
+  --cork-icon-size: 1.75rem;
+  margin-bottom: 1rem;
+}

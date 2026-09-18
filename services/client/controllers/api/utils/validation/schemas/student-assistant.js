@@ -1,7 +1,7 @@
 import * as z from "zod";
 import models from '#models';
 import logger from '#lib/logger.js';
-import { requiredArray, requiredNumber } from "./utils.js";
+import { requiredArray, requiredNumber, requiredString, pageParam, perPageParam } from "./utils.js";
 
 /**
  * @description Zod superRefine callback — validates that all form_id (name or UUID) entries exist.
@@ -46,6 +46,29 @@ const studentAssistantAssignmentSchema = z.object({
   group_id: requiredNumber({ required: 'Group is required', nan: 'Group must be a number' })
 }).superRefine(srValidateFormIds).superRefine(srValidateGroupId);
 
+const studentAssistantQuerySchema = z.object({
+  page: pageParam,
+  per_page: perPageParam(15),
+  user_id: z.string().optional(),
+  group_id: z.preprocess(
+    v => (v == null || v === '' ? undefined : Number(v)),
+    z.number().int().optional()
+  ),
+  form: z.string().optional()
+});
+
+const studentAssistantUpdateFormAccessSchema = z.object({
+  user_id: requiredString(),
+  form_id: z.array(z.string())
+}).superRefine(srValidateFormIds);
+
+const studentAssistantSyncSchema = z.object({
+  user_id: requiredString()
+});
+
 export {
-  studentAssistantAssignmentSchema
+  studentAssistantAssignmentSchema,
+  studentAssistantQuerySchema,
+  studentAssistantUpdateFormAccessSchema,
+  studentAssistantSyncSchema
 };

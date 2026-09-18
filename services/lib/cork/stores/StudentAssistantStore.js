@@ -8,7 +8,10 @@ class StudentAssistantStore extends BaseStore {
 
     this.data = {
       activeAppointments: new LruStore({name: 'studentAssistant.activeAppointments'}),
-      create: new LruStore({name: 'studentAssistant.create'})
+      create: new LruStore({name: 'studentAssistant.create'}),
+      query: new LruStore({name: 'studentAssistant.query'}),
+      updateFormAccess: new LruStore({name: 'studentAssistant.updateFormAccess'}),
+      sync: new LruStore({name: 'studentAssistant.sync'})
     };
     this.events = {};
   }

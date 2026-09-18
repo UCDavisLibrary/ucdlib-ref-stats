@@ -21,6 +21,7 @@
     "start-client": "node ./client/index.js"
   },
   "dependencies": {
+    "@keycloak/keycloak-admin-client": "^26.7.4",
     "@superset-ui/embedded-sdk": "^0.4.0",
     "@ucd-lib/cork-app-build": "^0.5.0",
     "@ucd-lib/cork-app-state": "^3.2.0",

@@ -7,12 +7,15 @@ import headings from './headings.css';
 import linkList from './link-list.css';
 import typeahead from './typeahead.css';
 import dashboardTeaser from './dashboard-teaser.css';
+import panel from './panel.css';
 
+// main dom lit component styles. imported here instead of in the component so that they aren't repeated in each component instance
 import { styles as corkFieldContainerStyles } from '#components/cork-field-container.tpl.js';
 import { styles as picklistTypeaheadStyles } from '#components/ref-stats-picklist-typeahead.tpl.js';
 import { styles as formTypeaheadStyles } from '#components/ref-stats-form-typeahead.tpl.js';
 import { styles as picklistItemQuickAddStyles } from '#components/ref-stats-picklist-item-quick-add.tpl.js';
 import { styles as formEntryQueryStyles } from '#components/ref-stats-form-entry-query.tpl.js';
+import { styles as studentAssistantStyles } from '#components/ref-stats-student-assistant.tpl.js';
 
 /**
  * @description Extracts CSS text from a Lit styles function and joins it into a single string.
@@ -32,6 +35,7 @@ const styles = `
   ${linkList}
   ${typeahead}
   ${dashboardTeaser}
+  ${panel}
   [hidden] {
     display: none !important;
   }
@@ -114,6 +118,7 @@ const styles = `
   ${getLitStyles(formTypeaheadStyles)}
   ${getLitStyles(picklistItemQuickAddStyles)}
   ${getLitStyles(formEntryQueryStyles)}
+  ${getLitStyles(studentAssistantStyles)}
 `;
 
 let sharedStyleElement = document.createElement('style');
