@@ -6,6 +6,12 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { AdminPageController, QueryStringController } from '#controllers';
 
+/**
+ * @description Admin page listing student assistant assignments, either across all forms
+ * (standalone route) or scoped to a single form (when reached from that form's admin page).
+ * @property {String} pageId - The app-state page id this component responds to
+ * @property {String} formNameOrId - The form this page is scoped to, or null for the standalone view
+ */
 export default class RefStatsPageStudentAssistant extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -55,6 +61,11 @@ export default class RefStatsPageStudentAssistant extends Mixin(LitElement)
     this.getData();
   }
 
+  /**
+   * @description Rebuilds the breadcrumb trail whenever `form` changes, since it determines
+   * whether the page is scoped to a specific form or shown standalone.
+   * @param {Map} props - Map of changed property names to their previous values
+   */
   willUpdate(props){
 
     // set breadcrumbs based on if we are on a specific form or not
@@ -75,11 +86,18 @@ export default class RefStatsPageStudentAssistant extends Mixin(LitElement)
     } 
   }
 
+  /**
+   * @description Fetches the page's assignment list and, when scoped to a form, that form's data.
+   */
   async getData() {
     const promises = [this.getAssignments(), this.getForm()];
     await Promise.all(promises);
   }
 
+  /**
+   * @description Fetches the paginated list of student assistant assignments, scoped to
+   * formNameOrId (if set) and the current query-string page/filter params.
+   */
   async getAssignments() {
     const q = {...this.ctl.qs.query};
     if ( this.formNameOrId ) {
@@ -92,6 +110,9 @@ export default class RefStatsPageStudentAssistant extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Fetches the form this page is scoped to. Clears `form` when formNameOrId is not set.
+   */
   async getForm() {
     if ( !this.formNameOrId ) {
       this.form = null;

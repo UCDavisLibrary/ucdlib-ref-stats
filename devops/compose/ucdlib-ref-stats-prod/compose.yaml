@@ -16,7 +16,10 @@ services:
       PGPORT: 5432
       SUPERSET_PUBLIC_URL: ${SUPERSET_PUBLIC_URL:-https://superset.staff.library.ucdavis.edu}
     depends_on:
-      - db
+      db:
+        condition: service_started
+      init:
+        condition: service_completed_successfully
     ports:
       - ${APP_HOST_PORT:-3000}:${APP_CONTAINER_PORT:-3000}
     restart: always
@@ -44,6 +47,7 @@ services:
       GOOGLE_APPLICATION_CREDENTIALS: /etc/service-account.json
       GC_BACKUP_BUCKET: 'itis-backups/ucdlib-ref-stats'
       BACKUP_FILE_NAME: 'db.sql.gz'
+      SUPERSET_BACKUP_FILE_NAME: 'superset.sql.gz'
     volumes:
       - ../../secrets/gc-writer-key.json:/etc/service-account.json
     command: /services/backup/entrypoint.sh
@@ -55,7 +59,7 @@ services:
       - db
     environment:
       # RUN_INIT: true
-      BACKUP_DATA_ENV: ${BACKUP_DATA_ENV:-prod}
+      INIT_DATA_ENV: ${INIT_DATA_ENV:-prod}
       PGUSER: 'postgres'
       PGHOST: 'db'
       PGDATABASE: 'postgres'
@@ -63,6 +67,7 @@ services:
       GOOGLE_APPLICATION_CREDENTIALS: /etc/service-account.json
       GC_BACKUP_BUCKET: 'itis-backups/ucdlib-ref-stats'
       BACKUP_FILE_NAME: 'db.sql.gz'
+      SUPERSET_BACKUP_FILE_NAME: 'superset.sql.gz'
     volumes:
       - ../../secrets/gc-reader-key.json:/etc/service-account.json
     command: /services/init/init.sh
@@ -107,6 +112,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      init:
+        condition: service_completed_successfully
 volumes:
   db-data:
   superset-home:

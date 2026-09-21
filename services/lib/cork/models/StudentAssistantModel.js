@@ -4,6 +4,10 @@ import StudentAssistantStore from '../stores/StudentAssistantStore.js';
 
 import clearCache from '../utils/clearCache.js';
 
+/**
+ * @description Model for student assistant form access - active appointments, granting/updating/
+ * removing form access, and syncing the resulting state to Keycloak.
+ */
 class StudentAssistantModel extends BaseModel {
 
   constructor() {

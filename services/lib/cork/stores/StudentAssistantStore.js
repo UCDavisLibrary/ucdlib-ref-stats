@@ -1,6 +1,9 @@
 import {LruStore} from '@ucd-lib/cork-app-utils';
 import BaseStore from './BaseStore.js';
 
+/**
+ * @description Store for student assistant API request state.
+ */
 class StudentAssistantStore extends BaseStore {
 
   constructor() {

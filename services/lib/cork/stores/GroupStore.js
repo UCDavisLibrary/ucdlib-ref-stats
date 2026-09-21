@@ -1,6 +1,9 @@
 import {LruStore} from '@ucd-lib/cork-app-utils';
 import BaseStore from './BaseStore.js';
 
+/**
+ * @description Store for group API request state.
+ */
 class GroupStore extends BaseStore {
 
   constructor() {

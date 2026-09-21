@@ -3,6 +3,9 @@ import GroupStore from '../stores/GroupStore.js';
 
 import payload from '../utils/payload.js';
 
+/**
+ * @description Service for the /api/group endpoints.
+ */
 class GroupService extends BaseService {
 
   constructor() {

@@ -6,6 +6,12 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 
 import { AppComponentController } from '#controllers';
 
+/**
+ * @description Displays a single student assistant assignment row: their active appointment
+ * status and form access, with actions to edit/remove form access and sync Keycloak roles.
+ * @property {Object} data - The student_assistant_assignment_full row being displayed
+ * @property {String} formNameOrId - The form this row is scoped to (from a form's admin page), or null when shown on the standalone student assistant page
+ */
 export default class RefStatsStudentAssistant extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -40,6 +46,11 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
     this._injectModel('AppStateModel', 'StudentAssistantModel', 'FormModel');
   }
 
+  /**
+   * @description Refetches the active appointment whenever `data` changes, and collapses the
+   * expanded form list whenever the row switches to a different user.
+   * @param {Map} props - Map of changed property names to their previous values
+   */
   willUpdate(props){
     if ( props.has('data') ) {
       this.getAppointment();
@@ -50,6 +61,10 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Finds this row's user among the currently active student assistant appointments,
+   * to determine whether their appointment is still active.
+   */
   async getAppointment() {
     if ( !this.data ) {
       this.appointment = null;
@@ -61,6 +76,11 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Opens a dialog to remove (form-scoped view) or edit (standalone view) this
+   * user's form access. In the standalone view, first fetches all forms so the dialog can list
+   * which access to keep.
+   */
   async _onRemoveClick() {
     if ( this.fetchingForms ) return;
     if ( !this.formNameOrId ) {
@@ -84,6 +104,10 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
 
   }
 
+  /**
+   * @description Opens a confirmation dialog before syncing this user's Keycloak account/roles
+   * to match their current form access.
+   */
   _onSyncClick() {
     this.AppStateModel.showDialogModal({
       title: 'Sync Student Assistant Roles',
@@ -99,6 +123,11 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
     })
   }
 
+  /**
+   * @description Handles dialog action events. Syncs Keycloak roles or updates form access when
+   * the user confirms the corresponding dialog, provided the dialog's userId still matches this row.
+   * @param {Object} e - Dialog action event with `action` and `data` properties
+   */
   async _onAppDialogAction(e){
     if ( !this.ctl.appComponent.isOnActivePage ) return;
     if ( e.action.value === 'sync-student-assistant-roles' && e.data?.userId === this.data?.user_id ) {

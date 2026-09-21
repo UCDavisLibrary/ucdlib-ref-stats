@@ -5,6 +5,9 @@ import StudentAssistantStore from '../stores/StudentAssistantStore.js';
 import payload from '../utils/payload.js';
 import serviceUtils from '../utils/serviceUtils.js';
 
+/**
+ * @description Service for the /api/student-assistant endpoints.
+ */
 class StudentAssistantService extends BaseService {
 
   constructor() {

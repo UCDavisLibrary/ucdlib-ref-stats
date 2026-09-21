@@ -383,6 +383,12 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
       userDepartmentGroupId = userData.res?.groups?.find(g => g.partOfOrg)?.id || null;
     }
 
+    // student assistants have no Library IAM record — fall back to their assigned student-assistant group
+    if ( !isUpdate && userDepartmentGroupId == null ) {
+      const saData = await models.studentAssistant.query({ user_id: token.id, per_page: 1 });
+      userDepartmentGroupId = saData.res?.results?.[0]?.groups?.[0]?.group_id ?? null;
+    }
+
     // build schema for field based on form definition and any hard-coded definitions
     const baseSchema = schema.formEntry?.[form.name]?.create || null;
     const fieldsResult = await models.field.query({ form: form.form_id, perPage: 1000 });
@@ -399,7 +405,7 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     const d = { ...validated.data };
     if ( isUpdate ){
       d.submitted_by = existingEntry.submitted_by;
-      d.group_id = existingEntry.group_id;
+      d.group_id = existingEntry.group?.group_id ?? null;
       d.impersonated_by = existingEntry.submitted_by !== token.id ? token.id : null;
     } else {
       d.submitted_by = token.id;

@@ -5,12 +5,25 @@ import keycloakAdmin from '#lib/keycloakAdmin.js';
 import cache from './cache.js';
 import models from '#models';
 
+/**
+ * @description Model for managing student assistant form access: which UC Davis Library
+ * student appointments are currently active (via the Rosetta API), which forms/group each
+ * student assistant has been granted access to (student_assistant_assignment table), and
+ * keeping their Keycloak account/roles in sync with that access (via keycloakAdmin.js).
+ */
 class StudentAssistant {
 
   constructor() {
     this.cacheType = 'studentAssistant';
   }
 
+  /**
+   * @description Gets the list of currently active student assistant appointments in the
+   * relevant department from the Rosetta API (UC Davis IAM), or cache. Used both to populate
+   * the "grant access" form's list of eligible people, and to validate which submitted userIds
+   * are real active appointments before creating assignments/Keycloak accounts for them.
+   * @returns {Object} {res: [{iamId, userId, name, firstName, lastName, email}]} or {error}
+   */
   async getActiveAppointments() {
 
     const cacheId = 'activeAppointments';
@@ -107,6 +120,22 @@ class StudentAssistant {
       max_page: Math.ceil(total_count / perPage),
       total_count
     }};
+  }
+
+  /**
+   * @description Cheap existence check for whether userId is a student assistant (i.e. has at
+   * least one row in student_assistant_assignment). Used to skip the external Library IAM
+   * lookup for users who will never have a record there. Fails toward false (not a student
+   * assistant) on a DB error, so a transient failure here falls back to the original behavior
+   * of still attempting the IAM lookup rather than silently skipping it for a real staff member.
+   * @param {String} userId
+   * @returns {Boolean}
+   */
+  async isStudentAssistant(userId) {
+    const sql = `SELECT 1 FROM ${config.db.tables.studentAssistant} WHERE user_id = $1 LIMIT 1`;
+    const r = await pgClient.query(sql, [userId]);
+    if ( r.error ) return false;
+    return r.res.rows.length > 0;
   }
 
   /**

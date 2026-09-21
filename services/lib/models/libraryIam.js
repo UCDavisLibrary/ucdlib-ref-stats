@@ -1,6 +1,7 @@
 import pgClient from '../pgClient.js';
 import config from '../config.js';
 import cache from './cache.js';
+import models from '#models';
 
 class LibraryIam {
 
@@ -91,7 +92,11 @@ class LibraryIam {
   }
 
   /**
-   * @description Gets user data by ID from the Library IAM API or cache.
+   * @description Gets user data by ID from the Library IAM API or cache. Student assistants
+   * never have a Library IAM record, so this skips the external API call entirely for them
+   * (via models.studentAssistant.isStudentAssistant) and returns {res: null} instead - the
+   * same "no data" shape callers already treat as a benign miss, without the failed-lookup
+   * latency or the unhandled-error path a real 404 would otherwise take.
    * @param {String} userId - The user ID for which to retrieve data.
    * @returns {Object} - {res, error}
    */
@@ -100,6 +105,10 @@ class LibraryIam {
     const cached = await cache.get(cacheType, userId, config.libraryIam.serverCacheExpiration);
     if ( cached.res?.rows?.length ) {
       return {res: cached.res.rows[0].data};
+    }
+
+    if ( await models.studentAssistant.isStudentAssistant(userId) ) {
+      return { res: null };
     }
 
     const params = {

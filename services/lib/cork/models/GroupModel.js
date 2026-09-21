@@ -2,6 +2,9 @@ import {BaseModel} from '@ucd-lib/cork-app-utils';
 import GroupService from '../services/GroupService.js';
 import GroupStore from '../stores/GroupStore.js';
 
+/**
+ * @description Model for retrieving reference desk groups.
+ */
 class GroupModel extends BaseModel {
 
   constructor() {

@@ -11,6 +11,13 @@ export default class AdminPageController {
     this.userCanAccess = null;
   }
 
+  /**
+   * @description Determines whether the current user can access the host page, setting
+   * `userCanAccess` and showing an error if not. Beyond general manager access, grants
+   * form-scoped managers access to their own form's "form-admin-single" and "student-assistant"
+   * pages (the latter only when reached as a sub-route of form-admin, i.e. scoped to that form).
+   * @param {Object} e - App state update event containing page and location
+   */
   async _onAppStateUpdate(e) {
     if ( e.page !== this.host.pageId ) return;
 

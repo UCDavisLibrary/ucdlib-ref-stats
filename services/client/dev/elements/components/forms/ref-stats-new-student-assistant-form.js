@@ -7,6 +7,16 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import { AppComponentController } from '#controllers';
 import { IdGenerator } from '#client-utils';
 
+/**
+ * @description Form element for granting student assistants access to one or more forms/a group.
+ * When formNameOrId is set, the form is scoped to that single form (used from a form's admin
+ * page); otherwise the user picks from all forms (used from the standalone student assistant page).
+ * @property {String} formNameOrId - The name or ID of the form to scope access to, or null to allow picking any form
+ * @property {Object} payload - The current form data payload bound to the form inputs
+ * @property {Array} forms - All available forms for the multi-select form picker (empty when formNameOrId is set)
+ * @property {Array} activeAppointments - Currently active student assistant appointments eligible for access
+ * @property {Array} groups - All reference desk groups for the group picker
+ */
 export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
   .with(LitCorkUtils, MainDomElement) {
 
@@ -42,6 +52,10 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
     this._injectModel('AppStateModel', 'FormModel', 'StudentAssistantModel', 'GroupModel');
   }
 
+  /**
+   * @description Refetches the form list whenever formNameOrId changes.
+   * @param {Map} props - Map of changed property names to their previous values
+   */
   willUpdate(props){
     if ( props.has('formNameOrId') ) {
       this.getForms();
@@ -58,6 +72,12 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
     this.getData();
   }
 
+  /**
+   * @description Handles form submission. Grants the submitted student assistants access to the
+   * chosen form(s)/group via StudentAssistantModel.create.
+   * @param {Event} e - The form submit event
+   * @returns {Object|undefined} The model response if there is a 422 validation error
+   */
   async _onSubmit(e) {
     e.preventDefault();
     if ( this.formNameOrId ) {
@@ -72,6 +92,10 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Fetches all data needed to render the form: available forms, active student
+   * assistant appointments, and groups.
+   */
   async getData(){
     const promises = [this.getForms(), this.getActiveAppointments(), this.getGroups()];
 
@@ -88,6 +112,10 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
     this.requestUpdate();
   }
 
+  /**
+   * @description Fetches all forms for the form picker. Skipped (clearing `forms`) when
+   * formNameOrId is already set, since the form is scoped to a single, known form.
+   */
   async getForms(){
     if ( this.formNameOrId ) {
       this.forms = [];
@@ -99,6 +127,10 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Fetches the list of currently active student assistant appointments, filtering
+   * out any without a name, userId, or email.
+   */
   async getActiveAppointments(){
     const res = await this.StudentAssistantModel.getActiveAppointments();
     if ( res?.state === 'loaded' ) {
@@ -106,6 +138,9 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Fetches all reference desk groups for the group picker.
+   */
   async getGroups(){
     const r = await this.GroupModel.getAllGroups();
     if ( r?.state === 'loaded' ) {

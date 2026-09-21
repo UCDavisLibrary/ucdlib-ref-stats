@@ -340,11 +340,14 @@ export default class FormEntryController {
   _renderFormEntrySummary(){
     if ( !this.formEntry ) return html``;
     const isEdited = this.formEntry.form_entry_id !== this.formEntry.original_form_entry_id;
+    const submittedBy = `${this.formEntry.submitted_by_user?.first_name || ''} ${this.formEntry.submitted_by_user?.last_name || ''}`.trim();
     return html`
       <div class="alert">
         <div><span class="bold primary">Submitted:</span><span> ${new Date(this.formEntry.created_at).toLocaleString()}</span></div>
         <div><span class="bold primary">Edited:</span><span> ${isEdited ? 'Yes' : 'No'}</span></div>
         <div ?hidden=${!isEdited}> <span class="bold primary">Original Submitted:</span><span> ${new Date(this.originalFormEntry?.created_at).toLocaleString()}</span></div>
+        <div class='u-space-mt'><span class="bold primary">Submitted By:</span><span> ${submittedBy}</span></div>
+        <div><span class="bold primary">Department:</span><span> ${this.formEntry.group?.name || ''}</span></div>
       </div>
     `;
   }

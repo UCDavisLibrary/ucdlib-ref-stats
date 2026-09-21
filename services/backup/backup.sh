@@ -18,6 +18,11 @@ if [[ -z $BACKUP_FILE_NAME ]]; then
   exit 1
 fi
 
+if [[ -z $SUPERSET_BACKUP_FILE_NAME ]]; then
+  echo "SUPERSET_BACKUP_FILE_NAME variable is required."
+  exit 1
+fi
+
 if [[ -z $GOOGLE_APPLICATION_CREDENTIALS ]]; then
   echo "GOOGLE_APPLICATION_CREDENTIALS variable is required."
   exit 1
@@ -27,11 +32,19 @@ fi
 echo "Generating sqldump file"
 pg_dump --exclude-table-data=cache | gzip > $DATA_DIR/$BACKUP_FILE_NAME
 
+# dump superset's own database. --create --clean --if-exists embeds a DROP DATABASE IF EXISTS
+# + CREATE DATABASE so init.sh can restore it standalone whether or not the superset database
+# already exists on the target volume.
+echo "Generating superset sqldump file"
+pg_dump --create --clean --if-exists -d superset | gzip > $DATA_DIR/$SUPERSET_BACKUP_FILE_NAME
+
 echo "uploading files to cloud bucket ${BACKUP_DATA_ENV}"
 gcloud auth login --quiet --cred-file=${GOOGLE_APPLICATION_CREDENTIALS}
 gsutil cp $DATA_DIR/$BACKUP_FILE_NAME "gs://${GC_BACKUP_BUCKET}/${BACKUP_DATA_ENV}/${BACKUP_FILE_NAME}"
+gsutil cp $DATA_DIR/$SUPERSET_BACKUP_FILE_NAME "gs://${GC_BACKUP_BUCKET}/${BACKUP_DATA_ENV}/${SUPERSET_BACKUP_FILE_NAME}"
 
 rm $DATA_DIR/$BACKUP_FILE_NAME
+rm $DATA_DIR/$SUPERSET_BACKUP_FILE_NAME
 
 if [[ -n $BACKUP_LOG_TABLE ]]; then
   echo "BACKUP_LOG_TABLE is set to $BACKUP_LOG_TABLE"
