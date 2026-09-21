@@ -55,6 +55,13 @@ Runs webpack inside the container (via volume mount) and hot-reloads on file cha
 ./devops/cmds/watch-client.sh
 ```
 
+### Superset Database Connection
+The Superset dashboards are built on a database connector defined in the Superset application. When initializing data from the production environment using the init container, the password will be wrong, so you will to update it manually. 
+1. Go to the [Database View list](http://localhost:8088/databaseview/list/) page in Superset
+2. Click edit for "Library Services Statistics"
+3. Update the SQLAlchemy URI to include the localhost password (env=`PGPASSWORD`) instead of the `XXXXXXXXXX` string
+
+
 ## Authentication
 
 Authentication is handled by Keycloak OIDC. Between the docker compose file and the `env`, all configuration is set.
@@ -106,14 +113,6 @@ Superset uses its own role system, mapped from Keycloak at login. The Keycloak c
 | `admin-access` | Admin | Full admin |
 | `refstats-superset-alpha` | Alpha | All data across all users |
 | `basic-access` | Gamma | Own submissions only (row-level security) |
-
-### Importing Assets
-
-On a fresh install, a few assets should be imported to Superset, which can be found in `services/superset/exports/`.
-
-The main dataset for dashboards is `dataset_main.zip`, which is the `form_entry_full` view (`postgres` database), which extracts specific field values as metrics (`event_count`, `person_count`, etc).
-
-Then there are a few dashboards, which are prefixed with `dashboard`.
 
 ### Dataset Access
 
