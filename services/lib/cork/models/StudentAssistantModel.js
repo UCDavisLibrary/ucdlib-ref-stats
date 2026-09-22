@@ -23,10 +23,12 @@ class StudentAssistantModel extends BaseModel {
 
   /**
    * @description Get the list of currently active student assistant appointments
+   * @param {Object} opts - Additional options for the request
+   * @param {Object} appStateOptions - Options passed to the app state model
    * @returns {Promise}
    */
-  async getActiveAppointments() {
-    return this.service.getActiveAppointments();
+  async getActiveAppointments(opts={}, appStateOptions={}) {
+    return this.service.getActiveAppointments(opts, appStateOptions);
   }
 
   /**

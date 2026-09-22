@@ -25,15 +25,13 @@ class StudentAssistantService extends BaseService {
 
   /**
    * @description Retrieves the list of currently active student assistant appointments.
+   * @param {Object} opts - Additional options for the request
+   * @param {Object} appStateOptions - Options passed to the app state model
    * @returns {Promise<object>} Store state object for the request.
    */
-  async getActiveAppointments() {
+  async getActiveAppointments(opts={}, appStateOptions={}) {
     const id = 'activeAppointments';
     const store = this.store.data.activeAppointments;
-
-    const appStateOptions = {
-      errorSettings: {message: 'Unable to retrieve active student assistant appointments'}
-    };
 
     await this.checkRequesting(
       id, store,
@@ -44,7 +42,7 @@ class StudentAssistantService extends BaseService {
           {...resp, id},
           store,
           null,
-          appStateOptions
+          serviceUtils.getAppStateOptions('Unable to retrieve active student assistant appointments', appStateOptions)
         )
       })
     );

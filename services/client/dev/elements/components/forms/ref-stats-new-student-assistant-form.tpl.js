@@ -18,7 +18,7 @@ export function render() {
       <cork-field-container schema='student-assistant' path='user_id' class='field-container'>
         <label>Student Assistants</label>
         <ucd-theme-slim-select @change=${e => this._onPayloadInput('user_id', e.detail?.length ? e.detail.map(o => o.value) : [])}>
-          <select multiple>
+          <select multiple ?disabled=${!this.activeAppointments?.length}>
             ${this.activeAppointments.map(person => html`
               <option value="${person.userId}" ?selected=${this.payload.user_id?.includes(person.userId)}>
                 ${person.name} (${person.email})
@@ -26,6 +26,7 @@ export function render() {
             `)}
           </select>
         </ucd-theme-slim-select>
+        <div class="field-description" ?hidden=${!this.loadingActiveAppointments}>Loading active appointments...</div>
       </cork-field-container>
       <cork-field-container schema='student-assistant' path='group_id' class='field-container'>
         <label>Department</label>

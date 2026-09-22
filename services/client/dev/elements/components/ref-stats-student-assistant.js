@@ -23,7 +23,8 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
       showFormList: { state: true },
       accessPayload: { state: true },
       forms: { state: true },
-      fetchingForms: { state: true }
+      fetchingForms: { state: true },
+      loadingAppointment: { state: true }
     }
   }
 
@@ -70,7 +71,9 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
       this.appointment = null;
       return;
     }
-    const res = await this.StudentAssistantModel.getActiveAppointments();
+    this.loadingAppointment = true;
+    const res = await this.StudentAssistantModel.getActiveAppointments({}, { loaderSettings: {suppressLoader: true} });
+    this.loadingAppointment = false;
     if ( res?.state === 'loaded' ) {
       this.appointment = res.payload.find(person => person.userId === this.data.user_id) || null;
     }

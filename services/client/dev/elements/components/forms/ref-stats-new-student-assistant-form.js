@@ -26,7 +26,8 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
       payload: {type: Object },
       forms: { state: true },
       activeAppointments: { state: true },
-      groups: { state: true }
+      groups: { state: true },
+      loadingActiveAppointments: { state: true }
     }
   }
 
@@ -43,6 +44,7 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
     this.forms = [];
     this.activeAppointments = [];
     this.groups = [];
+    this.loadingActiveAppointments = false;
 
     this.ctl = {
       appComponent : new AppComponentController(this),
@@ -97,7 +99,11 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
    * assistant appointments, and groups.
    */
   async getData(){
-    const promises = [this.getForms(), this.getActiveAppointments(), this.getGroups()];
+    const promises = [
+      this.getForms(), 
+      this.getActiveAppointments(), 
+      this.getGroups()
+    ];
 
     await Promise.all(promises);
   }
@@ -132,7 +138,9 @@ export default class RefStatsNewStudentAssistantForm extends Mixin(LitElement)
    * out any without a name, userId, or email.
    */
   async getActiveAppointments(){
-    const res = await this.StudentAssistantModel.getActiveAppointments();
+    this.loadingActiveAppointments = true;
+    const res = await this.StudentAssistantModel.getActiveAppointments({}, { loaderSettings: {suppressLoader: true} });
+    this.loadingActiveAppointments = false;
     if ( res?.state === 'loaded' ) {
       this.activeAppointments = res.payload.filter(person => person.name && person.userId && person.email);
     }

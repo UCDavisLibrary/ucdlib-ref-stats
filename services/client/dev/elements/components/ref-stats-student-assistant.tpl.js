@@ -107,7 +107,8 @@ export function render() {
         </div>
         <div class='student-assistant__detail'>
           <div>Appointment Status<span class='colon'>:</span></div>
-          <div>
+          <div ?hidden=${!this.loadingAppointment}>Loading...</div>
+          <div ?hidden=${this.loadingAppointment}>
             ${this.appointment ? 
               html`<span class='redwood'>Active</span>` : 
               html`<span class='double-decker'>Inactive</span><button class='link-button u-space-ml--small' @click=${this._onRemoveClick} aria-label='Remove ${this.data?.first_name} ${this.data?.last_name}'>Remove</button>`}
