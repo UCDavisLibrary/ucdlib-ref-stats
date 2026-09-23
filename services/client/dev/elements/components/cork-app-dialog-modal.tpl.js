@@ -126,7 +126,7 @@ return html`
     <div ?hidden=${!this.modalTitle} class='heading-wrapper'>
       <div class='heading'>
         <div class='h4'>${this.modalTitle}</div>
-        <cork-icon-button icon='fas.xmark' @click=${() => this._onButtonClick('dismiss')} basic></cork-icon-button>
+        <cork-icon-button icon='fas.xmark' @click=${() => this._onButtonClick(this.customDismissAction || 'dismiss')} basic></cork-icon-button>
       </div>
     </div>
     <div class='modal-content' style='max-height: ${this.contentMaxHeight || 'none'}'>

@@ -49,7 +49,8 @@ class Config {
       },
       oidcScope: this.getEnv('KEYCLOAK_OIDC_SCOPE', 'profile ucd-ids'),
       serverCacheExpiration: this.getEnv('KEYCLOAK_SERVER_CACHE_EXPIRATION', '12 hours'),
-      serverCacheLruSize: this.getEnv('KEYCLOAK_SERVER_CACHE_LRU_SIZE', 5)
+      serverCacheLruSize: this.getEnv('KEYCLOAK_SERVER_CACHE_LRU_SIZE', 5),
+      ssoSessionMaxSeconds: this.getEnv('KEYCLOAK_SSO_SESSION_MAX_SECONDS', 24 * 60 * 60)
     };
 
     this.libraryIam = {

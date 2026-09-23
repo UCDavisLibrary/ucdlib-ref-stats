@@ -140,6 +140,15 @@ export default class AccessToken {
   }
 
   /**
+   * @description Returns the Unix timestamp (seconds) of the original authentication that
+   * started this SSO session. Preserved across token refreshes per OIDC semantics — only a
+   * brand new login changes it.
+   */
+  get authTime(){
+    return this.token.auth_time;
+  }
+
+  /**
    * @description Check if user has a role, either assigned to the realm or to this client
    * @param {String} role - The role to check for
    * @param {Array|String} accessType - The role location. Can be 'realm', 'resource', or both.

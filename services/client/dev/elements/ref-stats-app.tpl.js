@@ -49,6 +49,7 @@ function renderHeader(){
         site-name="UC Davis Library"
         slogan=${config?.title || ''}>
         <a href='https://staff.library.ucdavis.edu'>Staff Intranet</a>
+        ${this.renewSessionUrl ? html`<a href=${this.renewSessionUrl}>Renew Session</a>` : html``}
         <a href='/logout'>Logout</a>
       </ucdlib-branding-bar>
 

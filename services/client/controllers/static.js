@@ -37,7 +37,8 @@ export default (app) => {
         title: appTitle,
         auth: {
           clientInit: config.auth.keycloakJsClient,
-          oidcScope: config.auth.oidcScope
+          oidcScope: config.auth.oidcScope,
+          ssoSessionMaxSeconds: config.auth.ssoSessionMaxSeconds
         },
         superset: {
           publicUrl: config.superset.publicUrl

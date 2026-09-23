@@ -1,4 +1,4 @@
-import { LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import {render, styles} from "./ref-stats-app.tpl.js";
 
 import config from '#lib/app-config.js';
@@ -32,6 +32,7 @@ import './components/cork-app-error.js';
 import './components/cork-app-loader.js';
 import './components/cork-app-toast.js';
 import './components/cork-field-container.js';
+import './components/cork-sso-warning.js';
 import './components/ref-stats-picklist-item-quick-add.js';
 import './components/ref-stats-form-entry-query.js';
 
@@ -68,7 +69,8 @@ export default class RefStatsApp extends Mixin(LitElement)
     return {
       page: {type: String},
       forms: {type: Array},
-      _firstAppStateUpdate : { state: true }
+      _firstAppStateUpdate : { state: true },
+      renewSessionUrl: { state: true }
     }
   }
 
@@ -117,6 +119,10 @@ export default class RefStatsApp extends Mixin(LitElement)
     }
     await this.getForms();
     this.page = page;
+
+    if ( location?.query?.['renew-sso-session'] === 'true' ) {
+      this.AuthModel.showSessionExpirationDialog();
+    }
   }
 
   async getForms(){
@@ -157,6 +163,25 @@ export default class RefStatsApp extends Mixin(LitElement)
     ele = this.renderRoot.querySelector('ucd-theme-quick-links');
     if ( ele ) {
       ele.close();
+    }
+  }
+
+  /**
+   * @description Handles actions from the app's dialog
+   * @param {Object} e - Event object
+   */
+  _onAppDialogAction(e){
+
+    // if user clicks dismiss on the session expiration dialog, add a "renew session" link to the header
+    // so that they can reopen the modal if they want to renew their session. 
+    if ( e.action.value === 'dismiss-renew-session' && e.data?.fromAuthModel ) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('renew-sso-session', 'true');
+      this.renewSessionUrl = url.href;
+    } else if ( e.action.value === 'dismiss-renew-session' ) {
+      let url = new URL(window.location.href);
+      url.searchParams.delete('renew-sso-session');
+      this.AppStateModel.setLocation(url.href);
     }
   }
 
