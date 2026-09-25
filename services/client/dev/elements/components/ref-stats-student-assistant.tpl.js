@@ -43,6 +43,9 @@ export function styles() {
       font-weight: 700;
       color: var(--ucd-blue, #022851);
     }
+    ref-stats-student-assistant .inactive-appointment {
+      --cork-icon-button-size: 1rem;
+    }
     @container (min-width: 400px) {
       ref-stats-student-assistant .student-assistant__heading {
         flex-direction: row;
@@ -111,7 +114,12 @@ export function render() {
           <div ?hidden=${this.loadingAppointment}>
             ${this.appointment ? 
               html`<span class='redwood'>Active</span>` : 
-              html`<span class='double-decker'>Inactive</span><button class='link-button u-space-ml--small' @click=${this._onRemoveClick} aria-label='Remove ${this.data?.first_name} ${this.data?.last_name}'>Remove</button>`}
+              html`
+              <span class='inactive-appointment'>
+                <span class='double-decker'>Inactive</span>
+                <cork-icon-button icon='fas.question' title='What does this mean?' aria-link-label='What does this mean?' @click=${this._onInactiveAppointmentInfoClick}></cork-icon-button>
+                <button class='link-button u-space-ml--small' @click=${this._onRemoveClick} aria-label='Remove ${this.data?.first_name} ${this.data?.last_name}'>Remove</button>
+              </span>`}
           </div>
         </div>
         <div class='student-assistant__detail ${this.showFormList ? 'expanded' : ''}' ?hidden=${this.formNameOrId}>
@@ -133,22 +141,26 @@ export function render() {
     if ( this.formNameOrId ){
       const formLabel = this.data?.forms?.find(f => (f.name || f.form_id) === this.formNameOrId)?.label || this.formNameOrId;
       return html`
-        <div>Are you sure you want to remove access to the form <b>${formLabel}</b> for <b>${this.data?.first_name} ${this.data?.last_name}</b>?</div>
+        <p>Are you sure you want to remove access to the form <b>${formLabel}</b> for <b>${this.data?.first_name} ${this.data?.last_name}</b>?</p>
+        <p class='double-decker' ?hidden=${this.appointment}>Since this student assistant has an inactive appointment, removing form access will result in a permanent loss of access.</p>
       `;
     }
     return html`
-      <p>Update form access for <b>${this.data?.first_name} ${this.data?.last_name}</b></p>
-      <cork-field-container class='field-container u-space-mb--vast'>
-        <label>Forms</label>
-        <ucd-theme-slim-select @change=${e => this.accessPayload = e.detail?.length ? e.detail.map(o => o.value) : []}>
-          <select multiple>
-            ${this.forms.map(form => html`
-              <option value="${form.name}" ?selected=${this.accessPayload?.includes(form.name)}>
-                ${form.label}
-              </option>
-            `)}
-          </select>
-        </ucd-theme-slim-select>
-      </cork-field-container>
+      <div class='u-space-mb--vast'>
+        <p>Update form access for <b>${this.data?.first_name} ${this.data?.last_name}</b></p>
+        <cork-field-container class='field-container'>
+          <label>Forms</label>
+          <ucd-theme-slim-select @change=${e => this.accessPayload = e.detail?.length ? e.detail.map(o => o.value) : []}>
+            <select multiple>
+              ${this.forms.map(form => html`
+                <option value="${form.name}" ?selected=${this.accessPayload?.includes(form.name)}>
+                  ${form.label}
+                </option>
+              `)}
+            </select>
+          </ucd-theme-slim-select>
+        </cork-field-container>
+        <p class='double-decker' ?hidden=${this.appointment}>Since this student assistant has an inactive appointment, removing <b>all</b> form access will result in a permanent loss of access.</p>
+      </div>
     `;
   }

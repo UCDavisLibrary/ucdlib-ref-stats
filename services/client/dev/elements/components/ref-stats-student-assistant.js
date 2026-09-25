@@ -165,6 +165,26 @@ export default class RefStatsStudentAssistant extends Mixin(LitElement)
     }
   }
 
+  /**
+   * @description Handles click event on the "What does this mean?" button next to an inactive appointment.
+   */
+  _onInactiveAppointmentInfoClick() {
+    this.AppStateModel.showDialogModal({
+      title: 'Inactive Student Assistant Appointment',
+      content: () => html`
+        <div>A student assistant's appointment is considered inactive if one of the following is true:</div>
+        <ul>
+          <li>Their UC Davis employment contract with the library has ended</li>
+          <li>They do not have an active student affiliation record (Banner) with UC Davis</li>
+        </ul>
+        <div>Despite having an inactive appointment, any student assistant listed here will be able to access the assigned form so long as they have a valid UC Davis computing account (CAS login).</div>
+      `,
+      actions: [
+        {text: 'Close', value: 'dismiss', invert: true, color: 'secondary'}
+      ]
+    })
+  }
+
 }
 
 customElements.define('ref-stats-student-assistant', RefStatsStudentAssistant);
