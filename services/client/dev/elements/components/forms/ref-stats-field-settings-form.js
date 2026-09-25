@@ -86,7 +86,7 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
     if ( props.has('assignmentSettings') || props.has('fieldType') || props.has('fieldName') || props.has('formName') ) {
       this.payload = { ...(this.assignmentSettings || {}) };
       this.customValidation = definitions.hasCustomValidation(this.formName, this.fieldName);
-      this.ctl.modal.setModalTitle('Field Settings');
+      this.ctl.modal.setModalTitle('Field Assignment Settings');
       this.ctl.modal.setModalSubmitButton('Save Settings');
     }
 
@@ -114,7 +114,7 @@ export default class RefStatsFieldSettingsForm extends Mixin(LitElement)
     if ( r?.payload?.error?.response?.status == 422 ) return r;
 
     if ( r.state === 'loaded' ) {
-      this.AppStateModel.showToast({ text: 'Field settings saved successfully', type: 'success' });
+      this.AppStateModel.showToast({ text: 'Field assignment settings saved successfully', type: 'success' });
       this.dispatchEvent(new CustomEvent('ucdlib-rs-field-assignment-action', {
         detail: { action: 'settings-updated', fieldId: this.fieldId, formId: this.formId },
         bubbles: true,

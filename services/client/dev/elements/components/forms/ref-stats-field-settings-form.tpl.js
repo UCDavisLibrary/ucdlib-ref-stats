@@ -168,6 +168,7 @@ export function render() {
 
     <fieldset>
       <legend>Default Value</legend>
+      <p>Control what displays as the default value for this field on a new entry form.</p>
 
       <cork-field-container class='field-container checkbox' ?hidden=${!isDate}>
         <input
