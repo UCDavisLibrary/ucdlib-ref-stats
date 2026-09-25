@@ -37,15 +37,19 @@ export default class RefStatsPageDashboardSingle extends Mixin(LitElement)
     this.nameOrId = '';
     this.data = {};
     this._embedded = false;
+    this._embedInstance = null;
 
     this._injectModel('AppStateModel', 'DashboardModel');
   }
 
   /**
-   * @description Responds to app-state changes. Loads the dashboard record.
+   * @description Responds to app-state changes. Unmounts any existing embed (stopping its
+   * internal guest-token refresh loop) before loading the new dashboard record, if any.
    * @param {Object} e - App state update event
    */
   async _onAppStateUpdate(e) {
+    this._unmountEmbed();
+
     if ( e.page !== this.pageId ) {
       if ( this._embedded ) {
         this._embedded = false;
@@ -91,7 +95,7 @@ export default class RefStatsPageDashboardSingle extends Mixin(LitElement)
     const supersetDomain = config?.superset?.publicUrl || window.location.origin;
 
     try {
-      await embedDashboard({
+      this._embedInstance = await embedDashboard({
         id: this.data.superset_dashboard_id,
         supersetDomain,
         mountPoint,
@@ -106,6 +110,15 @@ export default class RefStatsPageDashboardSingle extends Mixin(LitElement)
       this.logger.error('Failed to embed Superset dashboard', e);
       this.AppStateModel.showToast({text: 'Failed to load dashboard', type: 'error'});
     }
+  }
+
+  /**
+   * @description Unmounts the current Superset embed, if any, which stops the embedded SDK's internal
+   * guest-token refresh loop 
+   */
+  _unmountEmbed(){
+    this._embedInstance?.unmount();
+    this._embedInstance = null;
   }
 
 }
