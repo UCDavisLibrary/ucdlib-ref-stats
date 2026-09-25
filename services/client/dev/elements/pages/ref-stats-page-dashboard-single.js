@@ -46,7 +46,14 @@ export default class RefStatsPageDashboardSingle extends Mixin(LitElement)
    * @param {Object} e - App state update event
    */
   async _onAppStateUpdate(e) {
-    if ( e.page !== this.pageId ) return;
+    if ( e.page !== this.pageId ) {
+      if ( this._embedded ) {
+        this._embedded = false;
+        this.nameOrId = '';
+        this.data = {};
+      }
+      return;
+    }
     this.nameOrId = e.location.path[1] || '';
     this.data = {};
     this._embedded = false;
@@ -76,6 +83,8 @@ export default class RefStatsPageDashboardSingle extends Mixin(LitElement)
    * fetched from the backend.
    */
   async _embed() {
+    this.requestUpdate();
+    await this.updateComplete;
     const mountPoint = this.renderRoot.querySelector('#superset-embed');
     if ( !mountPoint ) return;
 
