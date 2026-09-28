@@ -64,7 +64,18 @@ router.get('/user-data', async (req, res) => {
       }
     }
 
-    res.status(200).json({userData: userData.res});
+    const out = {userData: userData.res};
+
+    // Student assistants never have a Library IAM record, but we can still get their group assignment from the student assistant table.
+    if ( userData.isStudentAssistant ) {
+      const saAssignments = await models.studentAssistant.query({per_page: 1, user_id: req.auth.token.id});
+      if ( saAssignments.error ) {
+        throw saAssignments.error;
+      }
+      out.studentAssistantGroup = saAssignments.res?.results?.[0]?.groups?.[0] || null;
+    }
+
+    res.status(200).json(out);
   } catch (e) {
     return handleError(res, req, e);
   }

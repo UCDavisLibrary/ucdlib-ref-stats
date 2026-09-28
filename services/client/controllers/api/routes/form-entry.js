@@ -384,9 +384,10 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
     }
 
     // student assistants have no Library IAM record — fall back to their assigned student-assistant group
-    if ( !isUpdate && userDepartmentGroupId == null ) {
+    if ( userData.isStudentAssistant ) {
       const saData = await models.studentAssistant.query({ user_id: token.id, per_page: 1 });
       userDepartmentGroupId = saData.res?.results?.[0]?.groups?.[0]?.group_id ?? null;
+      if ( userDepartmentGroupId ) userGroupIds = [userDepartmentGroupId];
     }
 
     // build schema for field based on form definition and any hard-coded definitions

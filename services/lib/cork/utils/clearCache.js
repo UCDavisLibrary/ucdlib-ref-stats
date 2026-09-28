@@ -1,7 +1,7 @@
 import { Registry, BaseStore, LruStore, getLogger } from '@ucd-lib/cork-app-utils';
 const logger = getLogger('clearCache');
 
-const defaultOpts = { skipModels: ['IconModel', 'AppStateModel'], skipStores: ['formentry.payload'] };
+const defaultOpts = { skipModels: ['IconModel', 'AppStateModel', 'AuthModel'], skipStores: ['formentry.payload'] };
 
 export default (opts={}) => {
   clearCache({ ...defaultOpts, ...opts });

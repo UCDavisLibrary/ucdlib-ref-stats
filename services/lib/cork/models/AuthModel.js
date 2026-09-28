@@ -57,10 +57,23 @@ class AuthModel extends BaseModel {
 
   /**
    * @description Returns the department of the current user from library IAM API
-   * @returns {Object} - group object from library IAM API
+   * @returns {Object} - name and group_id of the department, or null if not found
    */
   get userDepartment(){
-    return this.userData?.groups?.find(g => g.partOfOrg);
+    const iamDept = this.userData?.groups?.find(g => g.partOfOrg);
+    if ( iamDept ){
+      return {
+        group_id: iamDept.id,
+        name: iamDept.name
+      };
+    }
+
+    // If the user is a student assistant, return their assigned group from the student assistant table
+    const d = this.store.data.user.get(payload.getKey({action: 'user-data'}));
+    if ( d?.payload?.studentAssistantGroup ) {
+      return d.payload.studentAssistantGroup;
+    }
+    return null;
   }
 
   /**
@@ -79,7 +92,11 @@ class AuthModel extends BaseModel {
   userIsInGroup(groupId){
     if ( !Array.isArray(groupId) ) groupId = [groupId];
     groupId = groupId.map(Number);
-    return this.userData?.groups?.some(g => groupId.includes(g.id));
+    const inIamGroup = this.userData?.groups?.some(g => groupId.includes(g.id));
+    if ( inIamGroup ) return true;
+
+    // check for student assistant group assignment if user is a student assistant
+    return this.userDepartment?.group_id && groupId.includes(this.userDepartment.group_id);
   }
 
   /**

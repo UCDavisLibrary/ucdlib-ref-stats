@@ -108,7 +108,7 @@ class LibraryIam {
     }
 
     if ( await models.studentAssistant.isStudentAssistant(userId) ) {
-      return { res: null };
+      return { res: null, isStudentAssistant: true };
     }
 
     const params = {
