@@ -25,7 +25,7 @@
     "@superset-ui/embedded-sdk": "^0.4.0",
     "@ucd-lib/cork-app-build": "^0.5.0",
     "@ucd-lib/cork-app-state": "^3.2.0",
-    "@ucd-lib/cork-app-utils": "^6.4.1",
+    "@ucd-lib/cork-app-utils": "^6.6.0",
     "@ucd-lib/cork-icon": "^1.4.2",
     "@ucd-lib/logger": "^0.0.7",
     "@ucd-lib/spa-router-middleware": "^0.2.4",
