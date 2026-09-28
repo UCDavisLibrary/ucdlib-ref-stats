@@ -456,7 +456,8 @@ export default class FormEntryController {
   /**
    * @description Returns whether the given field should be visible to the current user,
    * based on the conditionalOnGroup assignment setting. Returns true when no groups are
-   * configured (field is unrestricted) or when the user belongs to at least one listed group.
+   * configured (field is unrestricted) or when the user belongs to at least one listed group
+   * or a sub-group of one.
    * @param {Object} field - Field object from this.fields
    * @returns {Boolean}
    */
@@ -464,7 +465,7 @@ export default class FormEntryController {
     const assignment = field?.forms?.find(f => f.form_id === this.form?.form_id);
     const conditionalOnGroup = assignment?.assignment_settings?.conditionalOnGroup;
     if ( !conditionalOnGroup?.length ) return true;
-    return !!this.models.AuthModel.userIsInGroup(conditionalOnGroup);
+    return !!this.models.AuthModel.userIsInGroup(conditionalOnGroup, {includeSubGroups: true});
   }
 
   /**

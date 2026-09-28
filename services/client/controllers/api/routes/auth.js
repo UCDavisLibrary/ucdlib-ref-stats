@@ -75,6 +75,14 @@ router.get('/user-data', async (req, res) => {
       out.studentAssistantGroup = saAssignments.res?.results?.[0]?.groups?.[0] || null;
     }
 
+    // The user's own group(s) plus every ancestor group
+    const ownGroupIds = userData.isStudentAssistant
+      ? (out.studentAssistantGroup?.group_id != null ? [out.studentAssistantGroup.group_id] : [])
+      : (userData.res?.groups || []).map(g => g.id);
+    out.allGroupMembership = ownGroupIds.length
+      ? await models.libraryIam.addParentGroupIds(ownGroupIds)
+      : [];
+
     res.status(200).json(out);
   } catch (e) {
     return handleError(res, req, e);

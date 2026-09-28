@@ -390,6 +390,11 @@ router.post('/:idOrName', json(), validate(schema.formIdOrNameSchema, {reqParts:
       if ( userDepartmentGroupId ) userGroupIds = [userDepartmentGroupId];
     }
 
+    // expand to include membership to parent groups so conditionalOnGroup field visibility can be satisfied by membership in a sub-group
+    if ( userGroupIds.length ) {
+      userGroupIds = await models.libraryIam.addParentGroupIds(userGroupIds);
+    }
+
     // build schema for field based on form definition and any hard-coded definitions
     const baseSchema = schema.formEntry?.[form.name]?.create || null;
     const fieldsResult = await models.field.query({ form: form.form_id, perPage: 1000 });

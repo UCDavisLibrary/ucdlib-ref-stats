@@ -85,13 +85,30 @@ class AuthModel extends BaseModel {
   }
 
   /**
+   * @description Returns the current user's own group ID(s) plus every ancestor group ID
+   * @returns {Array<Number>}
+   */
+  get allGroupMembership(){
+    const d = this.store.data.user.get(payload.getKey({action: 'user-data'}));
+    return d?.payload?.allGroupMembership || [];
+  }
+
+  /**
    * @description Checks if the current user is in a specific group
    * @param {String|Array} groupId - Group ID or array of group IDs to check
+   * @param {Object} opts
+   * @param {Boolean} opts.includeSubGroups - Also match if the user's own group is a descendant
+   * of one of the given groupId(s). Otherwise, use strict equality to the user's own group(s) only.
    * @returns {Boolean}
    */
-  userIsInGroup(groupId){
+  userIsInGroup(groupId, opts={}){
     if ( !Array.isArray(groupId) ) groupId = [groupId];
     groupId = groupId.map(Number);
+
+    if ( opts.includeSubGroups ) {
+      return !!this.allGroupMembership?.some(id => groupId.includes(id));
+    }
+
     const inIamGroup = this.userData?.groups?.some(g => groupId.includes(g.id));
     if ( inIamGroup ) return true;
 

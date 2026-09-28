@@ -43,6 +43,35 @@ class LibraryIam {
   }
 
   /**
+   * @description Returns array with any parent (ancestor) group IDs added.
+   * Traverses the group hierarchy using parent_id links to collect all ancestors, up to the root.
+   * @param {Array|Number} groupIds - Group ID or array of group IDs to check
+   * @returns {Array} - Array of group IDs (numbers) including all ancestor group IDs
+   */
+  async addParentGroupIds(groupIds) {
+    if ( !Array.isArray(groupIds) ) groupIds = [groupIds];
+    groupIds = groupIds.map(Number);
+
+    const r = await this.getAllGroups();
+    if ( r.error || !r.res ) return groupIds;
+    const byId = new Map(r.res.map(g => [Number(g.id), g]));
+
+    const result = new Set(groupIds);
+    const queue = [...groupIds];
+
+    while ( queue.length ) {
+      const id = queue.shift();
+      const parentId = byId.get(id)?.parent_id != null ? Number(byId.get(id).parent_id) : null;
+      if ( parentId != null && !result.has(parentId) ) {
+        result.add(parentId);
+        queue.push(parentId);
+      }
+    }
+
+    return [...result];
+  }
+
+  /**
    * @description Clears the cached group data for all groups.
    * @returns {Object} - {res, error}
    */
