@@ -444,11 +444,12 @@ export default class FormEntryController {
       window.scrollTo(0, rect.top + scrollTop - 65);
     }
     if ( r.state !== 'loaded' ) return;
+    const submissionLink = `/form/${this.formNameOrId}/${r.payload.form_entry_id}`;
     if ( this.formEntry ){
       this.models.AppStateModel.showToast({text: 'Update successful', type: 'success'});
-      this.models.AppStateModel.setLocation(`/form/${this.formNameOrId}/${r.payload.form_entry_id}`);
+      this.models.AppStateModel.setLocation(submissionLink);
     } else {
-      this.models.AppStateModel.showToast({text: 'Submission successful', type: 'success'});
+      this.models.AppStateModel.showToast({text: 'Submission successful', type: 'success', link: {text: 'View submission', href: submissionLink}});
       this.models.AppStateModel.refresh();
     }
   }

@@ -109,6 +109,7 @@ export default class CorkAppToast extends Mixin(LitElement)
    * @param {Number} item.animationTime - Duration in milliseconds for each fade animation.
    * @param {String} [item.icon] - Optional icon identifier to display alongside the toast.
    * @param {String} [item.brandColor] - Optional brand color name to apply to the toast.
+   * @param {Object} [item.link] - Optional link object with href and text to display in the toast.
    */
   async _show(item){
     this.currentToast = item;

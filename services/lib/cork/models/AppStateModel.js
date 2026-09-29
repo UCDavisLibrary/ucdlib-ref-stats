@@ -272,6 +272,7 @@ class AppStateModelImpl extends AppStateModel {
    * @param {Object} opts - toast options
    * @param {String} opts.text - The text of the toast
    * @param {String} opts.type - Optional. The type of toast. Options are 'basic' 'success', 'error'
+   * @param {Object} opts.link - Optional. An object with href and text properties to display a link in the toast
    * @param {Number} opts.displayTime - Optional. The time in ms to display the toast.
    * @param {Number} opts.animationTime - Optional. The time in ms to do enter/exit animations
    * @param {Boolean} opts.showOnPageLoad - Optional. Wait to show the toast on the next page load event
