@@ -34,13 +34,13 @@ class StudentAssistant {
 
     try {
       const params = {
-        affiliationContains: "student",
         department: "060500",
-        limit: "500",
+        limit: "1000",
         count: true
       };
       const r = await rosetta.getPeople(params);
       const activeAppointments = (r.results || [])
+        .filter(person => person.employee_association?.some(a => a.employee_classification === "5"))
         .map(person => {
           return {
             iamId: person.id?.iam_id || '',
@@ -51,7 +51,6 @@ class StudentAssistant {
             email: person.email?.campus || ''
           };
         });
-      
       await cache.set(this.cacheType, cacheId, {[cacheId]: activeAppointments});
       return {res: activeAppointments};
 
