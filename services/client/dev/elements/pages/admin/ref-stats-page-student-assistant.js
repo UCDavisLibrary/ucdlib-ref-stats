@@ -105,7 +105,7 @@ export default class RefStatsPageStudentAssistant extends Mixin(LitElement)
     }
     const res = await this.StudentAssistantModel.query(q);
     if ( res.state === 'loaded' ) {
-      this.assignmentsMaxPage = res.payload.maxPage || 1;
+      this.assignmentsMaxPage = res.payload.max_page || 1;
       this.assignments = [...res.payload.results];
     }
   }
