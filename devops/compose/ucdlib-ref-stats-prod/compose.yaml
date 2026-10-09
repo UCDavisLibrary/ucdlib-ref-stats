@@ -1,6 +1,6 @@
 x-variables:
-  main-image: &main-image us-west1-docker.pkg.dev/digital-ucdavis-edu/pub/ucdlib-ref-stats:v1.0.1
-  superset-image: &superset-image us-west1-docker.pkg.dev/digital-ucdavis-edu/pub/ucdlib-ref-stats-superset:v1.0.1
+  main-image: &main-image us-west1-docker.pkg.dev/digital-ucdavis-edu/pub/ucdlib-ref-stats:v1.0.2
+  superset-image: &superset-image us-west1-docker.pkg.dev/digital-ucdavis-edu/pub/ucdlib-ref-stats-superset:v1.0.2
 services:
   app:
     image: *main-image
