@@ -277,13 +277,20 @@ class AuthModel extends BaseModel {
   }
 
   /**
-   * @description Renews the SSO session by forcing Keycloak to actively re-authenticate
+   * @description Renews the SSO session by ending the current Keycloak session and redirecting
+   * back to the current page, where init() prompts a fresh login. Re-authenticating within the
+   * existing session (e.g. login with maxAge) is not sufficient, since Keycloak caps token expiration
+   * at the session's original start time + SSO Session Max.
    * A full page reload is required
+   * @returns {Promise<void>}
    */
-  _onRenewSession(){
+  async _onRenewSession(){
     let redirectUri = new URL(window.location.href);
     redirectUri.searchParams.delete('renew-sso-session');
-    this.client.login({maxAge: 1, redirectUri: redirectUri.href});
+    if ( this.sessionWarningInterval ) clearInterval(this.sessionWarningInterval);
+    if ( this.sessionDeadlineTimeout ) clearTimeout(this.sessionDeadlineTimeout);
+    await this.clearTokenServerCache();
+    this.client.logout({redirectUri: redirectUri.href});
   }
 
   /**
