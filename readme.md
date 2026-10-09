@@ -41,11 +41,13 @@ docker compose up
 ```
 
 ### Start App
-By default, the application container is idle at `docker compose up`. Start the Express server with:
+By default, the application container is idle at `docker compose up` during local dev. Start the Express server with:
 
 ```bash
 ./devops/cmds/start-app.sh
 ```
+
+Cancel and rerun anytime you need server changes to take effect.
 
 ### Frontend watch mode
 
@@ -214,6 +216,8 @@ This value must reference a real column (or a valid SQL expression) on the datas
 ### Build and deploy
 
 First check in and tag code. e.g. `git tag v1.1.0`. Make sure to update `ucdlib-ref-stats-prod/compose.yaml` with the new image version.
+
+Remember to update the [cork-build-registry](https://github.com/ucd-library/cork-build-registry) item.
 
 ```bash
 # Build images
