@@ -125,6 +125,8 @@ const filterSchema = z.object({
  *   3. Add create/update entries to the default export at the bottom of this file.
  *      buildDynamicFormEntrySchema will use the create schema as a baseSchema and
  *      automatically extend it with any remaining dynamic fields.
+ *      The create schema must be a plain z.object() with no refinements, since zod v4
+ *      throws when extending a refined object schema.
  */
 const exampleFormBase = z.object({
   '_formId': z.string(),
@@ -282,6 +284,11 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
     schema = z.object({ _formId: z.string(), ...extraShape });
   }
 
+  // zod v4 forbids .extend() on object schemas with refinements, so finalize the shape first
+  if (isUpdate) {
+    schema = schema.extend({ original_form_entry_id: z.uuid() });
+  }
+
   const allFieldKeys = new Set([
     ...Object.keys(extraShape),
     ...(baseSchema ? Object.keys(baseSchema.shape) : [])
@@ -294,7 +301,7 @@ export function buildDynamicFormEntrySchema(fields, opts = {}) {
   }
 
   if (isUpdate) {
-    schema = schema.extend({ original_form_entry_id: z.uuid() }).superRefine(srOriginalFormEntryExists);
+    schema = schema.superRefine(srOriginalFormEntryExists);
   }
 
   return schema;
