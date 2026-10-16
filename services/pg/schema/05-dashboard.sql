@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS dashboard (
   superset_rls JSONB NOT NULL DEFAULT '{}'::JSONB,
   created_at TIMESTAMP NOT NULL DEFAULT now(),
   updated_at TIMESTAMP NOT NULL DEFAULT now(),
-  is_archived BOOLEAN NOT NULL DEFAULT FALSE
+  is_archived BOOLEAN NOT NULL DEFAULT FALSE,
+  sort_order INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE OR REPLACE TRIGGER set_dashboard_updated_at

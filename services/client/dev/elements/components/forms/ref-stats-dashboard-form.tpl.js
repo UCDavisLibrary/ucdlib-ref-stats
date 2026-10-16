@@ -109,6 +109,17 @@ export function render() {
         </ucd-theme-slim-select>
       </cork-field-container>
 
+      <cork-field-container schema='dashboard' path='sort_order' class='field-container'>
+        <label for=${this.ctl.idGen.get('sort_order')}>Sort Order</label>
+        <input
+          type="number"
+          step="1"
+          id=${this.ctl.idGen.get('sort_order')}
+          .value=${String(this.payload?.sort_order ?? 0)}
+          @input=${e => this._onPayloadInput('sort_order', e.target.value === '' ? 0 : parseInt(e.target.value))}>
+        <div class='field-description'>Dashboards are listed by sort order (lowest first), then label. Use a higher number to push a dashboard lower in the list. Default is 0.</div>
+      </cork-field-container>
+
       <cork-field-container schema='dashboard' path='is_archived' class='field-container checkbox'>
         <input
           type="checkbox"

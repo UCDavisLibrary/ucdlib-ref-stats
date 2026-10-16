@@ -88,6 +88,7 @@ const dashboardBaseSchema = z.object({
   description: toString.pipe(z.string().max(300)).optional(),
   intro: toSafeHtml.optional(),
   is_archived: z.boolean().optional(),
+  sort_order: z.coerce.number().int().optional(),
   form_ids: z.array(z.string().uuid()).optional(),
   superset_dashboard_id: z.string().max(250).optional(),
   superset_dashboard_ui_config: uiConfigSchema,

@@ -4,7 +4,8 @@ import config from '../config.js';
 class Dashboard {
 
   /**
-   * @description Query dashboards with optional filtering and pagination
+   * @description Query dashboards with optional filtering and pagination.
+   * Results are ordered by sort_order, then label.
    * @param {Object} params - Query parameters
    * @param {Number} params.page - Page number
    * @param {Number} params.per_page - Number of results per page
@@ -46,7 +47,7 @@ class Dashboard {
       SELECT d.*, COUNT(*) OVER() AS total_count
       FROM ${config.db.views.dashboardFull} d
       ${whereSQL}
-      ORDER BY d.label ASC
+      ORDER BY d.sort_order ASC, d.label ASC
       LIMIT $${values.length + 1} OFFSET $${values.length + 2}
     `;
     const r = await pgClient.query(sql, [...values, perPage, offset]);
