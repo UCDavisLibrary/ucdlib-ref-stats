@@ -58,7 +58,7 @@ Runs webpack inside the container (via volume mount) and hot-reloads on file cha
 ```
 
 ### Superset Database Connection
-The Superset dashboards are built on a database connector defined in the Superset application. When initializing data from the production environment using the init container, the password will be wrong, so you will to update it manually. 
+The Superset dashboards are built on a database connector defined in the Superset application. When initializing data from the production environment using the init container, the password will be wrong, so you will need to update it manually. 
 1. Go to the [Database View list](http://localhost:8088/databaseview/list/) page in Superset
 2. Click edit for "Library Services Statistics"
 3. Update the SQLAlchemy URI to include the localhost password (env=`PGPASSWORD`) instead of the `XXXXXXXXXX` string
@@ -228,6 +228,7 @@ Ssh onto the VM, and pull the new image:
 
 ```bash
 cd devops/compose/ucdlib-ref-stats-prod
+git pull
 docker compose pull
 ```
 
