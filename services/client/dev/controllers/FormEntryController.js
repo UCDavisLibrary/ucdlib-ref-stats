@@ -24,6 +24,9 @@ export default class FormEntryController {
     this.appComponentController = new AppComponentController(host);
     this.idGen = new IdGenerator();
 
+    this._onAppStateUpdate = this._onAppStateUpdate.bind(this);
+    this._onPayloadUpdate = this._onPayloadUpdate.bind(this);
+
     this.form = {};
     this.formNameOrId = null;
     this.fields = [];
@@ -557,15 +560,15 @@ export default class FormEntryController {
    * @description Register event listeners when the host is connected to the DOM
    */
   hostConnected() {
-    this.models.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate.bind(this));
-    this.models.FormEntryModel.EventBus.on('formentry-payload-update', this._onPayloadUpdate.bind(this));
+    this.models.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate);
+    this.models.FormEntryModel.EventBus.on('formentry-payload-update', this._onPayloadUpdate);
   }
 
   /**
    * @description Remove event listeners when the host is disconnected from the DOM
    */
   hostDisconnected() {
-    this.models.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate.bind(this));
-    this.models.FormEntryModel.EventBus.off('formentry-payload-update', this._onPayloadUpdate.bind(this));
+    this.models.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate);
+    this.models.FormEntryModel.EventBus.off('formentry-payload-update', this._onPayloadUpdate);
   }
 }

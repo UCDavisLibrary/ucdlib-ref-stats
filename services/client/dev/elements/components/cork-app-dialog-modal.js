@@ -35,6 +35,7 @@ export default class CorkAppDialogModal extends Mixin(LitElement)
   constructor() {
     super();
     this.render = render.bind(this);
+    this.setMaxHeight = this.setMaxHeight.bind(this);
 
     this.clear();
     this.contentMaxHeight = '';
@@ -49,12 +50,12 @@ export default class CorkAppDialogModal extends Mixin(LitElement)
 
   connectedCallback(){
     super.connectedCallback();
-    window.addEventListener('resize', this.setMaxHeight.bind(this));
+    window.addEventListener('resize', this.setMaxHeight);
   }
 
   disconnectedCallback(){
     super.disconnectedCallback();
-    window.removeEventListener('resize', this.setMaxHeight.bind(this));
+    window.removeEventListener('resize', this.setMaxHeight);
   }
 
   async updated(){

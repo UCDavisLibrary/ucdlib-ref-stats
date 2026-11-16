@@ -4,11 +4,12 @@ export default class AdminPageController {
 
   constructor(host){
     this.host = host;
-    host.addController(this);
     this.AppStateModel = Registry.getModel('AppStateModel');
     this.AuthModel = Registry.getModel('AuthModel');
 
+    this._onAppStateUpdate = this._onAppStateUpdate.bind(this);
     this.userCanAccess = null;
+    host.addController(this);
   }
 
   /**
@@ -48,13 +49,13 @@ export default class AdminPageController {
    * @description Register event listeners when the host is connected to the DOM
    */
   hostConnected() {
-    this.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate.bind(this));
+    this.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate );
   }
 
   /**
    * @description Remove event listeners when the host is disconnected from the DOM
    */
   hostDisconnected() {
-    this.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate.bind(this));
+    this.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate );
   }
 }

@@ -30,6 +30,7 @@ export default class CorkFieldContainer extends Mixin(LitElement)
   constructor() {
     super();
     this.render = render.bind(this);
+    this._onInput = this._onInput.bind(this);
 
     this.schema = null;
     this.path = null;
@@ -47,7 +48,7 @@ export default class CorkFieldContainer extends Mixin(LitElement)
    */
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('input', this._onInput.bind(this));
+    this.addEventListener('input', this._onInput);
   }
 
   /**
@@ -55,7 +56,7 @@ export default class CorkFieldContainer extends Mixin(LitElement)
    */
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener('input', this._onInput.bind(this));
+    this.removeEventListener('input', this._onInput);
   }
 
   /**

@@ -27,6 +27,9 @@ export default class ModalFormController {
     this.submitCallback = opts.submitCallback;
     this.noCloseOnSubmit = opts.noCloseOnSubmit || false;
     this.openCallback = opts.openCallback;
+
+    this._onAppDialogAction = this._onAppDialogAction.bind(this);
+    this._onAppDialogOpen = this._onAppDialogOpen.bind(this);
   }
 
   /**
@@ -164,8 +167,8 @@ export default class ModalFormController {
    * @description Register event listeners and initialise modal defaults when the host is connected to the DOM
    */
   hostConnected() {
-    this.AppStateModel.EventBus.on('app-dialog-action', this._onAppDialogAction.bind(this));
-    this.AppStateModel.EventBus.on('app-dialog-open', this._onAppDialogOpen.bind(this));
+    this.AppStateModel.EventBus.on('app-dialog-action', this._onAppDialogAction);
+    this.AppStateModel.EventBus.on('app-dialog-open', this._onAppDialogOpen);
     this.setDefaultModalValues();
   }
 
@@ -173,8 +176,8 @@ export default class ModalFormController {
    * @description Remove event listeners and clear the cached modal reference when the host is disconnected from the DOM
    */
   hostDisconnected() {
-    this.AppStateModel.EventBus.off('app-dialog-action', this._onAppDialogAction.bind(this));
-    this.AppStateModel.EventBus.off('app-dialog-open', this._onAppDialogOpen.bind(this));
+    this.AppStateModel.EventBus.off('app-dialog-action', this._onAppDialogAction);
+    this.AppStateModel.EventBus.off('app-dialog-open', this._onAppDialogOpen);
     this._modal = null;
   }
 

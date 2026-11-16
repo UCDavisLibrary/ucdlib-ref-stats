@@ -14,6 +14,7 @@ export default class QueryStringController {
     host.addController(this);
     this.AppStateModel = Registry.getModel('AppStateModel');
     this.appComponentController = new AppComponentController(host);
+    this._onAppStateUpdate = this._onAppStateUpdate.bind(this);
     this.syncState();
 
     this.updateComplete = Promise.resolve();
@@ -324,13 +325,13 @@ export default class QueryStringController {
    * @description Register event listeners when the host is connected to the DOM
    */
   hostConnected() {
-    this.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate.bind(this));
+    this.AppStateModel.EventBus.on('app-state-update', this._onAppStateUpdate);
   }
 
   /**
    * @description Remove event listeners when the host is disconnected from the DOM
    */
   hostDisconnected() {
-    this.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate.bind(this));
+    this.AppStateModel.EventBus.off('app-state-update', this._onAppStateUpdate);
   }
 }
